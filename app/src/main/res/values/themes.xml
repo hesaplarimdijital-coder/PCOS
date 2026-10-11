@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose çizmeye başlayana kadar görünen temel tema -->
+    <style name="Theme.Ayla" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/zemin</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- Açılış ekranı: nar zemin üzerinde ay simgesi -->
+    <style name="Theme.Ayla.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/nar</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.Ayla</item>
+    </style>
+</resources>

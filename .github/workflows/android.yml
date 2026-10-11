@@ -1,0 +1,58 @@
+name: Android CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Derle ve test et
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Kaynağı al
+        uses: actions/checkout@v5
+
+      - name: JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Döngü motoru testleri
+        run: ./gradlew :core:cycle:test --no-daemon --stacktrace
+
+      - name: Uygulama birim testleri ve debug APK
+        run: ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Test raporları
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: test-raporlari
+          path: |
+            core/cycle/build/reports/tests/test
+            app/build/reports/tests/testDebugUnitTest
+          if-no-files-found: ignore
+
+      - name: Debug APK
+        if: success()
+        uses: actions/upload-artifact@v5
+        with:
+          name: ayla-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+build/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+.kotlin/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Sistem
+.DS_Store
+*.log
+
+# İmza anahtarları asla depoya girmez
+*.jks
+*.keystore
+keystore.properties

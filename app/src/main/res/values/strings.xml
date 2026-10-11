@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="app_name">Ayla</string>
+
+    <!-- Gezinme -->
+    <string name="nav_today">Bugün</string>
+    <string name="nav_calendar">Takvim</string>
+    <string name="nav_meds">İlaçlar</string>
+    <string name="nav_plan">Planım</string>
+    <string name="nav_me">Ben</string>
+
+    <!-- Ortak -->
+    <string name="action_save">Kaydet</string>
+    <string name="action_cancel">Vazgeç</string>
+    <string name="action_continue">Devam et</string>
+    <string name="action_back">Geri</string>
+    <string name="action_close">Kapat</string>
+    <string name="action_add">Ekle</string>
+    <string name="action_undo">Geri al</string>
+    <string name="action_skip">Atla</string>
+    <string name="action_taken">Aldım</string>
+    <string name="action_snooze">15 dk ertele</string>
+    <string name="action_all">Tümü</string>
+    <string name="action_open_settings">Ayarları aç</string>
+    <string name="action_not_now">Şimdi değil</string>
+    <string name="action_delete">Sil</string>
+    <string name="label_today">Bugün</string>
+    <string name="label_cycle_day">Döngü günü</string>
+    <string name="label_cycle_day_n">Döngünün %1$d. günü</string>
+    <string name="label_last_period">Son adet %1$s</string>
+    <string name="label_no_period_yet">Henüz adet kaydı yok</string>
+    <string name="label_predicted_period">Tahmini adet</string>
+    <string name="label_prediction_not_enough">Tahmin için 2 döngü gerekli</string>
+    <string name="label_prediction_hidden">Tahmin gizli</string>
+    <string name="label_cycle_longer_than_expected">Döngün beklenenden uzun sürüyor</string>
+    <string name="label_confidence">Güven: %1$s</string>
+    <string name="confidence_low">düşük</string>
+    <string name="confidence_medium">orta</string>
+    <string name="confidence_high">yüksek</string>
+    <string name="label_date_range">%1$s – %2$s</string>
+
+    <!-- Bugün -->
+    <string name="today_greeting_morning">Günaydın %1$s</string>
+    <string name="today_greeting_day">Merhaba %1$s</string>
+    <string name="today_greeting_evening">İyi akşamlar %1$s</string>
+    <string name="today_greeting_morning_anon">Günaydın</string>
+    <string name="today_greeting_day_anon">Merhaba</string>
+    <string name="today_greeting_evening_anon">İyi akşamlar</string>
+    <string name="today_daily_log">Günlük kayıt</string>
+    <string name="today_period_started">Adet başladı</string>
+    <string name="today_period_ended">Adet bitti</string>
+    <string name="today_plan_title">Bugünkü planın</string>
+    <string name="today_no_meds">Henüz ilaç ya da takviye eklemedin.</string>
+    <string name="today_add_med">İlaç ekle</string>
+    <string name="today_water_title">Su</string>
+    <string name="today_water_progress">%1$d/%2$d bardak</string>
+    <string name="today_water_add">Bir bardak su ekle</string>
+    <string name="today_water_goal_done">Hedef tamam</string>
+    <string name="today_dose_taken_at">Alındı · %1$s</string>
+    <string name="today_dose_skipped">Atlandı</string>
+    <string name="today_dose_missed">Kaçtı</string>
+    <string name="today_dose_with_food">yemekle</string>
+    <string name="today_dose_without_food">aç karna</string>
+    <string name="today_pill_title">Doğum kontrol hapı</string>
+    <string name="today_pill_regimen">%1$d/%2$d düzen · her gün %3$s</string>
+    <string name="today_pill_number">%1$d. hap</string>
+    <string name="today_pill_note">Hap kullanırken döngü tahmini yapılmaz. Plasebo günlerindeki kanama doğal adet değil, çekilme kanamasıdır.</string>
+    <string name="today_pill_pack_a11y">Pakette %1$d hap: bugün %2$d. hap</string>
+    <string name="today_ring_a11y">Döngünün %1$d. günü. Tahmini adet %2$s ile %3$s arası, güven %4$s.</string>
+    <string name="today_ring_a11y_no_prediction">Döngünün %1$d. günü. Henüz tahmin yok.</string>
+    <string name="today_ring_a11y_past">Döngünün %1$d. günü. Döngü beklenenden uzun sürüyor.</string>
+    <string name="today_period_prompt_title">Adet başladı mı?</string>
+    <string name="today_period_prompt_text">Bugün başladıysa tek dokunuşla kaydet; başka bir gün için takvimi kullan.</string>
+
+    <!-- Uzun döngü uyarıları -->
+    <string name="alert_cycle_60_title">Döngünün %1$d. günündesin</string>
+    <string name="alert_cycle_60_text">İki aydır adet görmemişsin. PCOS&#8217;ta bu sık olur; birkaç hafta daha sürerse doktoruna danışmanı önereceğiz.</string>
+    <string name="alert_cycle_90_title">Döngünün %1$d. günündesin</string>
+    <string name="alert_cycle_90_text">Üç aydan uzun adet görmemek rahim sağlığın için kontrol gerektirebilir. Hamilelik olasılığı varsa önce test yap.</string>
+    <string name="alert_few_periods_title">Son bir yılda 4&#8217;ten az adet</string>
+    <string name="alert_few_periods_text">Yılda en az dört adet görmek rahim sağlığı için önemlidir. Bunu doktorunla konuşmanı öneririz.</string>
+    <string name="alert_action_doctor_note">Doktor notu oluştur</string>
+
+    <!-- Bildirimler -->
+    <string name="notif_dose_title">%1$s zamanı</string>
+    <string name="notif_dose_text">%1$s · %2$s dozun seni bekliyor.</string>
+    <string name="notif_private_title">Ayla</string>
+    <string name="notif_private_text">Bir hatırlatman var</string>
+    <string name="notif_water_title">Bir bardak su molası?</string>
+    <string name="notif_water_text">Bugün %1$d/%2$d bardak.</string>
+    <string name="notif_evening_title">Akşam rutini</string>
+    <string name="notif_evening_text">Ekranı bırakıp birkaç dakika nefes egzersizi iyi gelebilir.</string>
+    <string name="notif_cycle_60_title">Döngünün %1$d. günündesin</string>
+    <string name="notif_cycle_60_text">İki aydır adet görmemişsin. Bu PCOS&#8217;ta sık olur; takipte kalalım.</string>
+    <string name="notif_cycle_90_title">Döngünün %1$d. günündesin</string>
+    <string name="notif_cycle_90_text">Üç aydan uzun adet görmemek rahim sağlığın için kontrol gerektirebilir. Doktoruna sormak için bir not hazırlayalım mı?</string>
+    <string name="notif_stock_title">%1$s stoğu azalıyor</string>
+    <string name="notif_stock_text">Yaklaşık %1$d günlük kaldı.</string>
+
+    <!-- Karşılama -->
+    <string name="onboarding_welcome_title">Ritmini birlikte okuyalım</string>
+    <string name="onboarding_welcome_text">Ayla, PCOS (yeni adıyla PMOS) ile yaşarken döngünü, ilaçlarını ve günlük alışkanlıklarını tek yerde tutar. Tanı koymaz, doz değiştirmez; doktorunla aranda bir not defteri gibidir.</string>
+    <string name="onboarding_privacy_note">Verilerin bu cihazda şifreli kalır. Hesap açman gerekmez.</string>
+    <string name="onboarding_name_label">Sana nasıl seslenelim?</string>
+    <string name="onboarding_name_hint">Adın (isteğe bağlı)</string>
+    <string name="onboarding_goals_title">Önceliğin ne?</string>
+    <string name="onboarding_goals_text">Birden fazlasını seçebilirsin. Ayla planını buna göre kurar; istediğin zaman değiştirebilirsin.</string>
+    <string name="goal_cycle_title">Döngümü düzene sokmak</string>
+    <string name="goal_cycle_text">Aralıklı tahmin ve uzun döngü uyarısı</string>
+    <string name="goal_symptoms_title">Semptomlarımı yönetmek</string>
+    <string name="goal_symptoms_text">Şişkinlik, akne, saç dökülmesi, ruh hâli</string>
+    <string name="goal_ttc_title">Hamile kalmayı planlıyorum</string>
+    <string name="goal_ttc_text">LH testi ve bazal vücut ısısı takibi (yakında)</string>
+    <string name="goal_pill_title">Doğum kontrol hapı kullanıyorum</string>
+    <string name="goal_pill_text">Paket takibi ve hap hatırlatması</string>
+    <string name="onboarding_period_title">Son adetin ne zaman başladı?</string>
+    <string name="onboarding_period_text">Bilmiyorsan atlayabilirsin; ilk adetini kaydedince döngünü birlikte okumaya başlarız.</string>
+    <string name="onboarding_period_pick">Tarih seç</string>
+    <string name="onboarding_period_unknown">Bilmiyorum</string>
+    <string name="onboarding_consent_title">İzinlerin sende</string>
+    <string name="onboarding_consent_text">Sağlık verin KVKK&#8217;ya göre özel nitelikli kişisel veridir. Temel işlev için verin yalnızca bu cihazda işlenir; aşağıdakiler isteğe bağlıdır ve her an kapatılabilir.</string>
+    <string name="consent_personalization_title">Kişiselleştirme</string>
+    <string name="consent_personalization_text">Planlarını sağlık profiline göre hazırlamak için</string>
+    <string name="consent_analytics_title">Anonim kullanım istatistikleri</string>
+    <string name="consent_analytics_text">Hangi özelliklerin işe yaradığını görmemizi sağlar</string>
+    <string name="consent_research_title">Araştırmaya katkı</string>
+    <string name="consent_research_text">Kimliksiz verilerle PCOS araştırmalarına destek</string>
+    <string name="onboarding_notifications_title">Hatırlatmalar için izin</string>
+    <string name="onboarding_notifications_text">Doz, su ve döngü hatırlatmaları bildirimle gelir. İstemezsen Ayla bildirimsiz de çalışır.</string>
+    <string name="onboarding_exact_alarm_title">Tam zamanlı hatırlatma</string>
+    <string name="onboarding_exact_alarm_text">Günde iki dozluk takviyelerin tam saatinde hatırlatılması için Android&#8217;in &#8220;Alarmlar ve hatırlatıcılar&#8221; izni gerekir. İzin yoksa hatırlatma 10 dakikaya kadar gecikebilir.</string>
+    <string name="onboarding_allow_notifications">Bildirimlere izin ver</string>
+    <string name="onboarding_allow_exact_alarm">Alarm iznini aç</string>
+    <string name="onboarding_step">Adım %1$d / %2$d</string>
+    <string name="onboarding_start">Başlayalım</string>
+    <string name="onboarding_disclaimer">Ayla tıbbi tavsiye vermez. Tanı ve tedavi için doktoruna danış.</string>
+
+    <!-- Günlük kayıt -->
+    <string name="log_title">Bugün nasılsın?</string>
+    <string name="log_mood">Ruh hâlin</string>
+    <string name="log_energy">Enerjin</string>
+    <string name="log_flow">Kanama</string>
+    <string name="log_body">Bedenin</string>
+    <string name="log_note">Not</string>
+    <string name="log_note_hint">Bugün aklında ne var?</string>
+    <string name="log_measurements">Ölçümler</string>
+    <string name="log_weight">Kilo (kg)</string>
+    <string name="log_waist">Bel çevresi (cm)</string>
+    <string name="log_saved">Kaydedildi</string>
+    <string name="mood_1">Çok düşük</string>
+    <string name="mood_2">Düşük</string>
+    <string name="mood_3">Orta</string>
+    <string name="mood_4">İyi</string>
+    <string name="mood_5">Çok iyi</string>
+    <string name="energy_1">Düşük</string>
+    <string name="energy_2">Orta</string>
+    <string name="energy_3">Yüksek</string>
+    <string name="flow_0">Yok</string>
+    <string name="flow_1">Lekelenme</string>
+    <string name="flow_2">Hafif</string>
+    <string name="flow_3">Orta</string>
+    <string name="flow_4">Yoğun</string>
+    <string name="symptom_bloating">Şişkinlik</string>
+    <string name="symptom_breast_tenderness">Meme hassasiyeti</string>
+    <string name="symptom_sweet_craving">Tatlı isteği</string>
+    <string name="symptom_acne">Akne</string>
+    <string name="symptom_hair_loss">Saç dökülmesi</string>
+    <string name="symptom_cramps">Kramp</string>
+    <string name="symptom_headache">Baş ağrısı</string>
+    <string name="symptom_low_mood">Keyifsizlik</string>
+    <string name="symptom_fatigue">Enerjim düşük</string>
+    <string name="symptom_nausea">Bulantı</string>
+    <string name="symptom_insomnia">Uykusuzluk</string>
+    <string name="symptom_spotting">Lekelenme</string>
+
+    <!-- İlaçlar -->
+    <string name="meds_title">İlaçlar</string>
+    <string name="meds_add_title">İlaç ya da takviye ekle</string>
+    <string name="meds_templates">Hızlı ekle</string>
+    <string name="meds_custom">Özel ekle</string>
+    <string name="meds_name">Ad</string>
+    <string name="meds_dose">Doz (ör. 1 kapsül)</string>
+    <string name="meds_times">Saatler</string>
+    <string name="meds_add_time">Saat ekle</string>
+    <string name="meds_with_food">Yemekle</string>
+    <string name="meds_stock">Stok (adet, isteğe bağlı)</string>
+    <string name="meds_pack_start">Paket başlangıcı</string>
+    <string name="meds_kind_supplement">Takviye</string>
+    <string name="meds_kind_prescription">Reçeteli ilaç</string>
+    <string name="meds_kind_contraceptive">Doğum kontrol hapı</string>
+    <string name="meds_kind_herbal">Bitkisel</string>
+    <string name="meds_adherence_title">Bu hafta</string>
+    <string name="meds_adherence_text">%1$d dozun %2$d&#8217;i alındı</string>
+    <string name="meds_stock_days">%1$s: %2$d günlük stok kaldı.</string>
+    <string name="meds_inositol_evidence_title">Inositol hakkında</string>
+    <string name="meds_inositol_evidence_text">2023 uluslararası kılavuz inositolü deneysel kabul ediyor. Kullandığını doktoruna söyle; dozu kendin değiştirme.</string>
+    <string name="meds_evidence_limited">Sınırlı kanıt</string>
+    <string name="meds_remove">Listeden kaldır</string>
+    <string name="meds_remove_confirm">%1$s listeden kaldırılsın mı? Geçmiş kayıtlar silinmez.</string>
+    <string name="meds_times_per_day">günde %1$d</string>
+
+    <!-- Takvim -->
+    <string name="calendar_title">Takvim</string>
+    <string name="calendar_legend_period">Kayıtlı adet</string>
+    <string name="calendar_legend_predicted">Tahmini aralık</string>
+    <string name="calendar_legend_log">Kayıt var</string>
+    <string name="calendar_prev_month">Önceki ay</string>
+    <string name="calendar_next_month">Sonraki ay</string>
+    <string name="calendar_history_title">Döngü geçmişi</string>
+    <string name="calendar_stats">Ortalama %1$d gün · en kısa %2$d · en uzun %3$d · son 12 ayda %4$d adet</string>
+    <string name="calendar_stats_empty">İlk iki adetini kaydedince döngü uzunluklarını burada göreceksin.</string>
+    <string name="calendar_mark_period_start">Adet başlangıcı olarak işaretle</string>
+    <string name="calendar_mark_period_end">Adet bitişi olarak işaretle</string>
+    <string name="calendar_unmark_period">Adet kaydını kaldır</string>
+    <string name="calendar_exclude_cycle">Bu döngüyü hesaba katma</string>
+    <string name="calendar_include_cycle">Bu döngüyü hesaba kat</string>
+    <string name="calendar_open_log">Günün kaydını aç</string>
+    <string name="calendar_day_a11y_period">%1$s, kayıtlı adet</string>
+    <string name="calendar_day_a11y_predicted">%1$s, tahmini adet aralığı</string>
+    <string name="calendar_cycle_length">%1$d günlük döngü</string>
+    <string name="calendar_excluded_user">Hesap dışı</string>
+    <string name="calendar_excluded_short">Çok kısa, hesap dışı</string>
+
+    <!-- Planım: su ve uyku -->
+    <string name="plan_title">Planım</string>
+    <string name="plan_tab_water_sleep">Su ve uyku</string>
+    <string name="plan_tab_nutrition">Beslenme</string>
+    <string name="plan_tab_movement">Hareket</string>
+    <string name="plan_coming_soon">Bu bölüm MVP 2 ile geliyor.</string>
+    <string name="plan_last_7_days">Son 7 gün</string>
+    <string name="plan_nutrition_preview">Düşük glisemik yüklü, lif ve protein ağırlıklı öğün önerileri; yemek sonrası kan şekerini yumuşatan 10–15 dakikalık yürüyüş hatırlatması. Beslenme kaydı yok, kalori sayma yok.</string>
+    <string name="plan_movement_preview">2023 uluslararası PCOS kılavuzu: haftada 150 dakika orta tempolu hareket ve 2 gün kuvvet çalışması. Döngü gününe göre kısa, evde yapılabilir rutinler.</string>
+    <string name="water_remove_cup">Bir bardak çıkar</string>
+    <string name="water_title">Su</string>
+    <string name="water_of_goal">/ %1$d bardak</string>
+    <string name="water_litres">%1$s L · hedef %2$s L</string>
+    <string name="water_add_cup">Bardak</string>
+    <string name="sleep_title">Uyku</string>
+    <string name="sleep_duration">%1$d sa %2$d dk</string>
+    <string name="sleep_last_night">Dün gece · %1$s–%2$s</string>
+    <string name="sleep_none">Henüz uyku kaydı yok.</string>
+    <string name="sleep_add">Uyku ekle</string>
+    <string name="sleep_import_hc">Health Connect&#8217;ten al</string>
+    <string name="sleep_hc_unavailable">Health Connect bu cihazda kullanılamıyor.</string>
+    <string name="sleep_bedtime">Yatış</string>
+    <string name="sleep_wake">Kalkış</string>
+    <string name="sleep_quality">Kalite</string>
+    <string name="sleep_quality_1">Kötü</string>
+    <string name="sleep_quality_2">Orta</string>
+    <string name="sleep_quality_3">İyi</string>
+    <string name="evening_routine_title">Akşam rutini</string>
+    <string name="evening_routine_text">%1$s · nefes egzersizi ve ekran molası</string>
+
+    <!-- Ben -->
+    <string name="me_title">İlerlemen</string>
+    <string name="me_cycle_section">Döngü düzeni</string>
+    <string name="me_adherence">Takviye uyumu</string>
+    <string name="me_water_days">Su hedefi</string>
+    <string name="me_log_days">Günlük kayıt</string>
+    <string name="me_days_this_week">%1$d/7 gün bu hafta</string>
+    <string name="me_last_4_weeks">son 4 hafta</string>
+    <string name="me_settings">Ayarlar</string>
+    <string name="me_privacy">Gizlilik ve güvenlik</string>
+    <string name="me_cycle_trend_shorter">Son %1$d döngün art arda kısaldı</string>
+    <string name="me_cycle_trend_text">Hedef aralık 21–35 gün; doğru yöndesin.</string>
+    <string name="me_cycle_need_data">Döngü eğilimi için en az 3 tamamlanmış döngü gerekir.</string>
+    <string name="me_cycle_stable">Döngülerin düzenli: ortalama %1$d gün (±%2$d).</string>
+    <string name="me_cycle_variable">Döngün %1$d–%2$d gün arasında değişiyor; PCOS&#8217;ta bu sık görülür. Hedef aralık 21–35 gün.</string>
+    <string name="me_cycle_lengths_a11y">Son döngü uzunlukları: %1$s gün</string>
+
+    <!-- Ayarlar ve gizlilik -->
+    <string name="settings_title">Gizlilik ve güvenlik</string>
+    <string name="settings_privacy_intro">Kayıtların bu telefonda şifreli saklanır. Reklam ya da izleme aracı yok; hesap açmadan kullanabilirsin.</string>
+    <string name="settings_section_protection">Koruma</string>
+    <string name="settings_app_lock">Uygulama kilidi</string>
+    <string name="settings_app_lock_text">Parmak izi ya da PIN ile aç</string>
+    <string name="settings_block_screenshots">Ekran görüntüsünü engelle</string>
+    <string name="settings_block_screenshots_text">Son uygulamalarda içerik gizlenir</string>
+    <string name="settings_hidden_notifications">Gizli bildirimler</string>
+    <string name="settings_hidden_notifications_text">Kilit ekranında yalnızca &#8220;Bir hatırlatman var&#8221;</string>
+    <string name="settings_section_consent">İzinlerin (KVKK)</string>
+    <string name="settings_section_notifications">Bildirimler</string>
+    <string name="settings_water_reminders">Su hatırlatmaları</string>
+    <string name="settings_cycle_notifications">Döngü bildirimleri</string>
+    <string name="settings_progress_notifications">İlerleme bildirimleri</string>
+    <string name="settings_quiet_hours">Sessiz saatler</string>
+    <string name="settings_quiet_hours_text">%1$s – %2$s · yalnızca ilaç hatırlatmaları gelir</string>
+    <string name="settings_exact_alarm_missing">Hatırlatmalar tam saatinde çalmayabilir: tam zamanlı alarm izni kapalı.</string>
+    <string name="settings_section_display">Görünüm</string>
+    <string name="settings_hide_prediction">Tahmini gizle</string>
+    <string name="settings_hide_prediction_text">Takvim ve halkada aralık gösterilmez</string>
+    <string name="settings_show_body">Kilo ve bel çevresi</string>
+    <string name="settings_show_body_text">Varsayılan olarak gizlidir; açarsan günlük kayıtta görünür</string>
+    <string name="settings_section_data">Verilerin</string>
+    <string name="settings_export">Verilerimi dışa aktar</string>
+    <string name="settings_export_text">JSON dosyası</string>
+    <string name="settings_delete_all">Tüm verilerimi sil</string>
+    <string name="settings_delete_confirm_title">Tüm veriler silinsin mi?</string>
+    <string name="settings_delete_confirm_text">Adet, kayıt, ilaç, su ve uyku verilerin kalıcı olarak silinir. Bu işlem geri alınamaz.</string>
+    <string name="settings_water_goal">Günlük su hedefi</string>
+    <string name="settings_cup_size">Bardak hacmi (ml)</string>
+    <string name="settings_name">Adın</string>
+    <string name="settings_goals">Önceliklerim</string>
+    <string name="settings_about">Hakkında</string>
+    <string name="settings_about_text">Ayla %1$s · Tıbbi tavsiye vermez. Kaynaklar ve kanıt düzeyleri için docs klasörüne bak.</string>
+    <string name="export_done">Dışa aktarıldı</string>
+    <string name="export_failed">Dışa aktarma başarısız oldu</string>
+
+    <!-- Uygulama kilidi -->
+    <string name="lock_title">Ayla kilitli</string>
+    <string name="lock_subtitle">Devam etmek için kimliğini doğrula</string>
+    <string name="lock_unlock">Kilidi aç</string>
+    <string name="lock_use_credential">PIN ile aç</string>
+
+    <!-- Hata ve boş durumlar -->
+    <string name="empty_today">Henüz kayıt yok. İlk adetini ekleyince döngünü birlikte okumaya başlarız.</string>
+    <string name="error_generic">Bir şeyler ters gitti. Tekrar dener misin?</string>
+</resources>
