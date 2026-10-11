@@ -21,6 +21,8 @@ jobs:
     name: Derle ve test et
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: write # Room şemasını depoya geri yazmak için
     steps:
       - name: Kaynağı al
         uses: actions/checkout@v5
@@ -112,6 +114,22 @@ jobs:
           name: ayla-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      # Room şema JSON'u derlemede üretilir; migration yazabilmek için depoda durmalı.
+      # Ajan oturumları derleyemediği için CI yazar (bot push'u yeni çalıştırma tetiklemez).
+      - name: Room şemasını depoya yaz
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          if [ -n "$(git status --porcelain app/schemas)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add app/schemas
+            git commit -m "Room şemasını güncelle (CI)" -m "[skip ci]"
+            git push
+          else
+            echo "Şema değişmedi."
+          fi
 
   release-check:
     name: Sürüm derlemesi (R8) ve lint
