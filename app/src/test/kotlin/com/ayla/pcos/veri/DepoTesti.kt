@@ -98,7 +98,7 @@ class DepoTesti : VeriTestOrtami() {
     }
 
     @Test
-    fun `doktor notu ibareyle baslar; dongu, ilac uyumu ve son 4 hafta semptomlarini ozetler`() {
+    fun `doktor notu ibareyle baslar, dongu, ilac uyumu ve son 4 hafta semptomlarini ozetler`() {
         val text = calistir {
             listOf(70L, 35L, 5L).forEach { cycles.addPeriodStart(bugun.minusDays(it)) }
             val id = meds.add(inofolic().copy(createdAt = bugun.minusDays(60).atStartOfDay(zone).toInstant()))

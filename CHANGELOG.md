@@ -16,9 +16,19 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr-TR/1.1.0/) ilkelerine, s
 - Planım: su (hedef, 7 gün), uyku (elle), akşam rutini.
 - Ben: döngü düzeni grafiği, uyum ve alışkanlık kartları, doktor notu paylaşımı.
 - Hatırlatmalar: tam zamanlı alarmlar ve pencereli yedek, yeniden başlatma/saat dilimi dayanıklılığı,
-  sessiz saatler, haftalık ilerleme özeti.
+  sessiz saatler, haftalık özet (Pazar 19:00).
 - Ayarlar: profil ve öncelikler, su ve hatırlatma saatleri, koruma (kilit, ekran görüntüsü engeli,
   gizli bildirim), KVKK rızaları, dışa aktarma ve tam silme.
 - Güvenlik: SQLCipher + Keystore; anahtar kaybında karantina ve dürüst bildirim.
 - Simge, temalı simge, açılış ve bildirim simgesi.
 - CI: birim testleri, debug APK, R8 sürüm derlemesi, lint özeti, ekran görüntüleri dalı.
+
+### Erişilebilirlik
+- Sistem yazı boyutu %200'de kesilme yok (alt gezinme, takvim başlıkları, sekmeler, ayar satırları);
+  büyük yazıda satırlar dikey düzene geçer.
+- "Animasyonları kaldır" açıkken dolum, çubuk, ölçüt ve dalga animasyonları durur.
+- İki temada metin/zemin kontrastı WCAG AA (otomatik test).
+
+### Düzeltildi
+- Su bardağına ya da "Aldım"a hızlı art arda dokunuşta kayıt kaybı ve stokun iki kez düşmesi
+  (yazmalar sıraya alındı).
