@@ -1,5 +1,6 @@
 package com.ayla.pcos.ui.log
 
+import com.ayla.pcos.ui.components.CipEtiketi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -46,6 +47,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.pcos.R
 import com.ayla.pcos.data.repo.SymptomCatalog
 import com.ayla.pcos.ui.components.Overline
+import com.ayla.pcos.ui.components.SegmentEtiketi
+import com.ayla.pcos.ui.components.segmentSimgesi
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -91,7 +94,7 @@ internal fun DailyLogContent(
     Column(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
             Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Overline(dateText)
                     Text(stringResource(if (state.isToday) R.string.log_title else R.string.log_title_past), style = MaterialTheme.typography.headlineMedium)
                 }
@@ -134,7 +137,8 @@ internal fun DailyLogContent(
                             selected = state.energy == index + 1,
                             onClick = { onEnergy(index + 1) },
                             shape = SegmentedButtonDefaults.itemShape(index = index, count = labels.size),
-                            label = { Text(stringResource(res)) },
+                            icon = segmentSimgesi(state.energy == index + 1),
+                            label = { SegmentEtiketi(stringResource(res), state.energy == index + 1) },
                         )
                     }
                 }
@@ -146,7 +150,7 @@ internal fun DailyLogContent(
                         FilterChip(
                             selected = state.flow == index,
                             onClick = { onFlow(index) },
-                            label = { Text(stringResource(res)) },
+                            label = { CipEtiketi(stringResource(res)) },
                             leadingIcon = if (state.flow == index) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
                         )
                     }
@@ -160,7 +164,7 @@ internal fun DailyLogContent(
                         FilterChip(
                             selected = selected,
                             onClick = { onSymptom(key) },
-                            label = { Text(stringResource(symptomLabel(key))) },
+                            label = { CipEtiketi(stringResource(symptomLabel(key))) },
                             leadingIcon = if (selected) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
                         )
                     }

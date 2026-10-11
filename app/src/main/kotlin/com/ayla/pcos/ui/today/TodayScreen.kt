@@ -141,7 +141,7 @@ internal fun TodayContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top,
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     val dateLine = state.today.dayOfWeek.getDisplayName(TextStyle.FULL, trLocale) + " · " + state.today.format(dayMonth)
                     Overline(dateLine)
                     Text(greeting(state.displayName, now.hour), style = MaterialTheme.typography.headlineMedium)
@@ -398,8 +398,9 @@ private fun GuvenRozeti(confidence: Confidence, text: String) {
 private fun PillHero(pill: PillModeState, uyari: HapUyarisi, onPillClick: (Int) -> Unit) {
     val timeText = pill.medication.times.firstOrNull()?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: ""
     AylaCard {
+        // Sol sütun ağırlıklı: büyük yazıda "12. hap" harf harf alt alta dizilmez.
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(stringResource(R.string.today_pill_title), style = MaterialTheme.typography.titleMedium)
                 Text(
                     stringResource(R.string.today_pill_regimen, pill.regimen.activeDays, pill.regimen.placeboDays, timeText),
@@ -411,6 +412,9 @@ private fun PillHero(pill: PillModeState, uyari: HapUyarisi, onPillClick: (Int) 
                 stringResource(R.string.today_pill_number, pill.todayPill),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
+                maxLines = 1,
+                softWrap = false,
+                modifier = Modifier.padding(start = 12.dp),
             )
         }
         Spacer(Modifier.height(12.dp))

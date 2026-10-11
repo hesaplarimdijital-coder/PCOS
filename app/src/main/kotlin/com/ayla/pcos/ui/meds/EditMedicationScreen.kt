@@ -1,5 +1,6 @@
 package com.ayla.pcos.ui.meds
 
+import com.ayla.pcos.ui.components.CipEtiketi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -54,8 +55,10 @@ import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.DegerSatiri
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SaatSeciciDialog
+import com.ayla.pcos.ui.components.SegmentEtiketi
 import com.ayla.pcos.ui.components.TarihSeciciDialog
 import com.ayla.pcos.ui.components.saatMetni
+import com.ayla.pcos.ui.components.segmentSimgesi
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import java.time.LocalDate
 import java.time.LocalTime
@@ -148,7 +151,7 @@ internal fun EditMedicationContent(
                         MedicationKind.HERBAL to R.string.meds_kind_herbal,
                         MedicationKind.CONTRACEPTIVE to R.string.meds_kind_contraceptive,
                     ).forEach { (kind, labelRes) ->
-                        FilterChip(selected = state.kind == kind, onClick = { onKind(kind) }, label = { Text(stringResource(labelRes)) })
+                        FilterChip(selected = state.kind == kind, onClick = { onKind(kind) }, label = { CipEtiketi(stringResource(labelRes)) })
                     }
                 }
             }
@@ -185,7 +188,8 @@ internal fun EditMedicationContent(
                                 selected = state.regimen == regimen,
                                 onClick = { onRegimen(regimen) },
                                 shape = SegmentedButtonDefaults.itemShape(index = index, count = regimens.size),
-                                label = { Text(stringResource(labels[index]), maxLines = 1) },
+                                icon = segmentSimgesi(state.regimen == regimen),
+                                label = { SegmentEtiketi(stringResource(labels[index]), state.regimen == regimen) },
                             )
                         }
                     }
@@ -207,7 +211,8 @@ internal fun EditMedicationContent(
                                 selected = state.food == option,
                                 onClick = { onFood(option) },
                                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                                label = { Text(stringResource(labels[index]), maxLines = 1) },
+                                icon = segmentSimgesi(state.food == option),
+                                label = { SegmentEtiketi(stringResource(labels[index]), state.food == option) },
                             )
                         }
                     }

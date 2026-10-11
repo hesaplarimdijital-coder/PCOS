@@ -17,6 +17,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ayla.pcos.R
@@ -104,6 +106,39 @@ fun DegerSatiri(
             valueAndChevron()
         }
     }
+}
+
+/**
+ * Bölümlü düğme (SegmentedButton) simgesi. Büyük yazıda onay simgesi etikete yer bıraksın diye gizlenir;
+ * seçim o zaman [SegmentEtiketi]'nin kalın yazısıyla da görünür (renk tek başına kalmaz).
+ */
+@Composable
+fun segmentSimgesi(selected: Boolean): @Composable () -> Unit =
+    if (LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI) {
+        {}
+    } else {
+        { SegmentedButtonDefaults.Icon(active = selected) }
+    }
+
+/**
+ * Seçim çipi etiketi. Dikey boşluk normal boyda çip yüksekliğini değiştirmez (20 + 12 = 32 dp); büyük
+ * yazıda iki satıra kırılan etiket çipin kenarına yapışmaz.
+ */
+@Composable
+fun CipEtiketi(text: String) {
+    Text(text, modifier = Modifier.padding(vertical = 6.dp))
+}
+
+/** Bölümlü düğme etiketi: büyük yazıda iki satıra kadar kırılır ve seçiliyse kalınlaşır. */
+@Composable
+fun SegmentEtiketi(text: String, selected: Boolean) {
+    val buyuk = LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI
+    Text(
+        text,
+        maxLines = if (buyuk) 2 else 1,
+        textAlign = TextAlign.Center,
+        fontWeight = if (buyuk && selected) FontWeight.Bold else null,
+    )
 }
 
 /**

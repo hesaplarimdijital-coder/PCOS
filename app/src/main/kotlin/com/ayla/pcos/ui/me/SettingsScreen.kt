@@ -1,5 +1,6 @@
 package com.ayla.pcos.ui.me
 
+import com.ayla.pcos.ui.components.CipEtiketi
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -65,10 +66,12 @@ import com.ayla.pcos.ui.components.BantTuru
 import com.ayla.pcos.ui.components.DegerSatiri
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SaatSeciciDialog
+import com.ayla.pcos.ui.components.SegmentEtiketi
 import com.ayla.pcos.ui.components.UyariBandi
 import com.ayla.pcos.ui.components.openExactAlarmSettings
 import com.ayla.pcos.ui.components.openNotificationSettings
 import com.ayla.pcos.ui.components.saatMetni
+import com.ayla.pcos.ui.components.segmentSimgesi
 import java.time.LocalTime
 
 /** Ayar sınırları; arayüz ve testler aynı değerleri kullanır. */
@@ -385,7 +388,7 @@ private fun HedefSecimi(selected: Set<Goal>, onToggle: (Goal) -> Unit) {
             FilterChip(
                 selected = isSelected,
                 onClick = { onToggle(goal) },
-                label = { Text(stringResource(labelRes)) },
+                label = { CipEtiketi(stringResource(labelRes)) },
                 leadingIcon = if (isSelected) ({ Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }) else null,
             )
         }
@@ -402,7 +405,8 @@ private fun AralikSecimi(selected: Int, onSelect: (Int) -> Unit) {
                 selected = selected == minutes,
                 onClick = { onSelect(minutes) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                label = { Text(stringResource(labels[index]), maxLines = 1) },
+                icon = segmentSimgesi(selected == minutes),
+                label = { SegmentEtiketi(stringResource(labels[index]), selected == minutes) },
             )
         }
     }

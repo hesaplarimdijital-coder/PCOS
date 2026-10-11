@@ -85,7 +85,9 @@ import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SatirZemini
 import com.ayla.pcos.ui.components.SectionHeader
+import com.ayla.pcos.ui.components.SegmentEtiketi
 import com.ayla.pcos.ui.components.SimgeZemini
+import com.ayla.pcos.ui.components.segmentSimgesi
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import com.ayla.pcos.ui.theme.LocalReducedMotion
@@ -505,7 +507,8 @@ private fun UykuEkleDialog(onDismiss: () -> Unit, onSave: (LocalTime, LocalTime,
                                 selected = quality == index + 1,
                                 onClick = { quality = if (quality == index + 1) null else index + 1 },
                                 shape = SegmentedButtonDefaults.itemShape(index = index, count = labels.size),
-                                label = { Text(stringResource(res)) },
+                                icon = segmentSimgesi(quality == index + 1),
+                                label = { SegmentEtiketi(stringResource(res), quality == index + 1) },
                             )
                         }
                     }

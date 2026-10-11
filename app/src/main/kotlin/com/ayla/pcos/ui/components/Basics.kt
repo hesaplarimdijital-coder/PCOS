@@ -88,7 +88,7 @@ fun SectionHeader(title: String, modifier: Modifier = Modifier, action: (@Compos
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(title, style = MaterialTheme.typography.titleMedium)
+        Text(title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f, fill = false).padding(end = 12.dp))
         action?.invoke()
     }
 }

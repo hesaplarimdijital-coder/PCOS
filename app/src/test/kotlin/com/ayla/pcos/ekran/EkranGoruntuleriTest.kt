@@ -262,6 +262,14 @@ class EkranGoruntuleriTest {
         Bugun(Ornek.bugunHap, hour = 21)
     }
 
+    @Config(qualifiers = UZUN)
+    @Test fun y08_yazi200_gunluk() = ekran("y08-yazi200-gunluk", sistemYaziOlcegi = 2f) {
+        DailyLogContent(
+            state = Ornek.gunlukKayit, onClose = {}, onMood = {}, onEnergy = {}, onFlow = {}, onSymptom = {},
+            onWeight = {}, onWaist = {}, onNote = {}, onSave = {},
+        )
+    }
+
     // --- İnceleme: tüm içerik (uzun) ---
 
     @Config(qualifiers = UZUN)

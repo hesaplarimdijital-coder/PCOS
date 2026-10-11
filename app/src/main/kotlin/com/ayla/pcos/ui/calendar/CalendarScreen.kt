@@ -160,7 +160,7 @@ internal fun CalendarContent(
             .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 24.dp),
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Overline(
                     state.cycleDay?.let { stringResource(R.string.label_cycle_day_n, it) }
                         ?: state.today.format(dayMonth),
