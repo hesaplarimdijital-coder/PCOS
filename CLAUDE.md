@@ -31,7 +31,14 @@ Arayüz dili **Türkçe**; ürün tonu sıcak, yargılamayan, kanıta bağlı.
   `:app:testDebugUnitTest`, `:app:assembleDebug`. Çalıştırmaları `gh run list` / `gh run view <id> --log-failed`
   ile izle; kırmızıysa düzelt, tekrar push et. Yeşil olmayan `main` bırakma.
 - `:core:cycle` yerelde Kotlin derleyicisiyle test edilebilir; algoritma değişikliği **testsiz birleşmez**
-  (`core/cycle/src/test`). Mevcut 32 test korunur.
+  (`core/cycle/src/test`).
+- Uygulama testleri üç katmandır: saf JVM kuralları (`ReminderPolicy`, takvim kuralları, form doğrulama),
+  Robolectric + bellek içi Room ile depo/ViewModel testleri (`app/src/test/.../veri/VeriTestOrtami`,
+  sabit gün için `SabitGun`), ve ekran görüntüleri (`.../ekran`, yalnızca `-Pekran`). Mevcut testler korunur.
+- **Ekranı görmeden arayüz değiştirme.** Her `main` push'unda CI görüntüleri `ekran-goruntuleri` dalına
+  yükler; `git fetch origin ekran-goruntuleri:refs/remotes/origin/ekran-goruntuleri --force` ve
+  `git archive origin/ekran-goruntuleri | tar -x -C <dizin>` ile alınıp incelenir. Yeni ekran/durum =
+  `EkranGoruntuleriTest`'e yeni görüntü (örnek veri `Ornek.kt`).
 - Yeni Room alanı → sürüm artır + Migration + `schemas/` json'u commit et. Yıkıcı migration yalnızca downgrade.
 
 ## Kod kuralları
@@ -40,7 +47,9 @@ Arayüz dili **Türkçe**; ürün tonu sıcak, yargılamayan, kanıta bağlı.
 - **Kullanıcıya görünen hiçbir metin kodda sabit yazılmaz**; hepsi `res/values/strings.xml`. Türkçe büyük harf
   için `toTurkishUpper()`; tarih biçimleri `Locale.forLanguageTag("tr")`.
 - Durum: ViewModel → `StateFlow<UiState>`; ekranlar `collectAsStateWithLifecycle`. Ekran dosyaları
-  `ui/<alan>/<Alan>Screen.kt` + `<Alan>ViewModel.kt`.
+  `ui/<alan>/<Alan>Screen.kt` + `<Alan>ViewModel.kt`. Her ekran `XxxScreen` (ViewModel bağlar) ve
+  durumsuz `internal fun XxxContent(state, callback'ler)` olarak ikiye ayrılır.
+- Büyük yazı: `LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI` (1,3) iken satırlar dikey düzene geçer.
 - Renk tek başına anlam taşımaz (ikon/metin/biçim eşlik eder); her etkileşimli öğe ≥ 48 dp ve
   `contentDescription` taşır; `LocalReducedMotion` açıkken süs animasyonları durur.
 - `fillMaxHeight(fraction)`/`fillMaxWidth(fraction)` yay animasyonlarında `coerceIn(0f, 1f)` ile beslenir.

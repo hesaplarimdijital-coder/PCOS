@@ -427,8 +427,6 @@ private fun PillHero(pill: PillModeState) {
     }
 }
 
-}
-
 /**
  * Henüz adet kaydı yokken halka yerine: sıcak bir karşılama ve son adet tarihini seçme düğmesi.
  * "Adet başladı" yalnızca bugünü kaydeder; ilk kayıt çoğunlukla geçmiş bir gündür.

@@ -187,6 +187,22 @@ class EkranGoruntuleriTest {
         )
     }
 
+    @Test fun t21_koyu_ben() = ekran("21-koyu-ben", sekme = Screen.Me, koyu = true) { MeContent(state = Ornek.ben, onOpenSettings = {}) }
+
+    @Test fun t22_koyu_planim() = ekran("22-koyu-planim", sekme = Screen.Plan, koyu = true) { Plan() }
+
+    @Test fun t23_buyuk_yazi_ilaclar() = ekran("23-buyuk-yazi-ilaclar", sekme = Screen.Meds, yaziOlcegi = 1.6f) { Ilaclar() }
+
+    @Config(qualifiers = UZUN)
+    @Test fun t24_buyuk_yazi_ayarlar() = ekran("24-buyuk-yazi-ayarlar", yaziOlcegi = 1.6f) {
+        SettingsContent(
+            prefs = Ornek.ayarlar, exactAlarmsAllowed = true, snackbar = remember { SnackbarHostState() },
+            onBack = {}, onUpdate = {}, onExport = {}, onWipe = {},
+        )
+    }
+
+    @Test fun t25_koyu_takvim_bos_secim() = ekran("25-takvim-secimsiz", sekme = Screen.Calendar) { Takvim(secili = false) }
+
     // --- İnceleme: tüm içerik (uzun) ---
 
     @Config(qualifiers = UZUN)
