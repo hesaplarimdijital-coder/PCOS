@@ -67,6 +67,21 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.cycle.DayKind
 import com.ayla.cycle.ExclusionReason
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.EventAvailable
+import androidx.compose.material.icons.rounded.LocalFlorist
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.ayla.pcos.R
 import com.ayla.pcos.data.db.PeriodEntity
 import com.ayla.pcos.ui.components.AylaCard
@@ -89,6 +104,7 @@ private val trLocale: Locale = Locale.forLanguageTag("tr")
 private val monthYear: DateTimeFormatter = DateTimeFormatter.ofPattern("LLLL yyyy", trLocale)
 private val dayMonth: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM", trLocale)
 private val dayMonthYear: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", trLocale)
+private val dayMonthShort: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM", trLocale)
 
 /**
  * Takvim: ay ızgarası (kayıtlı adet, tahmini aralık, günlük kayıt izi), seçili gün eylemleri
@@ -141,7 +157,10 @@ internal fun CalendarContent(
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
             Column {
-                Overline(state.month.format(monthYear))
+                Overline(
+                    state.cycleDay?.let { stringResource(R.string.label_cycle_day_n, it) }
+                        ?: state.today.format(dayMonth),
+                )
                 Text(stringResource(R.string.calendar_title), style = MaterialTheme.typography.headlineMedium)
             }
             IconButton(onClick = onToday) {
@@ -228,6 +247,7 @@ internal fun CalendarContent(
             state.history.forEach { row ->
                 DonguSatiri(
                     row = row,
+                    today = state.today,
                     onExcluded = { excluded -> row.period?.let { onExcluded(it, excluded) } },
                 )
             }
@@ -398,7 +418,6 @@ private fun LejantOgesi(label: String, marker: @Composable () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SeciliGunKarti(
     date: LocalDate,
@@ -416,73 +435,88 @@ private fun SeciliGunKarti(
         DayKind.PREDICTED -> stringResource(R.string.calendar_legend_predicted)
         else -> null
     }
+    val scheme = MaterialTheme.colorScheme
     AylaCard {
         Text(title, style = MaterialTheme.typography.titleMedium)
         if (subtitle != null) {
-            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
         }
-        Spacer(Modifier.height(12.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (actions.canOpenLog) {
-                Button(onClick = onOpenLog) {
-                    Icon(Icons.Rounded.EditNote, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.size(6.dp))
-                    Text(stringResource(R.string.calendar_open_log))
-                }
-            }
-            if (actions.canMarkStart) {
-                FilledTonalButton(onClick = onMarkStart) { Text(stringResource(R.string.calendar_mark_period_start)) }
-            }
-            if (actions.canMarkEnd) {
-                FilledTonalButton(onClick = onMarkEnd) { Text(stringResource(R.string.calendar_mark_period_end)) }
-            }
-            if (actions.canUnmark) {
-                TextButton(onClick = onUnmark) {
-                    Text(stringResource(R.string.calendar_unmark_period), color = MaterialTheme.colorScheme.error)
-                }
-            }
+        Spacer(Modifier.height(4.dp))
+        if (actions.canOpenLog) {
+            GunEylemi(Icons.Rounded.EditNote, stringResource(R.string.calendar_open_log), scheme.primary, onOpenLog)
+        }
+        if (actions.canMarkStart) {
+            GunEylemi(Icons.Rounded.LocalFlorist, stringResource(R.string.calendar_mark_period_start), scheme.primary, onMarkStart)
+        }
+        if (actions.canMarkEnd) {
+            GunEylemi(Icons.Rounded.EventAvailable, stringResource(R.string.calendar_mark_period_end), scheme.primary, onMarkEnd)
+        }
+        if (actions.canUnmark) {
+            GunEylemi(Icons.Rounded.DeleteOutline, stringResource(R.string.calendar_unmark_period), scheme.error, onUnmark)
         }
         val cycle = actions.cycle
         val period = actions.period
         if (cycle != null && period != null && cycle.isComplete) {
-            Spacer(Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(
-                    stringResource(if (period.excludedFromStats) R.string.calendar_include_cycle else R.string.calendar_exclude_cycle),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f),
-                )
-                Switch(checked = period.excludedFromStats, onCheckedChange = onExcluded)
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(role = Role.Switch) { onExcluded(!period.excludedFromStats) }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.calendar_count_cycle), style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.calendar_count_cycle_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+                }
+                Switch(checked = !period.excludedFromStats, onCheckedChange = null)
             }
         }
     }
 }
 
-/** Döngü geçmişi satırı: başlangıç, uzunluk, hesaba katılma durumu. */
+/** Seçili gün kartındaki eylem satırı: simge + metin, 48 dp dokunma alanı. */
 @Composable
-private fun DonguSatiri(row: CycleRow, onExcluded: (Boolean) -> Unit) {
+private fun GunEylemi(icon: ImageVector, label: String, tint: Color, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp)
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
+        Text(label, style = MaterialTheme.typography.bodyLarge, color = if (tint == MaterialTheme.colorScheme.error) tint else MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+/**
+ * Döngü geçmişi satırı: tarih aralığı, uzunluk ve 21–35 gün bandına göre konumu gösteren ince çizgi.
+ * "Hesaba katma" seçeneği taşma menüsündedir.
+ */
+@Composable
+private fun DonguSatiri(row: CycleRow, today: LocalDate, onExcluded: (Boolean) -> Unit) {
     val colors = LocalAylaColors.current
+    val scheme = MaterialTheme.colorScheme
     val cycle = row.cycle
     val length = cycle.lengthDays ?: return
+    val end = cycle.nextStart?.minusDays(1) ?: return
     val excluded = cycle.exclusion != null
-    SatirZemini {
+    var menuOpen by remember { mutableStateOf(false) }
+    val endText = if (end.year == today.year) end.format(dayMonthShort) else end.format(dayMonthYear)
+    val range = stringResource(R.string.label_date_range, cycle.start.format(dayMonthShort), endText)
+
+    SatirZemini(modifier = Modifier.alpha(if (excluded) 0.72f else 1f)) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(cycle.start.format(dayMonthYear), style = MaterialTheme.typography.titleMedium)
-            val badge = when (cycle.exclusion) {
-                ExclusionReason.USER -> stringResource(R.string.calendar_excluded_user)
-                ExclusionReason.IMPLAUSIBLY_SHORT -> stringResource(R.string.calendar_excluded_short)
-                null -> null
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    stringResource(R.string.calendar_cycle_length, length),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                if (badge != null) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(range, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f, fill = false))
+                if (excluded) {
                     Surface(shape = CircleShape, color = colors.uyariAcik) {
                         Text(
-                            badge,
+                            stringResource(if (cycle.exclusion == ExclusionReason.IMPLAUSIBLY_SHORT) R.string.calendar_excluded_short else R.string.calendar_excluded_user),
                             style = MaterialTheme.typography.labelSmall,
                             color = colors.uyari,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
@@ -490,13 +524,56 @@ private fun DonguSatiri(row: CycleRow, onExcluded: (Boolean) -> Unit) {
                     }
                 }
             }
+            Spacer(Modifier.height(8.dp))
+            DonguKonumu(length = length)
         }
-        if (row.period != null) {
-            Switch(
-                checked = !excluded,
-                onCheckedChange = { include -> onExcluded(!include) },
-                enabled = cycle.exclusion != ExclusionReason.IMPLAUSIBLY_SHORT,
-            )
+        Text(
+            stringResource(R.string.calendar_cycle_days, length),
+            style = MaterialTheme.typography.titleMedium,
+            color = scheme.onSurface,
+            modifier = Modifier.padding(start = 4.dp),
+        )
+        if (row.period != null && cycle.exclusion != ExclusionReason.IMPLAUSIBLY_SHORT) {
+            Box {
+                IconButton(onClick = { menuOpen = true }) {
+                    Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.calendar_cycle_options), tint = scheme.onSurfaceVariant)
+                }
+                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(if (excluded) R.string.calendar_include_cycle else R.string.calendar_exclude_cycle)) },
+                        onClick = {
+                            menuOpen = false
+                            onExcluded(!excluded)
+                        },
+                    )
+                }
+            }
         }
+    }
+}
+
+/**
+ * Döngü uzunluğunun konumu: 0–60 gün ölçeğinde ince iz, 21–35 gün bandı açık yeşil, döngü bir nokta.
+ * Yargı yok: bant "tipik aralık"tır, hedef değil.
+ */
+@Composable
+private fun DonguKonumu(length: Int) {
+    val colors = LocalAylaColors.current
+    val scheme = MaterialTheme.colorScheme
+    val maxDays = maxOf(60, length + 2).toFloat()
+    val track = colors.cukur
+    val band = colors.basariAcik
+    val dot = scheme.primary
+    val ring = colors.kart
+    Canvas(modifier = Modifier.fillMaxWidth().height(12.dp)) {
+        val y = size.height / 2f
+        val h = 4.dp.toPx()
+        drawRoundRect(track, topLeft = Offset(0f, y - h / 2f), size = Size(size.width, h), cornerRadius = CornerRadius(h / 2f))
+        val bandStart = size.width * (21f / maxDays)
+        val bandEnd = size.width * (35f / maxDays)
+        drawRoundRect(band, topLeft = Offset(bandStart, y - h / 2f), size = Size(bandEnd - bandStart, h), cornerRadius = CornerRadius(h / 2f))
+        val x = size.width * (length / maxDays)
+        drawCircle(ring, radius = 6.dp.toPx(), center = Offset(x, y))
+        drawCircle(dot, radius = 4.5.dp.toPx(), center = Offset(x, y))
     }
 }

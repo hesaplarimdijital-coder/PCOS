@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ayla.pcos.ui.theme.AylaMotion
@@ -62,6 +65,8 @@ fun HaleHalkasi(
     val colors = LocalAylaColors.current
     val scheme = MaterialTheme.colorScheme
     val reduced = LocalReducedMotion.current
+    // Büyük yazıda merkez metin sığsın diye halka da (en fazla %30) büyür.
+    val ringSize = size * LocalDensity.current.fontScale.coerceIn(1f, 1.3f)
 
     val safeTotal = totalDays.coerceAtLeast(1)
     val targetFraction = ((day ?: 0).coerceAtLeast(0).toFloat() / safeTotal).coerceIn(0f, 1f)
@@ -79,7 +84,8 @@ fun HaleHalkasi(
         label = "parilti",
     )
 
-    val fillColor = if (overdue) colors.uyari else scheme.primary
+    // Gecikme PCOS'ta sıktır: alarm kırmızısı değil, sıcak kayısı.
+    val fillColor = if (overdue) colors.kayisiCanli else scheme.primary
     val glowColor = scheme.primaryContainer
     val trackColor = colors.cukur
     val bandColor = colors.fazAdetAcik
@@ -88,7 +94,7 @@ fun HaleHalkasi(
 
     Box(
         modifier = modifier
-            .size(size)
+            .size(ringSize)
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center,
     ) {
@@ -159,7 +165,11 @@ fun HaleHalkasi(
                 drawCircle(color = fillColor, radius = 8.dp.toPx(), center = marker, style = Stroke(4.dp.toPx()))
             }
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) { center() }
+        // Merkez içerik iç dairenin içinde kalır (halka kalınlığı + hale payı düşülür).
+        Column(
+            modifier = Modifier.widthIn(max = ringSize * 0.62f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) { center() }
     }
 }
 
@@ -172,11 +182,14 @@ fun HaleMerkezi(label: String, day: Int?, subtitle: String) {
         style = MaterialTheme.typography.displayLarge,
         color = MaterialTheme.colorScheme.onSurface,
         textAlign = TextAlign.Center,
+        maxLines = 1,
     )
     Text(
         text = subtitle,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
     )
 }

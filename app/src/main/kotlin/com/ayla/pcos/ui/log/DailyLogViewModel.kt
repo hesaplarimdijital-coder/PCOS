@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ayla.pcos.data.db.DailyLogEntity
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.data.repo.DailyLogRepository
+import com.ayla.pcos.data.repo.DateTicker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,12 +27,15 @@ data class DailyLogUiState(
     val waistCm: String = "",
     val showBodyMeasurements: Boolean = false,
     val saved: Boolean = false,
+    /** Başlık: bugün için "Bugün nasılsın?", geçmiş gün için "O gün nasıldın?". */
+    val isToday: Boolean = true,
 )
 
 @HiltViewModel
 class DailyLogViewModel @Inject constructor(
     private val repository: DailyLogRepository,
     private val prefs: UserPreferencesRepository,
+    private val ticker: DateTicker,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DailyLogUiState())
@@ -53,6 +57,7 @@ class DailyLogViewModel @Inject constructor(
                 weightKg = existing?.weightKg?.toString() ?: "",
                 waistCm = existing?.waistCm?.toString() ?: "",
                 showBodyMeasurements = showBody,
+                isToday = date == ticker.now(),
             )
         }
     }

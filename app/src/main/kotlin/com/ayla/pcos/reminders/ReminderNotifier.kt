@@ -82,6 +82,9 @@ class ReminderNotifier @Inject constructor(@ApplicationContext private val conte
 
     fun cancel(id: Int) = manager.cancel(id)
 
+    /** Kullanıcı uygulamanın bildirimlerini kapattıysa (ya da Android 13+ izni vermediyse) false. */
+    fun notificationsEnabled(): Boolean = manager.areNotificationsEnabled()
+
     private fun base(channel: String, title: String, text: String, p: UserPreferences, openTarget: String): NotificationCompat.Builder {
         val builder = NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_notification)

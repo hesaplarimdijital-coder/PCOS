@@ -27,6 +27,9 @@ sealed interface Screen {
 
     data class DailyLog(val date: LocalDate) : Screen { override val route = "log/$date" }
     data object AddMedication : Screen { override val route = "meds/add" }
+
+    /** [id] 0 ise yeni ilaç formu. */
+    data class EditMedication(val id: Long) : Screen { override val route = "meds/edit/$id" }
     data object Settings : Screen { override val route = "settings" }
 
     companion object {
@@ -41,6 +44,7 @@ sealed interface Screen {
             route == AddMedication.route -> AddMedication
             route == Settings.route -> Settings
             route.startsWith("log/") -> runCatching { DailyLog(LocalDate.parse(route.removePrefix("log/"))) }.getOrNull()
+            route.startsWith("meds/edit/") -> route.removePrefix("meds/edit/").toLongOrNull()?.let { EditMedication(it) }
             else -> null
         }
     }
@@ -70,6 +74,12 @@ class AylaNavigator(initialTab: Screen.Tab = Screen.Today, initialStack: List<Sc
         } else if (stack.lastOrNull() != screen) {
             stack.add(screen)
         }
+    }
+
+    /** Üstteki ekranı [screen] ile değiştirir (ör. "ilaç ekle" → "yeni ilaç formu"). */
+    fun replaceTop(screen: Screen) {
+        if (stack.isNotEmpty()) stack.removeAt(stack.lastIndex)
+        push(screen)
     }
 
     fun pop(): Boolean = when {

@@ -12,21 +12,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Inventory2
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -35,6 +34,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.pcos.R
 import com.ayla.pcos.data.db.MedicationEntity
+import com.ayla.pcos.data.db.MedicationKind
 import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.BantTuru
@@ -42,17 +42,19 @@ import com.ayla.pcos.ui.components.DozSatiri
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SatirZemini
 import com.ayla.pcos.ui.components.UyariBandi
+import com.ayla.pcos.ui.components.saatMetni
+import com.ayla.pcos.ui.theme.LocalAylaColors
 import kotlin.math.roundToInt
 
 @Composable
-fun MedsScreen(onAdd: () -> Unit, viewModel: MedsViewModel = hiltViewModel()) {
+fun MedsScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit, viewModel: MedsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     MedsContent(
         state = state,
         onAdd = onAdd,
         onTaken = { viewModel.markTaken(it) },
         onUndo = { viewModel.undo(it) },
-        onRemove = { viewModel.remove(it) },
+        onEdit = { onEdit(it.id) },
     )
 }
 
@@ -63,10 +65,8 @@ internal fun MedsContent(
     onAdd: () -> Unit,
     onTaken: (DoseItem) -> Unit,
     onUndo: (DoseItem) -> Unit,
-    onRemove: (MedicationEntity) -> Unit,
+    onEdit: (MedicationEntity) -> Unit,
 ) {
-    var pendingRemoval by remember { mutableStateOf<MedicationEntity?>(null) }
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 24.dp),
@@ -95,85 +95,89 @@ internal fun MedsContent(
                     TextButton(onClick = onAdd) { Text(stringResource(R.string.today_add_med)) }
                 }
             }
-        } else {
-            item { Overline(stringResource(R.string.label_today)) }
-            items(state.todayDoses, key = { "${it.medication.id}-${it.time}" }) { dose ->
-                DozSatiri(item = dose, onTaken = { onTaken(dose) }, onUndo = { onUndo(dose) })
-            }
+            return@LazyColumn
+        }
 
-            item {
-                val a = state.weekAdherence
-                AylaCard {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
-                        Column {
-                            Overline(stringResource(R.string.meds_adherence_title))
-                            Text(stringResource(R.string.meds_adherence_text, a.scheduled, a.taken), style = MaterialTheme.typography.titleMedium)
-                        }
-                        Text(
-                            text = "%" + (a.ratio * 100).roundToInt(),
-                            style = MaterialTheme.typography.displaySmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
+        item { Overline(stringResource(R.string.label_today)) }
+        items(state.todayDoses, key = { "${it.medication.id}-${it.time}" }) { dose ->
+            DozSatiri(item = dose, onTaken = { onTaken(dose) }, onUndo = { onUndo(dose) })
+        }
+
+        item {
+            val a = state.weekAdherence
+            AylaCard {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Overline(stringResource(R.string.meds_adherence_title))
+                        Text(stringResource(R.string.meds_adherence_text, a.scheduled, a.taken), style = MaterialTheme.typography.titleMedium)
                     }
-                }
-            }
-
-            item { Overline(stringResource(R.string.action_all)) }
-            items(state.medications, key = { it.id }) { med ->
-                MedicationRow(med, onRemove = { pendingRemoval = med })
-            }
-
-            if (state.medications.any { it.name.contains("inofolic", ignoreCase = true) || it.name.contains("inositol", ignoreCase = true) }) {
-                item {
-                    UyariBandi(
-                        tur = BantTuru.BILGI,
-                        title = stringResource(R.string.meds_inositol_evidence_title),
-                        text = stringResource(R.string.meds_inositol_evidence_text),
+                    Text(
+                        text = "%" + (a.ratio * 100).roundToInt(),
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
         }
-    }
 
-    pendingRemoval?.let { med ->
-        AlertDialog(
-            onDismissRequest = { pendingRemoval = null },
-            title = { Text(stringResource(R.string.meds_remove)) },
-            text = { Text(stringResource(R.string.meds_remove_confirm, med.name)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    onRemove(med)
-                    pendingRemoval = null
-                }) { Text(stringResource(R.string.meds_remove)) }
-            },
-            dismissButton = { TextButton(onClick = { pendingRemoval = null }) { Text(stringResource(R.string.action_cancel)) } },
-        )
+        item {
+            Spacer(Modifier.height(4.dp))
+            Overline(stringResource(R.string.meds_list_title))
+        }
+        if (state.medications.any { isInositol(it.name) }) {
+            item {
+                UyariBandi(
+                    tur = BantTuru.BILGI,
+                    title = stringResource(R.string.meds_inositol_evidence_title),
+                    text = stringResource(R.string.meds_inositol_evidence_text),
+                )
+            }
+        }
+        items(state.medications, key = { it.id }) { med ->
+            MedicationRow(med, onClick = { onEdit(med) })
+        }
     }
 }
 
 @Composable
-private fun MedicationRow(med: MedicationEntity, onRemove: () -> Unit) {
-    SatirZemini {
+private fun MedicationRow(med: MedicationEntity, onClick: () -> Unit) {
+    val scheme = MaterialTheme.colorScheme
+    val colors = LocalAylaColors.current
+    SatirZemini(onClick = onClick) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(med.name, style = MaterialTheme.typography.titleMedium)
-            val times = med.times.joinToString(" · ") { it.toString() }
-            Text(
-                "${med.doseText} · $times",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(med.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f, fill = false))
+                if (isInositol(med.name) || med.kind == MedicationKind.HERBAL) {
+                    Surface(shape = CircleShape, color = colors.lavantaAcik) {
+                        Text(
+                            stringResource(R.string.meds_evidence_limited),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = colors.lavanta,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                        )
+                    }
+                }
+            }
+            val times = med.times.joinToString(" · ") { it.saatMetni() }
+            Text("${med.doseText} · $times", style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
             med.stockCount?.let { stock ->
-                val perDay = med.times.size.coerceAtLeast(1)
+                val daysLeft = stock / med.times.size.coerceAtLeast(1)
+                val low = daysLeft <= med.stockWarnDays
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Icon(Icons.Rounded.Inventory2, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Rounded.Inventory2,
+                        contentDescription = null,
+                        tint = if (low) colors.uyari else scheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp),
+                    )
                     Text(
-                        stringResource(R.string.meds_stock_days, med.name, stock / perDay),
+                        stringResource(if (low) R.string.meds_stock_low else R.string.meds_stock_left, daysLeft),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (low) colors.uyari else scheme.onSurfaceVariant,
                     )
                 }
             }
         }
-        TextButton(onClick = onRemove) { Text(stringResource(R.string.meds_remove)) }
+        Icon(Icons.Rounded.ChevronRight, contentDescription = stringResource(R.string.action_edit), tint = scheme.onSurfaceVariant)
     }
 }

@@ -36,6 +36,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.rounded.SentimentDissatisfied
+import androidx.compose.material.icons.rounded.SentimentNeutral
+import androidx.compose.material.icons.rounded.SentimentSatisfied
+import androidx.compose.material.icons.rounded.SentimentVeryDissatisfied
+import androidx.compose.material.icons.rounded.SentimentVerySatisfied
+import androidx.compose.ui.text.style.TextAlign
 import com.ayla.pcos.R
 import com.ayla.pcos.data.repo.SymptomCatalog
 import com.ayla.pcos.ui.components.Overline
@@ -86,24 +93,37 @@ internal fun DailyLogContent(
             Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                 Column {
                     Overline(dateText)
-                    Text(stringResource(R.string.log_title), style = MaterialTheme.typography.headlineMedium)
+                    Text(stringResource(if (state.isToday) R.string.log_title else R.string.log_title_past), style = MaterialTheme.typography.headlineMedium)
                 }
                 IconButton(onClick = onClose) { Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.action_close)) }
             }
 
             Bolum(stringResource(R.string.log_mood)) {
+                val moods = listOf(
+                    Icons.Rounded.SentimentVeryDissatisfied to R.string.mood_1,
+                    Icons.Rounded.SentimentDissatisfied to R.string.mood_2,
+                    Icons.Rounded.SentimentNeutral to R.string.mood_3,
+                    Icons.Rounded.SentimentSatisfied to R.string.mood_4,
+                    Icons.Rounded.SentimentVerySatisfied to R.string.mood_5,
+                )
                 SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    val labels = listOf(R.string.mood_1, R.string.mood_2, R.string.mood_3, R.string.mood_4, R.string.mood_5)
-                    labels.forEachIndexed { index, res ->
+                    moods.forEachIndexed { index, (icon, res) ->
                         SegmentedButton(
                             selected = state.mood == index + 1,
                             onClick = { onMood(index + 1) },
-                            shape = SegmentedButtonDefaults.itemShape(index = index, count = labels.size),
-                            label = { Text((index + 1).toString()) },
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = moods.size),
+                            icon = {},
+                            label = { Icon(icon, contentDescription = stringResource(res), modifier = Modifier.size(26.dp)) },
                         )
                     }
                 }
-                state.mood?.let { Text(stringResource(listOf(R.string.mood_1, R.string.mood_2, R.string.mood_3, R.string.mood_4, R.string.mood_5)[it - 1]), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                Text(
+                    state.mood?.let { stringResource(moods[it - 1].second) } ?: stringResource(R.string.log_mood_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
+                )
             }
 
             Bolum(stringResource(R.string.log_energy)) {

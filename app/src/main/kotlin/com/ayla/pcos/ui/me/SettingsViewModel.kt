@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.export.DataExporter
+import com.ayla.pcos.reminders.ReminderNotifier
 import com.ayla.pcos.reminders.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -26,6 +27,7 @@ class SettingsViewModel @Inject constructor(
     private val prefs: UserPreferencesRepository,
     private val exporter: DataExporter,
     private val scheduler: ReminderScheduler,
+    private val notifier: ReminderNotifier,
 ) : ViewModel() {
 
     val preferences: StateFlow<UserPreferences?> = prefs.preferences
@@ -35,6 +37,8 @@ class SettingsViewModel @Inject constructor(
     val events: SharedFlow<SettingsEvent> = _events
 
     fun exactAlarmsAllowed(): Boolean = scheduler.exactAlarmsAllowed()
+
+    fun notificationsEnabled(): Boolean = notifier.notificationsEnabled()
 
     fun update(transform: (UserPreferences) -> UserPreferences) = viewModelScope.launch {
         prefs.update(transform)

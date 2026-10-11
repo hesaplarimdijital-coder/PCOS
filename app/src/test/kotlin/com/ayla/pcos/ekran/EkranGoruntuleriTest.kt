@@ -12,7 +12,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
 import com.ayla.pcos.ui.AppLockContent
@@ -22,6 +22,8 @@ import com.ayla.pcos.ui.log.DailyLogContent
 import com.ayla.pcos.ui.me.MeContent
 import com.ayla.pcos.ui.me.SettingsContent
 import com.ayla.pcos.ui.meds.AddMedicationContent
+import com.ayla.pcos.ui.meds.EditMedicationContent
+import com.ayla.pcos.ui.meds.EditMedicationState
 import com.ayla.pcos.ui.meds.MedsContent
 import com.ayla.pcos.ui.navigation.Screen
 import com.ayla.pcos.ui.onboarding.OnboardingContent
@@ -30,12 +32,14 @@ import com.ayla.pcos.ui.theme.AylaTheme
 import com.ayla.pcos.ui.today.TodayContent
 import com.ayla.pcos.ui.today.TodayUiState
 import com.github.takahirom.roborazzi.captureRoboImage
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+import java.util.TimeZone
 
 /**
  * Ekran görüntüleri: durumsuz içerikler örnek veriyle çizilir ve app/build/ekran altına PNG olarak
@@ -51,6 +55,12 @@ class EkranGoruntuleriTest {
 
     @get:Rule
     val compose = createComposeRule()
+
+    @Before
+    fun saatDilimi() {
+        // Saatler (doz, uyku) kullanıcının diliminde gösterilir; CI sunucusu UTC'dir.
+        TimeZone.setDefault(TimeZone.getTimeZone(Ornek.zone))
+    }
 
     private fun ekran(
         ad: String,
@@ -90,13 +100,19 @@ class EkranGoruntuleriTest {
 
     @Composable
     private fun Takvim(secili: Boolean = true) = CalendarContent(
-        state = Ornek.takvim(if (secili) Ornek.bugun.minusDays(20) else null),
+        state = Ornek.takvim(if (secili) Ornek.bugun.minusDays(4) else null),
         onPrevious = {}, onNext = {}, onToday = {}, onSelect = {}, onOpenLog = {},
         onMarkStart = {}, onMarkEnd = {}, onUnmark = {}, onExcluded = { _, _ -> },
     )
 
     @Composable
-    private fun Ilaclar() = MedsContent(state = Ornek.ilaclar, onAdd = {}, onTaken = {}, onUndo = {}, onRemove = {})
+    private fun Ilaclar() = MedsContent(state = Ornek.ilaclar, onAdd = {}, onTaken = {}, onUndo = {}, onEdit = {})
+
+    @Composable
+    private fun IlacFormu(state: EditMedicationState) = EditMedicationContent(
+        state = state, onBack = {}, onName = {}, onDose = {}, onKind = {}, onAddTime = {}, onRemoveTime = {},
+        onFood = {}, onStock = {}, onStockWarnDays = {}, onRegimen = {}, onPackStart = {}, onSave = {}, onRemove = {},
+    )
 
     @Composable
     private fun Plan() = PlanContent(
@@ -131,7 +147,7 @@ class EkranGoruntuleriTest {
     }
 
     @Test fun t10_ilac_ekle() = ekran("10-ilac-ekle") {
-        AddMedicationContent(onBack = {}, onTemplate = {}, onSaveCustom = { _, _, _, _, _, _ -> })
+        AddMedicationContent(onBack = {}, onTemplate = { _, _ -> }, onCustom = {}, today = Ornek.bugun)
     }
 
     @Test fun t11_karsilama() = ekran("11-karsilama") {
@@ -144,6 +160,10 @@ class EkranGoruntuleriTest {
 
     @Test fun t13_karsilama_izinler() = ekran("13-karsilama-izinler") {
         OnboardingContent(Ornek.karsilamaIzinler, {}, {}, {}, {}, {}, {}, { _, _, _ -> })
+    }
+
+    @Test fun t19_bugun_bildirim_kapali() = ekran("19-bugun-bildirim-kapali", sekme = Screen.Today) {
+        Bugun(Ornek.bugunDongu.copy(notificationsOff = true))
     }
 
     @Test fun t14_kilit() = ekran("14-kilit") {
@@ -191,9 +211,10 @@ class EkranGoruntuleriTest {
     }
 
     @Config(qualifiers = UZUN)
-    @Test fun u07_ilac_ekle_tum() = ekran("u07-ilac-ekle-tum") {
-        AddMedicationContent(onBack = {}, onTemplate = {}, onSaveCustom = { _, _, _, _, _, _ -> })
-    }
+    @Test fun u07_ilac_duzenle_tum() = ekran("u07-ilac-duzenle-tum") { IlacFormu(Ornek.ilacDuzenle) }
+
+    @Config(qualifiers = UZUN)
+    @Test fun u08_hap_duzenle_tum() = ekran("u08-hap-duzenle-tum") { IlacFormu(Ornek.hapDuzenle) }
 }
 
 internal const val TELEFON = "w393dp-h852dp-xhdpi"

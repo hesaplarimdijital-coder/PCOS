@@ -43,6 +43,14 @@ import com.ayla.cycle.Confidence
 import com.ayla.cycle.CycleOverview
 import com.ayla.cycle.LongCycleAlert
 import com.ayla.cycle.Prediction
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalDensity
+import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
+import com.ayla.pcos.ui.components.TarihSeciciDialog
+import com.ayla.pcos.ui.theme.AylaExpressiveShapes
 import com.ayla.pcos.R
 import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.ui.components.AylaCard
@@ -89,6 +97,8 @@ fun TodayScreen(
         onUndo = viewModel::undoTaken,
         onPeriodStart = viewModel::startPeriodToday,
         onPeriodEnd = viewModel::endPeriodToday,
+        onDismissNotificationBand = { viewModel.dismissNotificationBand() },
+        onPeriodStartAt = { viewModel.startPeriodAt(it) },
     )
 }
 
@@ -104,6 +114,8 @@ internal fun TodayContent(
     onUndo: (DoseItem) -> Unit,
     onPeriodStart: () -> Unit,
     onPeriodEnd: () -> Unit,
+    onDismissNotificationBand: () -> Unit = {},
+    onPeriodStartAt: (LocalDate) -> Unit = {},
     hour: Int = LocalTime.now().hour,
 ) {
     val overview = state.overview
@@ -124,38 +136,49 @@ internal fun TodayContent(
                     Text(greeting(state.displayName, hour), style = MaterialTheme.typography.headlineMedium)
                 }
                 IconButton(onClick = onOpenSettings) {
-                    Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.me_privacy))
+                    Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.me_settings))
                 }
             }
         }
 
+        val noPeriodYet = state.pillMode == null && overview?.lastPeriodStart == null
         item {
-            if (state.pillMode != null) {
-                PillHero(state.pillMode)
-            } else {
-                CycleHero(overview, hidePrediction = state.hidePrediction, today = state.today)
+            when {
+                state.pillMode != null -> PillHero(state.pillMode)
+                noPeriodYet -> IlkAdetKarti(today = state.today, onPick = onPeriodStartAt)
+                else -> CycleHero(overview, hidePrediction = state.hidePrediction, today = state.today)
             }
         }
 
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = onOpenLog, modifier = Modifier.weight(1f)) {
+            // Hap modunda doğal adet kaydı anlamsızdır (plasebo kanaması kanama olarak günlükte işaretlenir);
+            // ilk adet kartı da kendi düğmesini taşır.
+            val showPeriodButton = state.pillMode == null && !noPeriodYet
+            val stacked = LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI
+            val logButton: @Composable (Modifier) -> Unit = { m ->
+                Button(onClick = onOpenLog, modifier = m) {
                     Icon(Icons.Rounded.EditNote, contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.size(8.dp))
                     Text(stringResource(R.string.today_daily_log))
                 }
-                if (state.openPeriod != null) {
-                    FilledTonalButton(onClick = onPeriodEnd, modifier = Modifier.weight(1f)) {
-                        Icon(Icons.Rounded.LocalFlorist, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.size(8.dp))
-                        Text(stringResource(R.string.today_period_ended))
-                    }
-                } else {
-                    FilledTonalButton(onClick = onPeriodStart, modifier = Modifier.weight(1f)) {
-                        Icon(Icons.Rounded.LocalFlorist, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.size(8.dp))
-                        Text(stringResource(R.string.today_period_started))
-                    }
+            }
+            val periodButton: @Composable (Modifier) -> Unit = { m ->
+                val ended = state.openPeriod != null
+                FilledTonalButton(onClick = if (ended) onPeriodEnd else onPeriodStart, modifier = m) {
+                    Icon(Icons.Rounded.LocalFlorist, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.size(8.dp))
+                    Text(stringResource(if (ended) R.string.today_period_ended else R.string.today_period_started))
+                }
+            }
+            if (stacked || !showPeriodButton) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    logButton(Modifier.fillMaxWidth())
+                    if (showPeriodButton) periodButton(Modifier.fillMaxWidth())
+                }
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    logButton(Modifier.weight(1f))
+                    periodButton(Modifier.weight(1f))
                 }
             }
         }
@@ -177,6 +200,21 @@ internal fun TodayContent(
                     tur = BantTuru.DIKKAT,
                     title = stringResource(R.string.alert_few_periods_title),
                     text = stringResource(R.string.alert_few_periods_text),
+                )
+            }
+        }
+
+        if (state.notificationsOff) {
+            item {
+                val context = LocalContext.current
+                UyariBandi(
+                    tur = BantTuru.DIKKAT,
+                    title = stringResource(R.string.today_notifications_off_title),
+                    text = stringResource(R.string.today_notifications_off_text),
+                    actionLabel = stringResource(R.string.action_open_settings),
+                    onAction = { openNotificationSettings(context) },
+                    dismissLabel = stringResource(R.string.action_not_now),
+                    onDismiss = onDismissNotificationBand,
                 )
             }
         }
@@ -276,10 +314,10 @@ private fun CycleHero(overview: CycleOverview?, hidePrediction: Boolean, today: 
             HaleMerkezi(
                 label = stringResource(R.string.label_cycle_day),
                 day = day,
-                subtitle = when {
-                    lastStart == null -> stringResource(R.string.label_no_period_yet)
-                    overdue -> stringResource(R.string.label_cycle_longer_than_expected)
-                    else -> stringResource(R.string.label_last_period, lastStart.format(dayMonth))
+                subtitle = if (lastStart == null) {
+                    stringResource(R.string.label_no_period_yet)
+                } else {
+                    stringResource(R.string.label_last_period, lastStart.format(dayMonth))
                 },
             )
         }
@@ -378,6 +416,56 @@ private fun PillHero(pill: PillModeState) {
             stringResource(R.string.today_pill_note),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/** Uygulamanın sistem bildirim ayarları (Android 8+). */
+internal fun openNotificationSettings(context: android.content.Context) {
+    val intent = android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
+        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+    runCatching { context.startActivity(intent) }
+}
+
+/**
+ * Henüz adet kaydı yokken halka yerine: sıcak bir karşılama ve son adet tarihini seçme düğmesi.
+ * "Adet başladı" yalnızca bugünü kaydeder; ilk kayıt çoğunlukla geçmiş bir gündür.
+ */
+@Composable
+private fun IlkAdetKarti(today: LocalDate, onPick: (LocalDate) -> Unit) {
+    var showPicker by rememberSaveable { mutableStateOf(false) }
+    val scheme = MaterialTheme.colorScheme
+    AylaCard(containerColor = scheme.primaryContainer, bordered = false) {
+        Box(
+            modifier = Modifier
+                .size(72.dp)
+                .background(LocalAylaColors.current.kart, AylaExpressiveShapes.Cicek),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(Icons.Rounded.LocalFlorist, contentDescription = null, tint = scheme.primary, modifier = Modifier.size(32.dp))
+        }
+        Spacer(Modifier.height(16.dp))
+        Text(stringResource(R.string.today_empty_title), style = MaterialTheme.typography.headlineSmall, color = scheme.onPrimaryContainer)
+        Spacer(Modifier.height(6.dp))
+        Text(stringResource(R.string.empty_today), style = MaterialTheme.typography.bodyMedium, color = scheme.onPrimaryContainer)
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = { showPicker = true }) {
+            Icon(Icons.Rounded.CalendarMonth, contentDescription = null, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.size(8.dp))
+            Text(stringResource(R.string.today_empty_pick))
+        }
+    }
+    if (showPicker) {
+        TarihSeciciDialog(
+            title = stringResource(R.string.onboarding_period_title),
+            initial = today,
+            latest = today,
+            onDismiss = { showPicker = false },
+            onConfirm = { date ->
+                showPicker = false
+                onPick(date)
+            },
         )
     }
 }

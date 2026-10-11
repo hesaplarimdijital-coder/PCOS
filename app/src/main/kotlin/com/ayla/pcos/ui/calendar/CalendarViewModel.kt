@@ -65,6 +65,8 @@ data class CalendarUiState(
     /** En yeni en üstte; yalnızca tamamlanmış döngüler. */
     val history: List<CycleRow> = emptyList(),
     val hidePrediction: Boolean = false,
+    /** Bugün döngünün kaçıncı günü (başlıkta); kayıt yoksa null. */
+    val cycleDay: Int? = null,
 )
 
 /** Ay + veri birleşimi; seçimle birleştirilmeden önceki ara durum. */
@@ -120,6 +122,7 @@ class CalendarViewModel @Inject constructor(
             stats = snap.overview.stats,
             history = history,
             hidePrediction = snap.hidePrediction,
+            cycleDay = snap.overview.currentCycleDay,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), CalendarUiState())
 

@@ -3,6 +3,8 @@ package com.ayla.pcos.ui.me
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Medication
-import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -50,6 +52,8 @@ import com.ayla.pcos.ui.components.SatirZemini
 import com.ayla.pcos.ui.components.SimgeZemini
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalAylaColors
+import java.time.format.TextStyle
+import java.time.DayOfWeek
 
 /** Ben: döngü düzeni, takviye uyumu, su ve kayıt alışkanlığı; ayarlara giriş. Sayılar yargılamaz, gösterir. */
 @Composable
@@ -76,9 +80,9 @@ internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Column {
-            Overline(stringResource(R.string.nav_me))
+            Overline(stringResource(R.string.me_title))
             Text(
-                if (state.displayName.isBlank()) stringResource(R.string.me_title) else state.displayName,
+                state.displayName.ifBlank { stringResource(R.string.me_title_anon) },
                 style = MaterialTheme.typography.headlineMedium,
             )
         }
@@ -136,13 +140,19 @@ internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit) {
             Overline(stringResource(R.string.me_last_4_weeks))
             Spacer(Modifier.height(6.dp))
             KayitIzgarasi(cells = state.logGrid, filled = colors.lavanta, empty = colors.cukur)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                stringResource(R.string.me_log_grid_a11y, state.logGrid.count { it == true }),
+                style = MaterialTheme.typography.bodySmall,
+                color = scheme.onSurfaceVariant,
+            )
         }
 
         SatirZemini(onClick = onOpenSettings) {
-            SimgeZemini(icon = Icons.Rounded.Shield, background = scheme.secondaryContainer, tint = scheme.secondary)
+            SimgeZemini(icon = Icons.Rounded.Settings, background = scheme.secondaryContainer, tint = scheme.secondary)
             Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(R.string.me_privacy), style = MaterialTheme.typography.titleMedium)
-                Text(stringResource(R.string.settings_privacy_intro), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, maxLines = 2)
+                Text(stringResource(R.string.me_settings), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.me_settings_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, maxLines = 2)
             }
             Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = scheme.onSurfaceVariant)
         }
@@ -184,6 +194,8 @@ private fun OlcutKarti(
             color = barColor,
             trackColor = LocalAylaColors.current.cukur,
             strokeCap = StrokeCap.Round,
+            gapSize = 0.dp,
+            drawStopIndicator = {},
         )
         extra?.invoke()
     }
@@ -199,7 +211,7 @@ private fun DonguCubuklari(lengths: List<Int>) {
     val scheme = MaterialTheme.colorScheme
     val maxLen = maxOf(45, lengths.max())
     val a11y = stringResource(R.string.me_cycle_lengths_a11y, lengths.joinToString(", "))
-    val bar = scheme.primary
+    val bar = scheme.primary.copy(alpha = 0.85f)
     val band = colors.basariAcik
     val bandLine = colors.basari
     Column(modifier = Modifier.semantics { contentDescription = a11y }) {
@@ -211,7 +223,7 @@ private fun DonguCubuklari(lengths: List<Int>) {
             drawLine(bandLine.copy(alpha = 0.5f), Offset(0f, y(35)), Offset(size.width, y(35)), strokeWidth = 1f)
             drawLine(bandLine.copy(alpha = 0.5f), Offset(0f, y(21)), Offset(size.width, y(21)), strokeWidth = 1f)
             val slot = size.width / lengths.size
-            val barWidth = (slot * 0.5f).coerceAtMost(28.dp.toPx())
+            val barWidth = (slot * 0.34f).coerceAtMost(18.dp.toPx())
             lengths.forEachIndexed { index, len ->
                 val left = slot * index + (slot - barWidth) / 2f
                 val top = y(len)
@@ -227,6 +239,31 @@ private fun DonguCubuklari(lengths: List<Int>) {
             lengths.forEach { len ->
                 Text(
                     len.toString(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = scheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(Modifier.size(width = 18.dp, height = 10.dp).background(band, RoundedCornerShape(3.dp)))
+            Text(stringResource(R.string.me_cycle_band), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+        }
+    }
+}
+
+/** 4 hafta × 7 gün nokta ızgarası (Pazartesi başlar): kayıt olan günler dolu, gelecek günler boş halka. */
+@Composable
+private fun KayitIzgarasi(cells: List<Boolean?>, filled: Color, empty: Color) {
+    val scheme = MaterialTheme.colorScheme
+    val tr = java.util.Locale.forLanguageTag("tr")
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            (1..7).map(DayOfWeek::of).forEach { dow ->
+                Text(
+                    dow.getDisplayName(TextStyle.NARROW, tr),
                     style = MaterialTheme.typography.labelSmall,
                     color = scheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -234,18 +271,15 @@ private fun DonguCubuklari(lengths: List<Int>) {
                 )
             }
         }
-    }
-}
-
-/** 4 hafta × 7 gün nokta ızgarası: kayıt olan günler dolu. */
-@Composable
-private fun KayitIzgarasi(cells: List<Boolean>, filled: Color, empty: Color) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         cells.chunked(7).forEach { week ->
             Row(modifier = Modifier.fillMaxWidth()) {
                 week.forEach { on ->
                     Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Box(modifier = Modifier.size(12.dp).background(if (on) filled else empty, CircleShape))
+                        when (on) {
+                            true -> Box(Modifier.size(14.dp).background(filled, CircleShape))
+                            false -> Box(Modifier.size(14.dp).background(empty, CircleShape))
+                            null -> Box(Modifier.size(14.dp).border(1.dp, empty, CircleShape))
+                        }
                     }
                 }
             }

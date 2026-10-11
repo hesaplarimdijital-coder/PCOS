@@ -24,6 +24,7 @@ import com.ayla.pcos.ui.calendar.calendarDayRules
 import com.ayla.pcos.ui.log.DailyLogUiState
 import com.ayla.pcos.ui.me.CycleTrend
 import com.ayla.pcos.ui.me.MeUiState
+import com.ayla.pcos.ui.meds.EditMedicationState
 import com.ayla.pcos.ui.meds.MedsUiState
 import com.ayla.pcos.ui.onboarding.OnboardingState
 import com.ayla.pcos.ui.plan.DayCups
@@ -146,7 +147,7 @@ internal object Ornek {
         }
         return CalendarUiState(
             loading = false, month = month, today = bugun, weeks = weeks, selected = secili, actions = actions,
-            stats = genelBakis.stats,
+            stats = genelBakis.stats, cycleDay = genelBakis.currentCycleDay,
             history = cycles.filter { it.isComplete }.asReversed().map { c -> CycleRow(c, adetler.firstOrNull { it.startDate == c.start }) },
         )
     }
@@ -164,7 +165,7 @@ internal object Ornek {
         lastNight = SleepEntity(id = 1, date = bugun, startAt = instant(bugun.minusDays(1), LocalTime.of(23, 40)), endAt = instant(bugun, LocalTime.of(7, 15)), quality = 3),
         sleepWeek = listOf(
             SleepEntity(id = 1, date = bugun, startAt = instant(bugun.minusDays(1), LocalTime.of(23, 40)), endAt = instant(bugun, LocalTime.of(7, 15)), quality = 3),
-            SleepEntity(id = 2, date = bugun.minusDays(1), startAt = instant(bugun.minusDays(2), LocalTime.of(0, 30)), endAt = instant(bugun.minusDays(1), LocalTime.of(7, 0)), quality = 2),
+            SleepEntity(id = 2, date = bugun.minusDays(1), startAt = instant(bugun.minusDays(1), LocalTime.of(0, 30)), endAt = instant(bugun.minusDays(1), LocalTime.of(7, 0)), quality = 2),
             SleepEntity(id = 3, date = bugun.minusDays(2), startAt = instant(bugun.minusDays(3), LocalTime.of(23, 5)), endAt = instant(bugun.minusDays(2), LocalTime.of(6, 50)), quality = 3),
         ),
         eveningRoutineEnabled = true, eveningRoutineTime = LocalTime.of(22, 30),
@@ -175,7 +176,8 @@ internal object Ornek {
         cycleLengths = listOf(38, 33, 44, 36, 41, 35), trend = CycleTrend.Variable(33, 44),
         adherence = Adherence(taken = 11, scheduled = 14), hasMedications = true,
         waterDaysThisWeek = 3, logDaysThisWeek = 5,
-        logGrid = List(28) { i -> i % 3 != 1 || i > 24 },
+        // Bugün Pazartesi: son satırın ilk hücresi bugün, sonrası gelecek.
+        logGrid = List(28) { i -> if (i > 21) null else (i % 3 != 1) },
     )
 
     val gunlukKayit = DailyLogUiState(
@@ -188,6 +190,9 @@ internal object Ornek {
         onboardingDone = true, displayName = "Elif", goals = setOf(Goal.CYCLE, Goal.SYMPTOMS),
         trackingSince = baslangiclar.first(),
     )
+
+    val ilacDuzenle = EditMedicationState.from(inofolic, bugun)
+    val hapDuzenle = EditMedicationState.from(hap, bugun)
 
     val karsilama = OnboardingState(step = 0, name = "Elif")
     val karsilamaHedefler = OnboardingState(step = 1, name = "Elif", goals = setOf(Goal.CYCLE, Goal.SYMPTOMS))

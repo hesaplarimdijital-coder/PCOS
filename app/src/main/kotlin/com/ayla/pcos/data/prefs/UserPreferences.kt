@@ -48,4 +48,6 @@ data class UserPreferences(
 
     // Uyarı tekrarını önlemek için
     val lastLongCycleAlertKey: String = "",
+    /** "Bildirimler kapalı" bandı kapatıldı; bildirimler yeniden açılınca sıfırlanır. */
+    val notificationsBandDismissed: Boolean = false,
 )

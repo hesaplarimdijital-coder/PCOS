@@ -59,6 +59,7 @@
     <string name="today_dose_taken_at">Alındı · %1$s</string>
     <string name="today_dose_skipped">Atlandı</string>
     <string name="today_dose_missed">Kaçtı</string>
+    <string name="today_dose_taken_a11y">Alındı. Geri almak için dokun.</string>
     <string name="today_dose_with_food">yemekle</string>
     <string name="today_dose_without_food">aç karna</string>
     <string name="today_pill_title">Doğum kontrol hapı</string>
@@ -69,6 +70,10 @@
     <string name="today_ring_a11y">Döngünün %1$d. günü. Tahmini adet %2$s ile %3$s arası, güven %4$s.</string>
     <string name="today_ring_a11y_no_prediction">Döngünün %1$d. günü. Henüz tahmin yok.</string>
     <string name="today_ring_a11y_past">Döngünün %1$d. günü. Döngü beklenenden uzun sürüyor.</string>
+    <string name="today_notifications_off_title">Bildirimler kapalı</string>
+    <string name="today_notifications_off_text">İlaç ve su hatırlatmaların gelmeyecek. İstersen bildirim ayarlarından açabilirsin.</string>
+    <string name="today_empty_title">Ritmini birlikte okuyalım</string>
+    <string name="today_empty_pick">Son adet tarihini seç</string>
     <string name="today_period_prompt_title">Adet başladı mı?</string>
     <string name="today_period_prompt_text">Bugün başladıysa tek dokunuşla kaydet; başka bir gün için takvimi kullan.</string>
 
@@ -131,12 +136,18 @@
     <string name="onboarding_exact_alarm_text">Günde iki dozluk takviyelerin tam saatinde hatırlatılması için Android&#8217;in &#8220;Alarmlar ve hatırlatıcılar&#8221; izni gerekir. İzin yoksa hatırlatma 10 dakikaya kadar gecikebilir.</string>
     <string name="onboarding_allow_notifications">Bildirimlere izin ver</string>
     <string name="onboarding_allow_exact_alarm">Alarm iznini aç</string>
+    <string name="onboarding_notifications_granted">Bildirimler açık</string>
+    <string name="onboarding_notifications_denied">İzin verilmedi. Ayla bildirimsiz de çalışır; istediğin zaman ayarlardan açabilirsin.</string>
+    <string name="onboarding_open_notification_settings">Bildirim ayarlarını aç</string>
+    <string name="onboarding_exact_alarm_granted">Tam zamanlı hatırlatma açık</string>
     <string name="onboarding_step">Adım %1$d / %2$d</string>
     <string name="onboarding_start">Başlayalım</string>
     <string name="onboarding_disclaimer">Ayla tıbbi tavsiye vermez. Tanı ve tedavi için doktoruna danış.</string>
 
     <!-- Günlük kayıt -->
     <string name="log_title">Bugün nasılsın?</string>
+    <string name="log_title_past">O gün nasıldın?</string>
+    <string name="log_mood_hint">Sana en yakın yüzü seç</string>
     <string name="log_mood">Ruh hâlin</string>
     <string name="log_energy">Enerjin</string>
     <string name="log_flow">Kanama</string>
@@ -177,7 +188,7 @@
     <string name="meds_title">İlaçlar</string>
     <string name="meds_add_title">İlaç ya da takviye ekle</string>
     <string name="meds_templates">Hızlı ekle</string>
-    <string name="meds_custom">Özel ekle</string>
+    <string name="meds_custom">Kendin ekle</string>
     <string name="meds_name">Ad</string>
     <string name="meds_dose">Doz (ör. 1 kapsül)</string>
     <string name="meds_times">Saatler</string>
@@ -198,6 +209,29 @@
     <string name="meds_remove">Listeden kaldır</string>
     <string name="meds_remove_confirm">%1$s listeden kaldırılsın mı? Geçmiş kayıtlar silinmez.</string>
     <string name="meds_times_per_day">günde %1$d</string>
+    <string name="meds_new_title">Yeni ilaç ya da takviye</string>
+    <string name="meds_edit_title">İlacı düzenle</string>
+    <string name="meds_kind">Tür</string>
+    <string name="meds_remove_time">%1$s saatini kaldır</string>
+    <string name="meds_regimen">Paket düzeni</string>
+    <string name="meds_regimen_21_7">21 + 7</string>
+    <string name="meds_regimen_24_4">24 + 4</string>
+    <string name="meds_regimen_28">Sürekli 28</string>
+    <string name="meds_pack_start_text">Paketteki ilk hapı aldığın gün</string>
+    <string name="meds_food">Yemekle ilişkisi</string>
+    <string name="meds_without_food">Aç karna</string>
+    <string name="meds_food_any">Fark etmez</string>
+    <string name="meds_stock_section">Stok</string>
+    <string name="meds_stock_help">Her &#8220;Aldım&#8221; bir azaltır; bitmeden haber veririz.</string>
+    <string name="meds_stock_warn">Uyarı eşiği</string>
+    <string name="meds_stock_warn_value">%1$d gün kala</string>
+    <string name="meds_list_title">İlaçlarım</string>
+    <string name="meds_stock_left">Yaklaşık %1$d günlük stok</string>
+    <string name="meds_stock_low">Stok azalıyor: yaklaşık %1$d gün</string>
+    <string name="meds_custom_title">Listede yok mu?</string>
+    <string name="meds_custom_text">Adını, dozunu ve saatlerini kendin gir; doğum kontrol hapı için paket düzenini seç.</string>
+    <string name="meds_template_pill">%1$s · %2$s · %3$d etken + %4$d plasebo</string>
+    <string name="action_edit">Düzenle</string>
 
     <!-- Takvim -->
     <string name="calendar_title">Takvim</string>
@@ -218,6 +252,10 @@
     <string name="calendar_day_a11y_period">%1$s, kayıtlı adet</string>
     <string name="calendar_day_a11y_predicted">%1$s, tahmini adet aralığı</string>
     <string name="calendar_cycle_length">%1$d günlük döngü</string>
+    <string name="calendar_cycle_days">%1$d gün</string>
+    <string name="calendar_cycle_options">Döngü seçenekleri</string>
+    <string name="calendar_count_cycle">Ortalamaya kat</string>
+    <string name="calendar_count_cycle_text">Hastalık, ilaç değişimi gibi istisnai döngüleri hariç tutabilirsin</string>
     <string name="calendar_excluded_user">Hesap dışı</string>
     <string name="calendar_excluded_short">Çok kısa, hesap dışı</string>
 
@@ -261,16 +299,43 @@
     <string name="me_last_4_weeks">son 4 hafta</string>
     <string name="me_settings">Ayarlar</string>
     <string name="me_privacy">Gizlilik ve güvenlik</string>
+    <string name="me_settings_text">Profil, su hedefi, hatırlatmalar, gizlilik ve verilerin</string>
     <string name="me_cycle_trend_shorter">Son %1$d döngün art arda kısaldı</string>
     <string name="me_cycle_trend_text">Hedef aralık 21–35 gün; doğru yöndesin.</string>
     <string name="me_cycle_need_data">Döngü eğilimi için en az 3 tamamlanmış döngü gerekir.</string>
+    <string name="me_title_anon">Senin ritmin</string>
+    <string name="me_cycle_band">21–35 gün: tipik aralık</string>
+    <string name="me_log_grid_a11y">Son 4 haftada %1$d gün kayıt tuttun.</string>
     <string name="me_cycle_stable">Döngülerin düzenli: ortalama %1$d gün (±%2$d).</string>
     <string name="me_cycle_variable">Döngün %1$d–%2$d gün arasında değişiyor; PCOS&#8217;ta bu sık görülür. Hedef aralık 21–35 gün.</string>
     <string name="me_cycle_lengths_a11y">Son döngü uzunlukları: %1$s gün</string>
 
     <!-- Ayarlar ve gizlilik -->
-    <string name="settings_title">Gizlilik ve güvenlik</string>
+    <string name="settings_title">Ayarlar</string>
     <string name="settings_privacy_intro">Kayıtların bu telefonda şifreli saklanır. Reklam ya da izleme aracı yok; hesap açmadan kullanabilirsin.</string>
+    <string name="settings_section_profile">Profil</string>
+    <string name="settings_name_empty">Eklenmedi</string>
+    <string name="settings_section_water">Su</string>
+    <string name="settings_water_goal_value">%1$d bardak</string>
+    <string name="settings_water_goal_text">Günde yaklaşık %1$s litre</string>
+    <string name="settings_cup_size_value">%1$d ml</string>
+    <string name="settings_water_interval">Hatırlatma aralığı</string>
+    <string name="settings_interval_60">1 sa</string>
+    <string name="settings_interval_90">1,5 sa</string>
+    <string name="settings_interval_120">2 sa</string>
+    <string name="settings_interval_180">3 sa</string>
+    <string name="settings_active_start">Su hatırlatması başlangıcı</string>
+    <string name="settings_active_end">Su hatırlatması bitişi</string>
+    <string name="settings_cycle_notifications_text">60. ve 90. gün uyarıları, yılda 4\'ten az adet işareti</string>
+    <string name="settings_daily_check">Günlük kontrol</string>
+    <string name="settings_daily_check_text">Kaçan dozlar, stok ve döngü uyarıları bu saatte değerlendirilir</string>
+    <string name="settings_evening_text">Yatmadan önce nefes egzersizi ve ekran molası hatırlatması</string>
+    <string name="settings_evening_time">Akşam rutini saati</string>
+    <string name="settings_quiet_hours_short">Yalnızca ilaç hatırlatmaları ve akşam rutini gelir</string>
+    <string name="settings_quiet_start">Sessizlik başlangıcı</string>
+    <string name="settings_quiet_end">Sessizlik bitişi</string>
+    <string name="action_increase">Artır</string>
+    <string name="action_decrease">Azalt</string>
     <string name="settings_section_protection">Koruma</string>
     <string name="settings_app_lock">Uygulama kilidi</string>
     <string name="settings_app_lock_text">Parmak izi ya da PIN ile aç</string>
@@ -318,6 +383,6 @@
     <string name="action_understood">Anladım</string>
 
     <!-- Hata ve boş durumlar -->
-    <string name="empty_today">Henüz kayıt yok. İlk adetini ekleyince döngünü birlikte okumaya başlarız.</string>
+    <string name="empty_today">Son adetinin başladığı günü seçince döngü gününü ve tahmini aralığı göstermeye başlarız. Tarihi tam hatırlamıyorsan yaklaşık bir gün de olur.</string>
     <string name="error_generic">Bir şeyler ters gitti. Tekrar dener misin?</string>
 </resources>

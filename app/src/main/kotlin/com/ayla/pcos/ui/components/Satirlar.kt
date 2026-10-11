@@ -50,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -114,66 +115,102 @@ fun DozSatiri(
         null -> null
     }
 
-    SatirZemini(modifier = modifier) {
-        Text(
-            text = item.time.format(timeFormatter),
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.width(44.dp),
-        )
-        SimgeZemini(icon = icon, background = bg, tint = tint)
-        Column(modifier = Modifier.weight(1f)) {
-            Text(item.medication.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            val subtitle = when (item.status) {
-                DoseStatus.TAKEN -> {
-                    val at = item.event?.actedAt?.atZone(ZoneId.systemDefault())?.toLocalTime()?.format(timeFormatter)
-                    if (at != null) stringResource(R.string.today_dose_taken_at, at) else stringResource(R.string.action_taken)
-                }
-                DoseStatus.SKIPPED -> stringResource(R.string.today_dose_skipped)
-                DoseStatus.MISSED -> stringResource(R.string.today_dose_missed)
-                DoseStatus.PENDING -> listOfNotNull(item.medication.doseText, foodText).joinToString(" · ")
-            }
-            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    val subtitle = when (item.status) {
+        DoseStatus.TAKEN -> {
+            val at = item.event?.actedAt?.atZone(ZoneId.systemDefault())?.toLocalTime()?.format(timeFormatter)
+            if (at != null) stringResource(R.string.today_dose_taken_at, at) else stringResource(R.string.action_taken)
         }
-        AnimatedContent(
-            targetState = item.status,
-            transitionSpec = {
-                (scaleIn(AylaMotion.spatial(), initialScale = 0.6f) + fadeIn()) togetherWith (scaleOut(targetScale = 0.8f) + fadeOut())
-            },
-            label = "dozDurum",
-        ) { status ->
-            when (status) {
-                DoseStatus.TAKEN -> Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(colors.basari, RoundedCornerShape(30))
-                        .clickable(onClick = onUndo)
-                        .semantics { contentDescription = "Alındı" },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(Icons.Rounded.Check, contentDescription = null, tint = colors.kart)
+        DoseStatus.SKIPPED -> stringResource(R.string.today_dose_skipped)
+        DoseStatus.MISSED -> stringResource(R.string.today_dose_missed)
+        DoseStatus.PENDING -> listOfNotNull(item.medication.doseText, foodText).joinToString(" · ")
+    }
+    // Büyük yazıda tek satıra sığmaz: saat ve simge üstte, ad ortada, eylem altta sağda.
+    val buyukYazi = LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI
+
+    SatirZemini(modifier = modifier) {
+        if (!buyukYazi) {
+            DozSaati(item.time.format(timeFormatter))
+            SimgeZemini(icon = icon, background = bg, tint = tint)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(item.medication.name, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            DozEylemi(item.status, onTaken = onTaken, onUndo = onUndo, takenColor = colors.basari, takenTint = colors.kart)
+        } else {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SimgeZemini(icon = icon, background = bg, tint = tint)
+                    DozSaati(item.time.format(timeFormatter))
                 }
-                DoseStatus.MISSED -> DurumRozeti(
-                    text = stringResource(R.string.today_dose_missed),
-                    icon = Icons.Outlined.Schedule,
-                    background = colors.uyariAcik,
-                    tint = colors.uyari,
-                    onClick = onTaken,
-                )
-                DoseStatus.SKIPPED -> DurumRozeti(
-                    text = stringResource(R.string.today_dose_skipped),
-                    icon = Icons.Outlined.Schedule,
-                    background = colors.cukur,
-                    tint = scheme.onSurfaceVariant,
-                    onClick = onTaken,
-                )
-                DoseStatus.PENDING -> Button(
-                    onClick = onTaken,
-                    modifier = Modifier.height(40.dp),
-                    contentPadding = ButtonDefaults.ContentPadding,
-                ) {
-                    Text(stringResource(R.string.action_taken))
+                Text(item.medication.name, style = MaterialTheme.typography.titleMedium)
+                Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+                    DozEylemi(item.status, onTaken = onTaken, onUndo = onUndo, takenColor = colors.basari, takenTint = colors.kart)
                 }
+            }
+        }
+    }
+}
+
+/** Fontun yazı ölçeği bu değeri geçince satırlar dikey düzene geçer (erişilebilirlik). */
+const val BUYUK_YAZI_ESIGI = 1.3f
+
+@Composable
+private fun DozSaati(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        fontWeight = FontWeight.Bold,
+        maxLines = 1,
+        softWrap = false,
+        modifier = Modifier.widthIn(min = 44.dp),
+    )
+}
+
+/** Doz durumu düğmesi: bekliyor → "Aldım", alındı → yeşil onay (dokununca geri alır), kaçtı/atlandı → rozet. */
+@Composable
+private fun DozEylemi(status: DoseStatus, onTaken: () -> Unit, onUndo: () -> Unit, takenColor: Color, takenTint: Color) {
+    val colors = LocalAylaColors.current
+    val scheme = MaterialTheme.colorScheme
+    val takenLabel = stringResource(R.string.today_dose_taken_a11y)
+    AnimatedContent(
+        targetState = status,
+        transitionSpec = {
+            (scaleIn(AylaMotion.spatial(), initialScale = 0.6f) + fadeIn()) togetherWith (scaleOut(targetScale = 0.8f) + fadeOut())
+        },
+        label = "dozDurum",
+    ) { current ->
+        when (current) {
+            DoseStatus.TAKEN -> Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(takenColor, RoundedCornerShape(30))
+                    .clickable(onClick = onUndo, onClickLabel = stringResource(R.string.action_undo))
+                    .semantics { contentDescription = takenLabel },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Rounded.Check, contentDescription = null, tint = takenTint)
+            }
+            DoseStatus.MISSED -> DurumRozeti(
+                text = stringResource(R.string.today_dose_missed),
+                icon = Icons.Outlined.Schedule,
+                background = colors.uyariAcik,
+                tint = colors.uyari,
+                onClick = onTaken,
+            )
+            DoseStatus.SKIPPED -> DurumRozeti(
+                text = stringResource(R.string.today_dose_skipped),
+                icon = Icons.Outlined.Schedule,
+                background = colors.cukur,
+                tint = scheme.onSurfaceVariant,
+                onClick = onTaken,
+            )
+            DoseStatus.PENDING -> Button(
+                onClick = onTaken,
+                modifier = Modifier.height(48.dp),
+                contentPadding = ButtonDefaults.ContentPadding,
+            ) {
+                Text(stringResource(R.string.action_taken), maxLines = 1)
             }
         }
     }
@@ -259,6 +296,8 @@ fun UyariBandi(
     modifier: Modifier = Modifier,
     actionLabel: String? = null,
     onAction: (() -> Unit)? = null,
+    dismissLabel: String? = null,
+    onDismiss: (() -> Unit)? = null,
 ) {
     val colors = LocalAylaColors.current
     val scheme = MaterialTheme.colorScheme
@@ -274,9 +313,18 @@ fun UyariBandi(
                 Text(title, style = MaterialTheme.typography.titleSmall, color = accent)
                 Spacer(Modifier.height(4.dp))
                 Text(text, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurface)
-                if (actionLabel != null && onAction != null) {
-                    TextButton(onClick = onAction, contentPadding = ButtonDefaults.TextButtonContentPadding, modifier = Modifier.widthIn(min = 48.dp)) {
-                        Text(actionLabel, color = scheme.onSurface, fontWeight = FontWeight.Bold)
+                if ((actionLabel != null && onAction != null) || (dismissLabel != null && onDismiss != null)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        if (actionLabel != null && onAction != null) {
+                            TextButton(onClick = onAction, contentPadding = ButtonDefaults.TextButtonContentPadding, modifier = Modifier.widthIn(min = 48.dp)) {
+                                Text(actionLabel, color = scheme.onSurface, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                        if (dismissLabel != null && onDismiss != null) {
+                            TextButton(onClick = onDismiss, contentPadding = ButtonDefaults.TextButtonContentPadding, modifier = Modifier.widthIn(min = 48.dp)) {
+                                Text(dismissLabel, color = scheme.onSurfaceVariant)
+                            }
+                        }
                     }
                 }
             }

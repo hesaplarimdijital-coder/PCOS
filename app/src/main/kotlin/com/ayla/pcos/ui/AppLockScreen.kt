@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.ContextWrapper
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.ayla.pcos.R
+import com.ayla.pcos.ui.theme.AylaExpressiveShapes
 
 /**
  * Uygulama kilidi. Biyometri ya da cihaz PIN'i; ikisi de yoksa kilit açılır (ayar kapatılmalıdır).
@@ -81,12 +84,19 @@ internal fun AppLockContent(title: String, subtitle: String, onUnlock: () -> Uni
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(
-            imageVector = Icons.Rounded.Lock,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(48.dp),
-        )
+        Box(
+            modifier = Modifier
+                .size(112.dp)
+                .background(MaterialTheme.colorScheme.primaryContainer, AylaExpressiveShapes.Cicek),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Lock,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(44.dp),
+            )
+        }
         Spacer(Modifier.height(16.dp))
         Text(title, style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
         Spacer(Modifier.height(8.dp))

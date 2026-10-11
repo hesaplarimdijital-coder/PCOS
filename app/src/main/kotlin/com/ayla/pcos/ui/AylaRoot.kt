@@ -36,6 +36,7 @@ import com.ayla.pcos.ui.log.DailyLogScreen
 import com.ayla.pcos.ui.me.MeScreen
 import com.ayla.pcos.ui.me.SettingsScreen
 import com.ayla.pcos.ui.meds.AddMedicationScreen
+import com.ayla.pcos.ui.meds.EditMedicationScreen
 import com.ayla.pcos.ui.meds.MedsScreen
 import com.ayla.pcos.ui.navigation.AylaNavigator
 import com.ayla.pcos.ui.navigation.Screen
@@ -150,11 +151,18 @@ private fun ScreenHost(screen: Screen, navigator: AylaNavigator) {
             onOpenSettings = { navigator.push(Screen.Settings) },
         )
         Screen.Calendar -> CalendarScreen(onOpenLog = { date -> navigator.push(Screen.DailyLog(date)) })
-        Screen.Meds -> MedsScreen(onAdd = { navigator.push(Screen.AddMedication) })
+        Screen.Meds -> MedsScreen(
+            onAdd = { navigator.push(Screen.AddMedication) },
+            onEdit = { id -> navigator.push(Screen.EditMedication(id)) },
+        )
         Screen.Plan -> PlanScreen()
         Screen.Me -> MeScreen(onOpenSettings = { navigator.push(Screen.Settings) })
         is Screen.DailyLog -> DailyLogScreen(date = screen.date, onClose = { navigator.pop() })
-        Screen.AddMedication -> AddMedicationScreen(onDone = { navigator.pop() })
+        Screen.AddMedication -> AddMedicationScreen(
+            onDone = { navigator.pop() },
+            onCustom = { navigator.replaceTop(Screen.EditMedication(0)) },
+        )
+        is Screen.EditMedication -> EditMedicationScreen(id = screen.id, onDone = { navigator.pop() })
         Screen.Settings -> SettingsScreen(onBack = { navigator.pop() })
     }
 }

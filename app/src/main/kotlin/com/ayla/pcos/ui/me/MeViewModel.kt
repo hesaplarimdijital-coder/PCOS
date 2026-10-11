@@ -42,8 +42,11 @@ data class MeUiState(
     /** Bu hafta (Pazartesiden bugüne) su hedefine ulaşılan gün sayısı. */
     val waterDaysThisWeek: Int = 0,
     val logDaysThisWeek: Int = 0,
-    /** Son 28 gün, eskiden yeniye: o gün kayıt var mı. */
-    val logGrid: List<Boolean> = emptyList(),
+    /**
+     * Son 4 hafta, Pazartesiden Pazara satırlar hâlinde (28 hücre, eskiden yeniye): kayıt var mı.
+     * Bu haftanın henüz gelmemiş günleri null.
+     */
+    val logGrid: List<Boolean?> = emptyList(),
 )
 
 @HiltViewModel
@@ -59,7 +62,7 @@ class MeViewModel @Inject constructor(
     val uiState: StateFlow<MeUiState> = ticker.today
         .flatMapLatest { today ->
             val weekStart = today.with(DayOfWeek.MONDAY)
-            val gridStart = today.minusDays(27)
+            val gridStart = weekStart.minusWeeks(3)
             combine(
                 cycleRepository.overview,
                 medicationRepository.observeAdherence(today.minusDays(6), today),
@@ -78,7 +81,10 @@ class MeViewModel @Inject constructor(
                     hasMedications = adherence.scheduled > 0,
                     waterDaysThisWeek = water.count { it.cups >= p.waterGoalCups },
                     logDaysThisWeek = logDates.count { !it.isBefore(weekStart) },
-                    logGrid = (0 until 28).map { gridStart.plusDays(it.toLong()) in logDates },
+                    logGrid = (0 until 28).map { i ->
+                        val d = gridStart.plusDays(i.toLong())
+                        if (d.isAfter(today)) null else d in logDates
+                    },
                 )
             }
         }

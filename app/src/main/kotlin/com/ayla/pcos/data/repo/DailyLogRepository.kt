@@ -37,8 +37,12 @@ object SymptomCatalog {
     const val INSOMNIA = "insomnia"
     const val SPOTTING = "spotting"
 
+    /**
+     * Günlük kayıtta sunulanlar. Lekelenme "Kanama" bölümünde seçildiği için burada yok;
+     * [SPOTTING] eski kayıtlar okunabilsin diye anahtar olarak kalır.
+     */
     val defaults: List<String> = listOf(
         BLOATING, BREAST_TENDERNESS, SWEET_CRAVING, ACNE, HAIR_LOSS, CRAMPS,
-        HEADACHE, LOW_MOOD, FATIGUE, NAUSEA, INSOMNIA, SPOTTING,
+        HEADACHE, LOW_MOOD, FATIGUE, NAUSEA, INSOMNIA,
     )
 }

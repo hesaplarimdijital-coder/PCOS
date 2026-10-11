@@ -61,6 +61,7 @@ class UserPreferencesRepository @Inject constructor(
             hidePrediction = this[Keys.HIDE_PREDICTION] ?: defaults.hidePrediction,
             showBodyMeasurements = this[Keys.SHOW_BODY] ?: defaults.showBodyMeasurements,
             lastLongCycleAlertKey = this[Keys.LAST_LONG_CYCLE_ALERT] ?: defaults.lastLongCycleAlertKey,
+            notificationsBandDismissed = this[Keys.NOTIFICATIONS_BAND_DISMISSED] ?: defaults.notificationsBandDismissed,
         )
     }
 
@@ -92,6 +93,7 @@ class UserPreferencesRepository @Inject constructor(
         this[Keys.HIDE_PREDICTION] = p.hidePrediction
         this[Keys.SHOW_BODY] = p.showBodyMeasurements
         this[Keys.LAST_LONG_CYCLE_ALERT] = p.lastLongCycleAlertKey
+        this[Keys.NOTIFICATIONS_BAND_DISMISSED] = p.notificationsBandDismissed
     }
 
     private fun String?.toTime(default: LocalTime): LocalTime =
@@ -125,5 +127,6 @@ class UserPreferencesRepository @Inject constructor(
         val HIDE_PREDICTION = booleanPreferencesKey("hide_prediction")
         val SHOW_BODY = booleanPreferencesKey("show_body_measurements")
         val LAST_LONG_CYCLE_ALERT = stringPreferencesKey("last_long_cycle_alert")
+        val NOTIFICATIONS_BAND_DISMISSED = booleanPreferencesKey("notifications_band_dismissed")
     }
 }

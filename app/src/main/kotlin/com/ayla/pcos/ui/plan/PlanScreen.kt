@@ -122,7 +122,13 @@ internal fun PlanContent(
         Spacer(Modifier.height(8.dp))
         PrimaryTabRow(selectedTabIndex = tab, containerColor = MaterialTheme.colorScheme.surface) {
             listOf(R.string.plan_tab_water_sleep, R.string.plan_tab_nutrition, R.string.plan_tab_movement).forEachIndexed { index, res ->
-                Tab(selected = tab == index, onClick = { tab = index }, text = { Text(stringResource(res), maxLines = 1) })
+                Tab(
+                    selected = tab == index,
+                    onClick = { tab = index },
+                    text = { Text(stringResource(res), maxLines = 1) },
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
         AnimatedContent(

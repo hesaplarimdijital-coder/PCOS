@@ -15,6 +15,7 @@ import com.ayla.pcos.data.repo.DateTicker
 import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.data.repo.HydrationRepository
 import com.ayla.pcos.data.repo.MedicationRepository
+import com.ayla.pcos.reminders.ReminderNotifier
 import com.ayla.pcos.reminders.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,9 +53,14 @@ data class TodayUiState(
     val waterCups: Int = 0,
     val waterGoal: Int = 8,
     val exactAlarmMissing: Boolean = false,
+    /** İlaç var ama uygulamanın bildirimleri kapalı ve kullanıcı bandı kapatmadı. */
+    val notificationsOff: Boolean = false,
     /** Bugün başlayan açık bir adet var mı (bitişi işaretlenebilir). */
     val openPeriod: PeriodEntity? = null,
 )
+
+/** Öne gelişte yeniden okunan sistem izinleri. */
+private data class PermissionSnapshot(val exactAlarmsAllowed: Boolean, val notificationsEnabled: Boolean)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -65,6 +71,7 @@ class TodayViewModel @Inject constructor(
     private val prefs: UserPreferencesRepository,
     private val ticker: DateTicker,
     private val scheduler: ReminderScheduler,
+    private val notifier: ReminderNotifier,
 ) : ViewModel() {
 
     private val todayFlow: Flow<LocalDate> = ticker.today
@@ -96,16 +103,29 @@ class TodayViewModel @Inject constructor(
         periods.lastOrNull { it.endDate == null && !it.startDate.isAfter(today) && ChronoUnit.DAYS.between(it.startDate, today) <= 10 }
     }
 
-    /** Tam alarm izni ayarlardan değiştirilip geri dönülünce yeniden okunur (öne gelme sinyali). */
-    private val exactAlarmAllowedFlow: Flow<Boolean> = ticker.foreground.map { scheduler.exactAlarmsAllowed() }
+    /** İzinler ayarlardan değiştirilip geri dönülünce yeniden okunur (öne gelme sinyali). */
+    private val permissionFlow: Flow<PermissionSnapshot> = ticker.foreground.map {
+        PermissionSnapshot(scheduler.exactAlarmsAllowed(), notifier.notificationsEnabled())
+    }
+
+    init {
+        // Bildirimler yeniden açıldıysa kapatılmış bandı sıfırla; ileride tekrar kapanırsa bant yine görünsün.
+        viewModelScope.launch {
+            permissionFlow.collect { snapshot ->
+                if (snapshot.notificationsEnabled && prefs.current().notificationsBandDismissed) {
+                    prefs.update { it.copy(notificationsBandDismissed = false) }
+                }
+            }
+        }
+    }
 
     val uiState: StateFlow<TodayUiState> = combine(
         combine(todayFlow, cycleRepository.overview, prefs.preferences) { today, overview, p -> Triple(today, overview, p) },
         combine(dosesFlow, medicationRepository.activeMedications) { doses, meds -> doses to meds.isNotEmpty() },
-        combine(waterFlow, exactAlarmAllowedFlow) { water, exactAllowed -> water to exactAllowed },
+        combine(waterFlow, permissionFlow) { water, permissions -> water to permissions },
         pillFlow,
         openPeriodFlow,
-    ) { (today, overview, p), (doses, hasMeds), (water, exactAllowed), pill, openPeriod ->
+    ) { (today, overview, p), (doses, hasMeds), (water, permissions), pill, openPeriod ->
         TodayUiState(
             loading = false,
             today = today,
@@ -117,12 +137,15 @@ class TodayViewModel @Inject constructor(
             hasMedications = hasMeds,
             waterCups = water,
             waterGoal = p.waterGoalCups,
-            exactAlarmMissing = hasMeds && !exactAllowed,
+            exactAlarmMissing = hasMeds && permissions.notificationsEnabled && !permissions.exactAlarmsAllowed,
+            notificationsOff = hasMeds && !permissions.notificationsEnabled && !p.notificationsBandDismissed,
             openPeriod = openPeriod,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TodayUiState())
 
     fun addWater() = viewModelScope.launch { hydrationRepository.addCup(ticker.now()) }
+
+    fun dismissNotificationBand() = viewModelScope.launch { prefs.update { it.copy(notificationsBandDismissed = true) } }
 
     fun markTaken(item: DoseItem) = viewModelScope.launch {
         if (item.status == DoseStatus.TAKEN) return@launch
@@ -135,6 +158,11 @@ class TodayViewModel @Inject constructor(
     }
 
     fun startPeriodToday() = viewModelScope.launch { cycleRepository.startPeriod(ticker.now()) }
+
+    /** İlk kayıt: kullanıcının seçtiği geçmiş bir gün (gelecek tarih reddedilir). */
+    fun startPeriodAt(date: LocalDate) = viewModelScope.launch {
+        if (!date.isAfter(ticker.now())) cycleRepository.addPeriodStart(date)
+    }
 
     fun endPeriodToday() = viewModelScope.launch {
         val open = uiState.value.openPeriod ?: return@launch
