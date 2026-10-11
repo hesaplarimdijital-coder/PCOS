@@ -73,6 +73,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -87,6 +88,7 @@ import com.ayla.cycle.ExclusionReason
 import com.ayla.pcos.R
 import com.ayla.pcos.data.db.PeriodEntity
 import com.ayla.pcos.ui.components.AylaCard
+import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SatirZemini
 import com.ayla.pcos.ui.components.SectionHeader
@@ -275,14 +277,19 @@ private fun AyGezinme(month: YearMonth, onPrevious: () -> Unit, onNext: () -> Un
 
 @Composable
 private fun HaftaBasliklari() {
+    // Büyük yazıda üç harf hücreye sığmaz ("CU/M"); tek harfe iner, ekran okuyucu tam adı okur.
+    val style = if (LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI) TextStyle.NARROW else TextStyle.SHORT
     Row(modifier = Modifier.fillMaxWidth()) {
         (1..7).map(DayOfWeek::of).forEach { dow ->
+            val fullName = dow.getDisplayName(TextStyle.FULL, trLocale)
             Text(
-                dow.getDisplayName(TextStyle.SHORT, trLocale).trimEnd('.').toTurkishUpper(),
+                dow.getDisplayName(style, trLocale).trimEnd('.').toTurkishUpper(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                softWrap = false,
+                modifier = Modifier.weight(1f).semantics { contentDescription = fullName },
             )
         }
     }
@@ -511,6 +518,16 @@ private fun DonguSatiri(row: CycleRow, today: LocalDate, onExcluded: (Boolean) -
     var menuOpen by remember { mutableStateOf(false) }
     val endText = if (end.year == today.year) end.format(dayMonthShort) else end.format(dayMonthYear)
     val range = stringResource(R.string.label_date_range, cycle.start.format(dayMonthShort), endText)
+    // Büyük yazıda gün sayısı tarih aralığının altına iner; aralık iki satıra bölünmez.
+    val stacked = LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI
+    val lengthText: @Composable () -> Unit = {
+        Text(
+            stringResource(R.string.calendar_cycle_days, length),
+            style = MaterialTheme.typography.titleMedium,
+            color = scheme.onSurface,
+            modifier = Modifier.padding(start = if (stacked) 0.dp else 4.dp),
+        )
+    }
 
     SatirZemini(modifier = Modifier.alpha(if (excluded) 0.72f else 1f)) {
         Column(modifier = Modifier.weight(1f)) {
@@ -527,15 +544,11 @@ private fun DonguSatiri(row: CycleRow, today: LocalDate, onExcluded: (Boolean) -
                     }
                 }
             }
+            if (stacked) lengthText()
             Spacer(Modifier.height(8.dp))
             DonguKonumu(length = length)
         }
-        Text(
-            stringResource(R.string.calendar_cycle_days, length),
-            style = MaterialTheme.typography.titleMedium,
-            color = scheme.onSurface,
-            modifier = Modifier.padding(start = 4.dp),
-        )
+        if (!stacked) lengthText()
         if (row.period != null && cycle.exclusion != ExclusionReason.IMPLAUSIBLY_SHORT) {
             Box {
                 IconButton(onClick = { menuOpen = true }) {

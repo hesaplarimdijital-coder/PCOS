@@ -30,12 +30,15 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.ayla.pcos.R
 import com.ayla.pcos.ui.navigation.Screen
@@ -116,7 +119,7 @@ fun AltGezinme(selected: Screen.Tab, onSelect: (Screen.Tab) -> Unit) {
                         contentDescription = null,
                     )
                 },
-                label = { Text(stringResource(tab.labelRes()), maxLines = 1) },
+                label = { GezinmeEtiketi(stringResource(tab.labelRes())) },
                 alwaysShowLabel = true,
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.primaryContainer,
@@ -129,6 +132,21 @@ fun AltGezinme(selected: Screen.Tab, onSelect: (Screen.Tab) -> Unit) {
         }
     }
 }
+
+/**
+ * Beş sekme 393 dp'ye sığmalı: sistem yazı boyutu %200'e çıktığında etiket [GEZINME_YAZI_SINIRI]
+ * ölçeğinde durur (simge ve ekran okuyucu metni değişmez); aksi hâlde "Bugü", "Takvi" diye kesilir.
+ */
+@Composable
+private fun GezinmeEtiketi(text: String) {
+    val density = LocalDensity.current
+    val capped = if (density.fontScale > GEZINME_YAZI_SINIRI) Density(density.density, GEZINME_YAZI_SINIRI) else density
+    CompositionLocalProvider(LocalDensity provides capped) {
+        Text(text, maxLines = 1, softWrap = false)
+    }
+}
+
+private const val GEZINME_YAZI_SINIRI = 1.5f
 
 private fun Screen.Tab.icon(selected: Boolean): ImageVector = when (this) {
     Screen.Today -> if (selected) Icons.Rounded.Today else Icons.Outlined.Today

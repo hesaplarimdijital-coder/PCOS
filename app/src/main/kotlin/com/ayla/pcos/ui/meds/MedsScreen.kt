@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -37,6 +38,7 @@ import com.ayla.pcos.data.db.MedicationEntity
 import com.ayla.pcos.data.db.MedicationKind
 import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.ui.components.AylaCard
+import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
 import com.ayla.pcos.ui.components.BantTuru
 import com.ayla.pcos.ui.components.DozSatiri
 import com.ayla.pcos.ui.components.Overline
@@ -143,19 +145,27 @@ internal fun MedsContent(
 private fun MedicationRow(med: MedicationEntity, onClick: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     val colors = LocalAylaColors.current
+    val limitedEvidence = isInositol(med.name) || med.kind == MedicationKind.HERBAL
+    val badge: @Composable () -> Unit = {
+        Surface(shape = CircleShape, color = colors.lavantaAcik) {
+            Text(
+                stringResource(R.string.meds_evidence_limited),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.lavanta,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+            )
+        }
+    }
     SatirZemini(onClick = onClick) {
         Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(med.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f, fill = false))
-                if (isInositol(med.name) || med.kind == MedicationKind.HERBAL) {
-                    Surface(shape = CircleShape, color = colors.lavantaAcik) {
-                        Text(
-                            stringResource(R.string.meds_evidence_limited),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = colors.lavanta,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                        )
-                    }
+            if (LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI) {
+                // Büyük yazıda rozet adın altına iner; ad "Nane / çayı" diye bölünmez.
+                Text(med.name, style = MaterialTheme.typography.titleMedium)
+                if (limitedEvidence) badge()
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(med.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f, fill = false))
+                    if (limitedEvidence) badge()
                 }
             }
             val times = med.times.joinToString(" · ") { it.saatMetni() }

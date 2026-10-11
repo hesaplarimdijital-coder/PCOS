@@ -42,6 +42,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -67,6 +68,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -79,6 +81,7 @@ import com.ayla.pcos.R
 import com.ayla.pcos.data.db.SleepEntity
 import com.ayla.pcos.data.repo.duration
 import com.ayla.pcos.ui.components.AylaCard
+import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SatirZemini
 import com.ayla.pcos.ui.components.SectionHeader
@@ -131,6 +134,7 @@ internal fun PlanContent(
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     var showSleepDialog by remember { mutableStateOf(false) }
     val reduced = LocalReducedMotion.current
+    val buyukYazi = LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI
 
     Column(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp)) {
@@ -138,16 +142,27 @@ internal fun PlanContent(
             Text(stringResource(R.string.plan_title), style = MaterialTheme.typography.headlineMedium)
         }
         Spacer(Modifier.height(8.dp))
-        PrimaryTabRow(selectedTabIndex = tab, containerColor = MaterialTheme.colorScheme.surface) {
+        val tabs: @Composable () -> Unit = {
             listOf(R.string.plan_tab_water_sleep, R.string.plan_tab_nutrition, R.string.plan_tab_movement).forEachIndexed { index, res ->
                 Tab(
                     selected = tab == index,
                     onClick = { tab = index },
-                    text = { Text(stringResource(res), maxLines = 1) },
+                    text = { Text(stringResource(res), maxLines = 1, softWrap = false) },
                     selectedContentColor = MaterialTheme.colorScheme.primary,
                     unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        }
+        if (buyukYazi) {
+            // Büyük yazıda eşit genişlikli sekmeler "Beslen…" diye kesilir; kaydırılabilir satır her etiketi tam gösterir.
+            PrimaryScrollableTabRow(
+                selectedTabIndex = tab,
+                containerColor = MaterialTheme.colorScheme.surface,
+                edgePadding = 20.dp,
+                tabs = tabs,
+            )
+        } else {
+            PrimaryTabRow(selectedTabIndex = tab, containerColor = MaterialTheme.colorScheme.surface, tabs = tabs)
         }
         AnimatedContent(
             targetState = tab,
@@ -208,6 +223,19 @@ private fun SuKarti(state: PlanUiState, onAdd: () -> Unit, onRemove: () -> Unit)
         label = "suDolum",
     )
     val progressText = stringResource(R.string.today_water_progress, state.waterCups, state.waterGoal)
+    // Büyük yazıda − / + düğmeleri sayacın altına iner; metin sütunu daralıp "2,0 / L" diye kırılmaz.
+    val buyukYazi = LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI
+    val addButton: @Composable () -> Unit = {
+        FilledIconButton(
+            onClick = onAdd,
+            colors = IconButtonDefaults.filledIconButtonColors(containerColor = scheme.secondary, contentColor = scheme.onSecondary),
+        ) { Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.today_water_add)) }
+    }
+    val removeButton: @Composable () -> Unit = {
+        IconButton(onClick = onRemove, enabled = state.waterCups > 0) {
+            Icon(Icons.Rounded.Remove, contentDescription = stringResource(R.string.water_remove_cup))
+        }
+    }
 
     AylaCard {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -237,20 +265,29 @@ private fun SuKarti(state: PlanUiState, onAdd: () -> Unit, onRemove: () -> Unit)
                     color = if (state.waterCups >= state.waterGoal) colors.basari else scheme.onSurfaceVariant,
                 )
             }
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                FilledIconButton(
-                    onClick = onAdd,
-                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = scheme.secondary, contentColor = scheme.onSecondary),
-                ) { Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.today_water_add)) }
-                IconButton(onClick = onRemove, enabled = state.waterCups > 0) {
-                    Icon(Icons.Rounded.Remove, contentDescription = stringResource(R.string.water_remove_cup))
+            if (!buyukYazi) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    addButton()
+                    removeButton()
                 }
+            }
+        }
+        if (buyukYazi) {
+            Row(
+                modifier = Modifier.align(Alignment.End),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                removeButton()
+                addButton()
             }
         }
         Spacer(Modifier.height(16.dp))
         Overline(stringResource(R.string.plan_last_7_days))
         Spacer(Modifier.height(8.dp))
-        HaftalikCubuklar(values = state.waterWeek.map { it.cups }, goal = state.waterGoal, labels = state.waterWeek.map { it.date.dayOfWeek.getDisplayName(TextStyle.SHORT, trLocale).trimEnd('.') })
+        // Büyük yazıda "Çar" sütuna sığmaz ("Ça/r"); tek harfe iner.
+        val dayStyle = if (LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI) TextStyle.NARROW else TextStyle.SHORT
+        HaftalikCubuklar(values = state.waterWeek.map { it.cups }, goal = state.waterGoal, labels = state.waterWeek.map { it.date.dayOfWeek.getDisplayName(dayStyle, trLocale).trimEnd('.') })
     }
 }
 
@@ -333,8 +370,8 @@ private fun HaftalikCubuklar(values: List<Int>, goal: Int, labels: List<String>)
                             .background(if (reached) scheme.secondary else scheme.secondary.copy(alpha = 0.45f)),
                     )
                 }
-                Text(value.toString(), style = MaterialTheme.typography.labelSmall, color = scheme.onSurfaceVariant)
-                Text(labels.getOrNull(index) ?: "", style = MaterialTheme.typography.labelSmall, color = scheme.onSurfaceVariant)
+                Text(value.toString(), style = MaterialTheme.typography.labelSmall, color = scheme.onSurfaceVariant, maxLines = 1, softWrap = false)
+                Text(labels.getOrNull(index) ?: "", style = MaterialTheme.typography.labelSmall, color = scheme.onSurfaceVariant, maxLines = 1, softWrap = false)
             }
         }
     }

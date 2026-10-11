@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -77,11 +78,12 @@ class EkranGoruntuleriTest {
             AylaTheme(darkTheme = koyu, reducedMotion = true) {
                 val density = LocalDensity.current
                 val context = LocalContext.current
+                val configuration = LocalConfiguration.current
                 // yaziOlcegi: doğrusal ölçek (sınama için abartılı). sistemYaziOlcegi: cihazdaki gibi
                 // yapılandırmadan okunur; Android 14+ büyük metni doğrusal olmayan biçimde daha az büyütür.
-                val olcekli = remember(context, yaziOlcegi, sistemYaziOlcegi) {
+                val olcekli = remember(context, configuration, yaziOlcegi, sistemYaziOlcegi) {
                     if (sistemYaziOlcegi != null) {
-                        val cfg = Configuration(context.resources.configuration).apply { fontScale = sistemYaziOlcegi }
+                        val cfg = Configuration(configuration).apply { fontScale = sistemYaziOlcegi }
                         Density(context.createConfigurationContext(cfg))
                     } else {
                         Density(density.density, yaziOlcegi)
@@ -246,6 +248,19 @@ class EkranGoruntuleriTest {
 
     @Config(qualifiers = UZUN)
     @Test fun y05_yazi200_ilaclar() = ekran("y05-yazi200-ilaclar", sekme = Screen.Meds, sistemYaziOlcegi = 2f) { Ilaclar() }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y06_yazi200_ayarlar() = ekran("y06-yazi200-ayarlar", sistemYaziOlcegi = 2f) {
+        SettingsContent(
+            prefs = Ornek.ayarlar, exactAlarmsAllowed = true, snackbar = remember { SnackbarHostState() },
+            onBack = {}, onUpdate = {}, onExport = {}, onWipe = {},
+        )
+    }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y07_yazi200_bugun_hap() = ekran("y07-yazi200-bugun-hap", sekme = Screen.Today, sistemYaziOlcegi = 2f) {
+        Bugun(Ornek.bugunHap, hour = 21)
+    }
 
     // --- İnceleme: tüm içerik (uzun) ---
 

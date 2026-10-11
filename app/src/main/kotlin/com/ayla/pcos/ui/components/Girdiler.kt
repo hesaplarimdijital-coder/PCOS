@@ -26,6 +26,7 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
@@ -79,20 +80,29 @@ fun DegerSatiri(
     enabled: Boolean = true,
 ) {
     val scheme = MaterialTheme.colorScheme
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, color = if (enabled) scheme.onSurface else scheme.onSurfaceVariant)
-            if (text != null) Text(text, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
-        }
+    val labels: @Composable () -> Unit = {
+        Text(title, style = MaterialTheme.typography.titleMedium, color = if (enabled) scheme.onSurface else scheme.onSurfaceVariant)
+        if (text != null) Text(text, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
+    }
+    val valueAndChevron: @Composable () -> Unit = {
         Text(value, style = MaterialTheme.typography.titleMedium, color = if (enabled) scheme.primary else scheme.onSurfaceVariant)
         Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = scheme.onSurfaceVariant)
+    }
+    val rowModifier = modifier
+        .fillMaxWidth()
+        .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+        .padding(vertical = 12.dp)
+    if (LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI) {
+        // Büyük yazıda başlık tam genişlikte, değer altında: başlık harf harf kırılmaz.
+        Column(modifier = rowModifier) {
+            labels()
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) { valueAndChevron() }
+        }
+    } else {
+        Row(modifier = rowModifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(modifier = Modifier.weight(1f)) { labels() }
+            valueAndChevron()
+        }
     }
 }
 
@@ -111,18 +121,11 @@ fun AdimSayaci(
     modifier: Modifier = Modifier,
     text: String? = null,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .semantics(mergeDescendants = false) { stateDescription = valueText },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            if (text != null) Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
+    val labels: @Composable () -> Unit = {
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        if (text != null) Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+    val stepper: @Composable () -> Unit = {
         FilledTonalIconButton(onClick = onDecrease, enabled = canDecrease) {
             Icon(Icons.Rounded.Remove, contentDescription = stringResource(R.string.action_decrease))
         }
@@ -134,6 +137,26 @@ fun AdimSayaci(
         )
         FilledTonalIconButton(onClick = onIncrease, enabled = canIncrease) {
             Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.action_increase))
+        }
+    }
+    val rowModifier = modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp)
+        .semantics(mergeDescendants = false) { stateDescription = valueText }
+    if (LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI) {
+        // Büyük yazıda düğmeler başlığın altına iner; başlık ve açıklama tam genişliği kullanır.
+        Column(modifier = rowModifier) {
+            labels()
+            Row(
+                modifier = Modifier.align(Alignment.End),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) { stepper() }
+        }
+    } else {
+        Row(modifier = rowModifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.weight(1f)) { labels() }
+            stepper()
         }
     }
 }

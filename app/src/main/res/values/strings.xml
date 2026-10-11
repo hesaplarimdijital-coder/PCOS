@@ -295,7 +295,7 @@
     <string name="evening_routine_text">%1$s · nefes egzersizi ve ekran molası</string>
 
     <!-- Ben -->
-    <string name="me_title">İlerlemen</string>
+    <string name="me_title">Özetin</string>
     <string name="me_cycle_section">Döngü düzeni</string>
     <string name="me_adherence">Takviye uyumu</string>
     <string name="me_water_days">Su hedefi</string>
@@ -350,7 +350,8 @@
     <string name="settings_section_notifications">Bildirimler</string>
     <string name="settings_water_reminders">Su hatırlatmaları</string>
     <string name="settings_cycle_notifications">Döngü bildirimleri</string>
-    <string name="settings_progress_notifications">İlerleme bildirimleri</string>
+    <string name="settings_progress_notifications">Haftalık özet</string>
+    <string name="settings_progress_notifications_text">Pazar akşamı 19:00'da haftanın kısa özeti</string>
     <string name="settings_quiet_hours">Sessiz saatler</string>
     <string name="settings_exact_alarm_missing">Hatırlatmalar tam saatinde çalmayabilir: tam zamanlı alarm izni kapalı.</string>
     <string name="settings_section_display">Görünüm</string>

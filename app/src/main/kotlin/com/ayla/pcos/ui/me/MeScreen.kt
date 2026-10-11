@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -160,7 +161,6 @@ internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit, onShareDoct
                 cells = state.logGrid,
                 firstMonday = state.today.with(DayOfWeek.MONDAY).minusWeeks(3),
                 filled = colors.lavanta,
-                empty = colors.cukur,
             )
             Spacer(Modifier.height(8.dp))
             Text(
@@ -174,7 +174,7 @@ internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit, onShareDoct
             SimgeZemini(icon = Icons.Rounded.Description, background = scheme.primaryContainer, tint = scheme.primary)
             Column(modifier = Modifier.weight(1f)) {
                 Text(stringResource(R.string.me_doctor_note), style = MaterialTheme.typography.titleMedium)
-                Text(stringResource(R.string.me_doctor_note_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, maxLines = 2)
+                Text(stringResource(R.string.me_doctor_note_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
             }
             Icon(Icons.Rounded.IosShare, contentDescription = null, tint = scheme.onSurfaceVariant)
         }
@@ -183,7 +183,7 @@ internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit, onShareDoct
             SimgeZemini(icon = Icons.Rounded.Settings, background = scheme.secondaryContainer, tint = scheme.secondary)
             Column(modifier = Modifier.weight(1f)) {
                 Text(stringResource(R.string.me_settings), style = MaterialTheme.typography.titleMedium)
-                Text(stringResource(R.string.me_settings_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, maxLines = 2)
+                Text(stringResource(R.string.me_settings_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
             }
             Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = scheme.onSurfaceVariant)
         }
@@ -299,17 +299,29 @@ private fun DonguCubuklari(lengths: List<Int>) {
 }
 
 /**
- * 4 hafta × 7 gün nokta ızgarası (Pazartesi başlar): kayıt olan günler dolu, gelecek günler boş halka.
+ * 4 hafta × 7 gün nokta ızgarası (Pazartesi başlar): kayıt olan günler dolu, olmayanlar halka.
  * Her satırın solunda o haftanın Pazartesi tarihi yazar; haftalar böylece birbirinden ayrışır.
  */
 @Composable
-private fun KayitIzgarasi(cells: List<Boolean?>, firstMonday: LocalDate, filled: Color, empty: Color) {
+private fun KayitIzgarasi(cells: List<Boolean?>, firstMonday: LocalDate, filled: Color) {
     val scheme = MaterialTheme.colorScheme
+    val ring = scheme.outline
+    val future = scheme.outlineVariant
     val tr = java.util.Locale.forLanguageTag("tr")
     val weekLabel = remember { DateTimeFormatter.ofPattern("d MMM", tr) }
+    val labels = remember(firstMonday, cells.size) {
+        (0 until (cells.size + 6) / 7).map { firstMonday.plusWeeks(it.toLong()).format(weekLabel).trimEnd('.') }
+    }
+    // Etiket sütunu en uzun tarihin ölçülen genişliği kadar: büyük yazıda "28 Ey" diye kesilmez.
+    val labelStyle = MaterialTheme.typography.labelSmall
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val labelWidth = remember(labels, labelStyle, density) {
+        with(density) { (labels.maxOfOrNull { measurer.measure(it, labelStyle).size.width } ?: 0).toDp() } + 8.dp
+    }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            Spacer(Modifier.weight(WEEK_LABEL_WEIGHT))
+            Spacer(Modifier.width(labelWidth))
             (1..7).map(DayOfWeek::of).forEach { dow ->
                 Text(
                     dow.getDisplayName(TextStyle.NARROW, tr),
@@ -323,19 +335,20 @@ private fun KayitIzgarasi(cells: List<Boolean?>, firstMonday: LocalDate, filled:
         cells.chunked(7).forEachIndexed { index, week ->
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    firstMonday.plusWeeks(index.toLong()).format(weekLabel).trimEnd('.'),
-                    style = MaterialTheme.typography.labelSmall,
+                    labels[index],
+                    style = labelStyle,
                     color = scheme.onSurfaceVariant,
                     maxLines = 1,
                     softWrap = false,
-                    modifier = Modifier.weight(WEEK_LABEL_WEIGHT),
+                    modifier = Modifier.width(labelWidth),
                 )
                 week.forEach { on ->
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.weight(1f).height(16.dp), contentAlignment = Alignment.Center) {
                         when (on) {
+                            // Kayıt var: dolu nokta. Kayıt yok: belirgin halka (≥ 3:1). Henüz gelmedi: soluk küçük nokta.
                             true -> Box(Modifier.size(14.dp).background(filled, CircleShape))
-                            false -> Box(Modifier.size(14.dp).background(empty, CircleShape))
-                            null -> Box(Modifier.size(14.dp).border(1.dp, empty, CircleShape))
+                            false -> Box(Modifier.size(14.dp).border(1.5.dp, ring, CircleShape))
+                            null -> Box(Modifier.size(6.dp).background(future, CircleShape))
                         }
                     }
                 }
@@ -348,5 +361,3 @@ private fun KayitIzgarasi(cells: List<Boolean?>, firstMonday: LocalDate, filled:
 private const val TYPICAL_MIN = 21
 private const val TYPICAL_MAX = 35
 
-/** Kayıt ızgarasında hafta etiketi sütununun, bir gün sütununa göre genişliği. */
-private const val WEEK_LABEL_WEIGHT = 1.6f

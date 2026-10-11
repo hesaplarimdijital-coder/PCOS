@@ -227,7 +227,7 @@ internal fun SettingsContent(
                 }
                 AyarSatiri(R.string.settings_cycle_notifications, R.string.settings_cycle_notifications_text, p.cycleNotificationsEnabled) { v -> onUpdate { it.copy(cycleNotificationsEnabled = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.settings_progress_notifications, null, p.progressNotificationsEnabled) { v -> onUpdate { it.copy(progressNotificationsEnabled = v) } }
+                AyarSatiri(R.string.settings_progress_notifications, R.string.settings_progress_notifications_text, p.progressNotificationsEnabled) { v -> onUpdate { it.copy(progressNotificationsEnabled = v) } }
                 HorizontalDivider()
                 DegerSatiri(
                     title = stringResource(R.string.settings_daily_check),
