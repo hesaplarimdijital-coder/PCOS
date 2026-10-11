@@ -62,6 +62,17 @@ Arayüz dili **Türkçe**; ürün tonu sıcak, yargılamayan, kanıta bağlı.
 - Push öncesi `git fetch origin main` ve gerekiyorsa rebase. Anahtar dosyaları (`*.jks`, `keystore.properties`)
   asla commit'lenmez.
 
+## İş kuyruğu
+Açık işler GitHub Issues'da etiketlerle durur (`mvp-1`, `mvp-2`, `ui`, `veri`, `hatirlatma`, `test`, `belge`,
+`klinik`): `gh api repos/hesaplarimdijital-coder/pcos/issues?labels=mvp-1`. GraphQL kapalı; yalnızca REST
+(`gh api`) kullan. Bir işi bitirince PR/commit mesajında `Fixes #N` yaz.
+
+## CI çıktısını okuma
+`gh run list --repo hesaplarimdijital-coder/pcos --limit 3` → çalıştırma kimliği →
+`gh api repos/hesaplarimdijital-coder/pcos/check-runs/<job_id>/annotations` (job kimliği `gh run view <id> --json jobs`).
+Derleme hataları `error`, Kotlin uyarıları `warning`, test ve lint sayıları `notice` olarak gelir. Günlük ve
+artefakt indirme ajan oturumunda engellidir; ihtiyaç duyulan her bilgi açıklama olarak yayımlanmalıdır.
+
 ## Yol haritası (kısa)
 - MVP 1 (bu depo): döngü + tahmin, ilaç/hap, günlük kayıt, su, uyku (elle), ayarlar, dışa aktarma, kilit.
 - MVP 2: Health Connect uyku içe aktarma, beslenme/hareket planı, bitkisel öneriler, Glance widget, Nav3.

@@ -23,6 +23,13 @@ class DateTicker @Inject constructor(private val clock: Clock) {
 
     private val refresh = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
+    /**
+     * Her öne gelişte (ve ilk abonelikte) tetiklenir; tarihten bağımsız olarak yeniden okunması gereken
+     * sistem durumları için (ör. tam alarm izni). [today] aynı gün içinde tekrar yaymaz, bu yayar.
+     */
+    private val foregroundSignal = MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1).apply { tryEmit(Unit) }
+    val foreground: Flow<Unit> = foregroundSignal
+
     private val midnightTicker: Flow<LocalDate> = flow {
         while (true) {
             val now = LocalDate.now(clock)
@@ -38,6 +45,7 @@ class DateTicker @Inject constructor(private val clock: Clock) {
     /** Etkinlik öne geldiğinde çağrılır; uzun uykudan sonra tarihi tazeler. */
     fun refresh() {
         refresh.tryEmit(Unit)
+        foregroundSignal.tryEmit(Unit)
     }
 
     fun now(): LocalDate = LocalDate.now(clock)

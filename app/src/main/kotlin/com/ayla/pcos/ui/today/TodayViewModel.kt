@@ -96,13 +96,16 @@ class TodayViewModel @Inject constructor(
         periods.lastOrNull { it.endDate == null && !it.startDate.isAfter(today) && ChronoUnit.DAYS.between(it.startDate, today) <= 10 }
     }
 
+    /** Tam alarm izni ayarlardan değiştirilip geri dönülünce yeniden okunur (öne gelme sinyali). */
+    private val exactAlarmAllowedFlow: Flow<Boolean> = ticker.foreground.map { scheduler.exactAlarmsAllowed() }
+
     val uiState: StateFlow<TodayUiState> = combine(
         combine(todayFlow, cycleRepository.overview, prefs.preferences) { today, overview, p -> Triple(today, overview, p) },
         combine(dosesFlow, medicationRepository.activeMedications) { doses, meds -> doses to meds.isNotEmpty() },
-        waterFlow,
+        combine(waterFlow, exactAlarmAllowedFlow) { water, exactAllowed -> water to exactAllowed },
         pillFlow,
         openPeriodFlow,
-    ) { (today, overview, p), (doses, hasMeds), water, pill, openPeriod ->
+    ) { (today, overview, p), (doses, hasMeds), (water, exactAllowed), pill, openPeriod ->
         TodayUiState(
             loading = false,
             today = today,
@@ -114,7 +117,7 @@ class TodayViewModel @Inject constructor(
             hasMedications = hasMeds,
             waterCups = water,
             waterGoal = p.waterGoalCups,
-            exactAlarmMissing = hasMeds && !scheduler.exactAlarmsAllowed(),
+            exactAlarmMissing = hasMeds && !exactAllowed,
             openPeriod = openPeriod,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TodayUiState())
