@@ -90,6 +90,8 @@ class DoctorNoteRepository @Inject constructor(
 
         line(s(R.string.note_title))
         line(s(R.string.note_prepared, today.format(longDate)))
+        // Okuyan ilk bunu görsün: kayıt özetidir, tanı ya da tavsiye değildir.
+        line(s(R.string.note_disclaimer))
         append('\n')
 
         line(s(R.string.note_section_cycle).uppercase(tr))
@@ -140,8 +142,5 @@ class DoctorNoteRepository @Inject constructor(
             line("- " + top.joinToString(", ") { (key, days) -> s(R.string.note_symptom_days, context.getString(symptomLabel(key)), days) })
         }
         line("- " + s(R.string.note_log_days, logs.size))
-        append('\n')
-
-        line(s(R.string.note_disclaimer))
     }
 }

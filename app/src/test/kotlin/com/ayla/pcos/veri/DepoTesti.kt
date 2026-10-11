@@ -1,11 +1,16 @@
 package com.ayla.pcos.veri
 
+import com.ayla.pcos.R
+import com.ayla.pcos.data.db.DailyLogEntity
 import com.ayla.pcos.data.db.DoseEventEntity
 import com.ayla.pcos.data.db.DoseStatus
 import com.ayla.pcos.data.db.MedicationEntity
 import com.ayla.pcos.data.db.MedicationKind
+import com.ayla.pcos.data.repo.SymptomCatalog
 import org.junit.Test
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -90,5 +95,31 @@ class DepoTesti : VeriTestOrtami() {
         assertTrue(kuruluAlarmlar().any { it.contains("/daily_check/") })
         meds.deactivate(id)
         assertEquals(0, kuruluAlarmlar().count { it.contains("/dose/") })
+    }
+
+    @Test
+    fun `doktor notu ibareyle baslar; dongu, ilac uyumu ve son 4 hafta semptomlarini ozetler`() {
+        val text = calistir {
+            listOf(70L, 35L, 5L).forEach { cycles.addPeriodStart(bugun.minusDays(it)) }
+            val id = meds.add(inofolic().copy(createdAt = bugun.minusDays(60).atStartOfDay(zone).toInstant()))
+            (0L until 3L).forEach { d -> meds.markTaken(id, bugun.minusDays(d), LocalTime.of(9, 0)) }
+            logs.save(DailyLogEntity(date = bugun.minusDays(1), symptoms = listOf(SymptomCatalog.BLOATING, SymptomCatalog.ACNE)))
+            logs.save(DailyLogEntity(date = bugun.minusDays(2), symptoms = listOf(SymptomCatalog.BLOATING)))
+            logs.save(DailyLogEntity(date = bugun.minusDays(40), symptoms = listOf(SymptomCatalog.HEADACHE))) // 4 haftadan eski
+            doctorNote.build()
+        }
+        val lines = text.lines()
+        assertEquals(context.getString(R.string.note_title), lines[0])
+        assertEquals(context.getString(R.string.note_disclaimer), lines[2], "ibare en üstte olmalı")
+        val longDate = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("tr"))
+        listOf(
+            context.getString(R.string.note_last_period, bugun.minusDays(5).format(longDate), 6),
+            context.getString(R.string.note_cycle_lengths, "30, 35"),
+            context.getString(R.string.note_periods_year, 3),
+            "Inofolic Combi · 1 kapsül · 09:00, 21:00 · " + context.getString(R.string.note_adherence, 3, 56),
+            context.getString(R.string.symptom_bloating) + " (2 gün), " + context.getString(R.string.symptom_acne) + " (1 gün)",
+            context.getString(R.string.note_log_days, 2),
+        ).forEach { beklenen -> assertTrue(beklenen in text, "Notta yok: $beklenen\n---\n$text") }
+        assertTrue(context.getString(R.string.symptom_headache) !in text, "4 haftadan eski semptom notta olmamalı")
     }
 }
