@@ -11,12 +11,8 @@
     <!-- Uygulama kilidi -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
-    <!-- Health Connect: yalnızca uyku okuma (MVP 1) -->
-    <uses-permission android:name="android.permission.health.READ_SLEEP" />
-
-    <queries>
-        <package android:name="com.google.android.apps.healthdata" />
-    </queries>
+    <!-- Health Connect (uyku okuma) MVP 2'de eklenir: READ_SLEEP izni, <queries> ve izin gerekçesi
+         etkinlikleri Play'in Health Connect beyan formunu gerektirir; kullanılmayan izin beyan edilmez. -->
 
     <application
         android:name=".AylaApp"
@@ -40,23 +36,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- Health Connect izin gerekçesi (Android 13 ve altı) -->
-            <intent-filter>
-                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
-            </intent-filter>
         </activity>
-
-        <!-- Health Connect izin gerekçesi (Android 14 ve üstü) -->
-        <activity-alias
-            android:name="ViewPermissionUsageActivity"
-            android:exported="true"
-            android:permission="android.permission.START_VIEW_PERMISSION_USAGE"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
-                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
-            </intent-filter>
-        </activity-alias>
 
         <!-- Alarm tetiklendiğinde bildirimi gösterir ve sıradaki alarmı kurar -->
         <receiver

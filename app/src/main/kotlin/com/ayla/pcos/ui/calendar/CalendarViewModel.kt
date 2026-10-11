@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 /** Takvim ızgarasında tek hücre. */
@@ -165,22 +164,15 @@ class CalendarViewModel @Inject constructor(
     }
 
     private fun dayActions(date: LocalDate, periods: List<PeriodEntity>, cycles: List<Cycle>, today: LocalDate): DayActions {
-        // Bitişi girilmemiş adet, varsayılan 5 gün (ya da bugüne kadar) sürüyor sayılır.
-        val containing = periods.firstOrNull { p ->
-            val end = p.endDate ?: minOf(p.startDate.plusDays(4), today)
-            !date.isBefore(p.startDate) && !date.isAfter(end)
-        }
-        val previous = periods.filter { !it.startDate.isAfter(date) }.maxByOrNull { it.startDate }
-        val future = date.isAfter(today)
-        val cycle = containing?.let { p -> cycles.firstOrNull { it.start == p.startDate } }
+        val records = periods.map { PeriodRecord(it.startDate, it.endDate, it.excludedFromStats) }
+        val rules = calendarDayRules(date, records, cycles, today)
         return DayActions(
-            canMarkStart = !future && containing == null,
-            canMarkEnd = !future && previous != null && previous.endDate != date &&
-                ChronoUnit.DAYS.between(previous.startDate, date) in 0..14,
-            canUnmark = containing != null,
-            canOpenLog = !future,
-            period = containing,
-            cycle = cycle,
+            canMarkStart = rules.canMarkStart,
+            canMarkEnd = rules.canMarkEnd,
+            canUnmark = rules.canUnmark,
+            canOpenLog = rules.canOpenLog,
+            period = rules.containingStart?.let { start -> periods.firstOrNull { it.startDate == start } },
+            cycle = rules.cycle,
         )
     }
 
@@ -201,4 +193,50 @@ class CalendarViewModel @Inject constructor(
             return if (weeks.last().none { it.inMonth }) weeks.dropLast(1) else weeks
         }
     }
+}
+
+/** Takvimde bir güne uygulanabilecek düzenleme kuralları; saf, test edilebilir. */
+data class CalendarDayRules(
+    val canMarkStart: Boolean,
+    val canMarkEnd: Boolean,
+    val canUnmark: Boolean,
+    val canOpenLog: Boolean,
+    /** Günün içinde olduğu adetin başlangıcı (varsa). */
+    val containingStart: LocalDate?,
+    /** O adetle başlayan döngü (varsa). */
+    val cycle: Cycle?,
+)
+
+/**
+ * Kurallar:
+ * - Gelecek günlerde hiçbir düzenleme ve kayıt yok.
+ * - Bitişi girilmemiş adet, varsayılan [defaultPeriodLengthDays] gün (bugünü aşmadan) sürüyor sayılır.
+ * - "Başlangıç olarak işaretle": gün bir adetin içinde değilse.
+ * - "Bitiş olarak işaretle": günden önce (ya da aynı gün) başlayan son adet varsa, bitişi zaten bu gün
+ *   değilse ve başlangıçtan en fazla [maxPeriodLengthDays] gün geçmişse.
+ * - "Kaydı kaldır": gün bir adetin içindeyse.
+ */
+fun calendarDayRules(
+    date: LocalDate,
+    records: List<PeriodRecord>,
+    cycles: List<Cycle>,
+    today: LocalDate,
+    defaultPeriodLengthDays: Long = 5,
+    maxPeriodLengthDays: Long = 14,
+): CalendarDayRules {
+    val future = date.isAfter(today)
+    val containing = records.firstOrNull { r ->
+        val end = r.end ?: minOf(r.start.plusDays(defaultPeriodLengthDays - 1), today)
+        !date.isBefore(r.start) && !date.isAfter(end)
+    }
+    val previous = records.filter { !it.start.isAfter(date) }.maxByOrNull { it.start }
+    val sinceStart = previous?.let { java.time.temporal.ChronoUnit.DAYS.between(it.start, date) } ?: -1L
+    return CalendarDayRules(
+        canMarkStart = !future && containing == null,
+        canMarkEnd = !future && previous != null && previous.end != date && sinceStart in 0..maxPeriodLengthDays,
+        canUnmark = !future && containing != null,
+        canOpenLog = !future,
+        containingStart = containing?.start,
+        cycle = containing?.let { c -> cycles.firstOrNull { it.start == c.start } },
+    )
 }

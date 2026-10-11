@@ -12,8 +12,10 @@ Android 17 kararlı sürümü 16 Haziran 2026'da yayımlandı. Ayla `compileSdk 
   `SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED` ile dinlenir.
 - **Bildirim izni** (13+) → karşılamada kullanım anında istenir; reddedilirse uygulama bildirimsiz çalışır.
 - **Öngörücü geri** → `enableOnBackInvokedCallback=true`; Compose `BackHandler`.
-- **Health Connect** → `READ_SLEEP` izni ve `ACTION_SHOW_PERMISSIONS_RATIONALE` etkinliği manifestte;
-  içe aktarma MVP 2 (gizlilik politikası URL'si gerekir).
+- **Health Connect** → MVP 2'de: `READ_SLEEP` izni, `<queries>` (com.google.android.apps.healthdata),
+  `ACTION_SHOW_PERMISSIONS_RATIONALE` intent-filter'ı ve Android 14+ için `VIEW_PERMISSION_USAGE`
+  activity-alias'ı manifeste eklenir; Play Health Connect beyan formu ve gizlilik politikası URL'si gerekir.
+  MVP 1'de kullanılmayan izin beyan edilmez (Play incelemesini gereksiz tetiklememek için).
 
 ## Google Play
 - 31 Ağustos 2026'dan beri yeni uygulamalar/güncellemeler API ≥ 36 hedeflemeli → 37 ile karşılanır.

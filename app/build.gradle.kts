@@ -92,7 +92,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.health.connect)
+    // Health Connect (libs.androidx.health.connect) MVP 2'de eklenir; bkz. docs/arastirma/android-17-uyum.md
 
     // Veri
     implementation(libs.androidx.room.runtime)

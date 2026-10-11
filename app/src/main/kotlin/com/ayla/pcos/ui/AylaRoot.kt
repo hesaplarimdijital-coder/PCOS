@@ -11,6 +11,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -19,8 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -127,7 +130,13 @@ private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit) {
             },
             label = "screen",
         ) { screen ->
-            ScreenHost(screen, navigator)
+            // Android 17 büyük ekranlarda yönlendirme/boyut kısıtlarını yok sayar: içerik ortalanır,
+            // 720 dp'den geniş olmaz; telefonlarda etkisizdir.
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                Box(modifier = Modifier.widthIn(max = 720.dp).fillMaxSize()) {
+                    ScreenHost(screen, navigator)
+                }
+            }
         }
     }
 }
