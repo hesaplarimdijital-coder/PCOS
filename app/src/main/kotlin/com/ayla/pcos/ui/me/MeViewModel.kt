@@ -78,8 +78,8 @@ class MeViewModel @Inject constructor(
                     loading = false,
                     today = today,
                     displayName = p.displayName,
-                    cycleLengths = eligibleLengths(overview).takeLast(6),
-                    trend = trend(overview),
+                    cycleLengths = eligibleCycleLengths(overview).takeLast(6),
+                    trend = cycleTrend(overview),
                     adherence = adherence,
                     hasMedications = adherence.scheduled > 0,
                     waterDaysThisWeek = water.count { it.cups >= p.waterGoalCups },
@@ -97,25 +97,32 @@ class MeViewModel @Inject constructor(
     fun prepareDoctorNote(onReady: (title: String, text: String) -> Unit) = viewModelScope.launch {
         onReady(doctorNote.title(), doctorNote.build())
     }
+}
 
-    private fun eligibleLengths(overview: CycleOverview): List<Int> =
-        overview.cycles.filter { it.countsForStats }.mapNotNull { it.lengthDays }
+/** Ortalamaya katılan tamamlanmış döngülerin uzunlukları, eskiden yeniye. */
+internal fun eligibleCycleLengths(overview: CycleOverview): List<Int> =
+    overview.cycles.filter { it.countsForStats }.mapNotNull { it.lengthDays }
 
-    private fun trend(overview: CycleOverview): CycleTrend {
-        val lengths = eligibleLengths(overview)
-        if (lengths.size < 3) return CycleTrend.NeedData
-        // Sondan geriye art arda kısalma zinciri.
-        var run = 1
-        var i = lengths.lastIndex
-        while (i > 0 && lengths[i] < lengths[i - 1]) {
-            run++
-            i--
-        }
-        if (run >= 3 && lengths.last() in 21..35) return CycleTrend.Shortening(run)
-        val stats = overview.stats
-        val mean = stats.mean
-        val sd = stats.standardDeviation
-        if (mean != null && sd != null && sd <= 3.0) return CycleTrend.Stable(mean.roundToInt(), sd.roundToInt().coerceAtLeast(1))
-        return CycleTrend.Variable(lengths.min(), lengths.max())
+/**
+ * Döngü düzeni özeti:
+ * - 3'ten az döngü → veri yetersiz
+ * - sondan art arda en az 3 döngü kısaldıysa ve sonuncusu 21–35 gündeyse → kısalıyor
+ * - standart sapma ≤ 3 gün → düzenli
+ * - aksi hâlde → değişken (en kısa–en uzun)
+ */
+internal fun cycleTrend(overview: CycleOverview): CycleTrend {
+    val lengths = eligibleCycleLengths(overview)
+    if (lengths.size < 3) return CycleTrend.NeedData
+    var run = 1
+    var i = lengths.lastIndex
+    while (i > 0 && lengths[i] < lengths[i - 1]) {
+        run++
+        i--
     }
+    if (run >= 3 && lengths.last() in 21..35) return CycleTrend.Shortening(run)
+    val stats = overview.stats
+    val mean = stats.mean
+    val sd = stats.standardDeviation
+    if (mean != null && sd != null && sd <= 3.0) return CycleTrend.Stable(mean.roundToInt(), sd.roundToInt().coerceAtLeast(1))
+    return CycleTrend.Variable(lengths.min(), lengths.max())
 }

@@ -16,10 +16,11 @@ import javax.inject.Singleton
 
 /**
  * "Bugün" akışı. Gece yarısında ve uygulama öne geldiğinde yeniden değerlendirilir; böylece
- * ekranlar tarih değişince kendiliğinden güncellenir.
+ * ekranlar tarih değişince kendiliğinden güncellenir. Testler sabit bir gün için alt sınıf kullanır
+ * (gece yarısı döngüsü sanal zamanda sonsuza dek ilerlemesin diye).
  */
 @Singleton
-class DateTicker @Inject constructor(private val clock: Clock) {
+open class DateTicker @Inject constructor(private val clock: Clock) {
 
     private val refresh = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -28,7 +29,7 @@ class DateTicker @Inject constructor(private val clock: Clock) {
      * sistem durumları için (ör. tam alarm izni). [today] aynı gün içinde tekrar yaymaz, bu yayar.
      */
     private val foregroundSignal = MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1).apply { tryEmit(Unit) }
-    val foreground: Flow<Unit> = foregroundSignal
+    open val foreground: Flow<Unit> = foregroundSignal
 
     private val midnightTicker: Flow<LocalDate> = flow {
         while (true) {
@@ -40,13 +41,13 @@ class DateTicker @Inject constructor(private val clock: Clock) {
         }
     }
 
-    val today: Flow<LocalDate> = merge(midnightTicker, refresh.map { LocalDate.now(clock) }).distinctUntilChanged()
+    open val today: Flow<LocalDate> = merge(midnightTicker, refresh.map { LocalDate.now(clock) }).distinctUntilChanged()
 
     /** Etkinlik öne geldiğinde çağrılır; uzun uykudan sonra tarihi tazeler. */
-    fun refresh() {
+    open fun refresh() {
         refresh.tryEmit(Unit)
         foregroundSignal.tryEmit(Unit)
     }
 
-    fun now(): LocalDate = LocalDate.now(clock)
+    open fun now(): LocalDate = LocalDate.now(clock)
 }

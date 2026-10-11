@@ -33,6 +33,6 @@ ilk kez açan kişi içindir. Bulguları GitHub Issues'a (etiket `mvp-1`) yaz.
 | 19 | Sessiz saatlerde (22:30–08:00) su hatırlatması | Gelmez; akşam rutini açıksa 22:30'da gelir |
 | 20 | Ayarlar: Tüm verilerimi sil → onayla | Karşılama ekranına dönülür, veriler ve ilaçlar silinmiştir |
 
-## Bilinen eksikler (MVP 1 kapanışı için açık issue'lar)
-Ayarlarda su hedefi/bardak hacmi düzenleme (#2), hap paket başlangıcını değiştirme (#3), doktor notu (#4),
-ikon/splash son tasarımı (#8), ekran görüntüleri ve CHANGELOG (#9).
+## Bilinen eksikler
+Health Connect uyku içe aktarma (#11), beslenme/hareket içeriği (#12) ve widget (#14) MVP 2'dedir.
+Gerçek cihazda alarm güvenilirliği (üretici pil optimizasyonları) için #17.
