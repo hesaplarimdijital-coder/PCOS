@@ -65,7 +65,7 @@ fun HapPaketi(
                         .clip(CircleShape)
                         .then(
                             if (clickable) {
-                                Modifier.toggleable(value = taken, role = Role.Checkbox, onValueChange = { onPillClick?.invoke(number) })
+                                Modifier.toggleable(value = taken, role = Role.Checkbox, onValueChange = { onPillClick(number) })
                             } else {
                                 Modifier
                             },

@@ -11,6 +11,8 @@ import com.ayla.pcos.reminders.ReminderScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -40,6 +42,12 @@ class MedicationRepository @Inject constructor(
     private val scheduler: ReminderScheduler,
 ) {
     val activeMedications: Flow<List<MedicationEntity>> = medicationDao.observeActive()
+
+    /**
+     * Doz durumu ve stok birlikte değişir (oku-değiştir-yaz). Uygulama içi düğme, bildirim eylemi ve
+     * paket dokunuşu aynı anda gelse de stok iki kez düşmesin diye yazmalar sıraya girer.
+     */
+    private val doseLock = Mutex()
 
     /** Günün tüm dozları, saat sırasıyla. */
     fun observeDoses(date: LocalDate): Flow<List<DoseItem>> =
@@ -97,7 +105,7 @@ class MedicationRepository @Inject constructor(
         doseDao.insertIgnore(DoseEventEntity(medicationId = medicationId, date = date, time = time))
     }
 
-    suspend fun markTaken(medicationId: Long, date: LocalDate, time: LocalTime, at: Instant = Instant.now()) {
+    suspend fun markTaken(medicationId: Long, date: LocalDate, time: LocalTime, at: Instant = Instant.now()) = doseLock.withLock {
         val existing = doseDao.find(medicationId, date, time)
         val wasTaken = existing?.status == DoseStatus.TAKEN
         doseDao.upsert(
@@ -107,7 +115,7 @@ class MedicationRepository @Inject constructor(
         if (!wasTaken) adjustStock(medicationId, -1)
     }
 
-    suspend fun markSkipped(medicationId: Long, date: LocalDate, time: LocalTime, at: Instant = Instant.now()) {
+    suspend fun markSkipped(medicationId: Long, date: LocalDate, time: LocalTime, at: Instant = Instant.now()) = doseLock.withLock {
         val existing = doseDao.find(medicationId, date, time)
         if (existing?.status == DoseStatus.TAKEN) adjustStock(medicationId, +1)
         doseDao.upsert(
@@ -117,8 +125,8 @@ class MedicationRepository @Inject constructor(
     }
 
     /** "Aldım"ı geri alır. */
-    suspend fun markPending(medicationId: Long, date: LocalDate, time: LocalTime) {
-        val existing = doseDao.find(medicationId, date, time) ?: return
+    suspend fun markPending(medicationId: Long, date: LocalDate, time: LocalTime) = doseLock.withLock {
+        val existing = doseDao.find(medicationId, date, time) ?: return@withLock
         if (existing.status == DoseStatus.TAKEN) adjustStock(medicationId, +1)
         doseDao.upsert(existing.copy(status = DoseStatus.PENDING, actedAt = null))
     }
@@ -126,7 +134,7 @@ class MedicationRepository @Inject constructor(
     /** Günlük kontrolde çağrılır: dünden önceki bekleyen dozlar kaçırılmış sayılır. */
     suspend fun markOldPendingAsMissed(today: LocalDate) = doseDao.markPendingBeforeAsMissed(today)
 
-    suspend fun setStock(id: Long, count: Int?) = medicationDao.setStock(id, count)
+    suspend fun setStock(id: Long, count: Int?) = doseLock.withLock { medicationDao.setStock(id, count) }
 
     private suspend fun adjustStock(medicationId: Long, delta: Int) {
         val med = medicationDao.get(medicationId) ?: return

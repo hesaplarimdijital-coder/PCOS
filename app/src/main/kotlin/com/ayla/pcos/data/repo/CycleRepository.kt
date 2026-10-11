@@ -9,6 +9,8 @@ import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -32,6 +34,9 @@ class CycleRepository @Inject constructor(
 
     val periods: Flow<List<PeriodEntity>> = periodDao.observeAll()
 
+    /** "Varsa ekleme" denetimleri ile yazma arasına başka bir yazma girmesin (çift dokunuş). */
+    private val writeLock = Mutex()
+
     suspend fun snapshot(): CycleOverview = overview.first()
 
     /**
@@ -39,12 +44,12 @@ class CycleRepository @Inject constructor(
      * [SAME_PERIOD_WINDOW_DAYS] içinde ise yeni kayıt açmaz; bu, aynı adetin iki kez
      * kaydedilmesini önler.
      */
-    suspend fun startPeriod(date: LocalDate) {
+    suspend fun startPeriod(date: LocalDate) = writeLock.withLock {
         val latest = periodDao.latestOnOrBefore(date)
         if (latest != null) {
             val gap = ChronoUnit.DAYS.between(latest.startDate, date)
-            if (gap in 0 until SAME_PERIOD_WINDOW_DAYS && latest.endDate == null) return
-            if (gap == 0L) return
+            if (gap in 0 until SAME_PERIOD_WINDOW_DAYS && latest.endDate == null) return@withLock
+            if (gap == 0L) return@withLock
         }
         periodDao.upsert(PeriodEntity(startDate = date))
         ensureTrackingSince(date)
@@ -60,8 +65,8 @@ class CycleRepository @Inject constructor(
      * "aynı adet iki kez" koruması burada uygulanmaz; kullanıcı tarihi bilinçli seçmiştir.
      * Mantıksız kısa döngüler motor tarafından zaten istatistik dışı bırakılır.
      */
-    suspend fun addPeriodStart(date: LocalDate) {
-        if (periodDao.getByStart(date) != null) return
+    suspend fun addPeriodStart(date: LocalDate) = writeLock.withLock {
+        if (periodDao.getByStart(date) != null) return@withLock
         periodDao.upsert(PeriodEntity(startDate = date))
         ensureTrackingSince(date)
     }

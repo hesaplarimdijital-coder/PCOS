@@ -8,6 +8,7 @@ import com.ayla.pcos.data.repo.duration
 import com.ayla.pcos.ui.plan.PlanViewModel
 import com.ayla.pcos.ui.today.TodayViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.junit.Test
 import java.time.Duration
 import java.time.LocalTime
@@ -119,13 +120,36 @@ class ViewModelTesti : VeriTestOrtami() {
     @Test
     fun `su ekleme ve cikarma sifirin altina inmez`() {
         val vm = PlanViewModel(water, sleep, prefs, scheduler, ticker)
-        vm.removeCup()
-        vm.addCup()
-        vm.addCup()
+        calistir {
+            vm.removeCup().join()
+            vm.addCup().join()
+            vm.addCup().join()
+        }
         bekle(vm.uiState) { it.waterCups == 2 }
-        vm.removeCup()
-        vm.removeCup()
-        vm.removeCup()
+        calistir { repeat(3) { vm.removeCup().join() } }
         assertEquals(0, bekle(vm.uiState) { it.waterCups == 0 }.waterCups)
+    }
+
+    @Test
+    fun `es zamanli dokunuslarda bardak kaybolmaz`() {
+        calistir {
+            kotlinx.coroutines.coroutineScope {
+                repeat(20) { launch(kotlinx.coroutines.Dispatchers.Default) { water.addCup(bugun) } }
+            }
+        }
+        assertEquals(20, calistir { water.cups(bugun) })
+    }
+
+    @Test
+    fun `es zamanli aldim stoğu bir kez dusurur`() {
+        val id = calistir {
+            meds.add(MedicationEntity(name = "D", doseText = "1", kind = MedicationKind.SUPPLEMENT, times = listOf(LocalTime.of(9, 0)), stockCount = 10))
+        }
+        calistir {
+            kotlinx.coroutines.coroutineScope {
+                repeat(10) { launch(kotlinx.coroutines.Dispatchers.Default) { meds.markTaken(id, bugun, LocalTime.of(9, 0)) } }
+            }
+        }
+        assertEquals(9, calistir { meds.get(id)?.stockCount })
     }
 }
