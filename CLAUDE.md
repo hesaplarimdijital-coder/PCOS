@@ -10,7 +10,7 @@ günlük kayıt, su ve uyku. Beslenme/hareket planı, bitkisel öneriler, cilt b
 Arayüz dili **Türkçe**; ürün tonu sıcak, yargılamayan, kanıta bağlı.
 
 ## Teknik çerçeve (değiştirmeden önce ADR yaz)
-- **AGP 9.4.0 + yerleşik Kotlin.** `org.jetbrains.kotlin.android` eklentisi **kullanılmaz**; Kotlin ayarları
+- **AGP 9.4.x + yerleşik Kotlin.** `org.jetbrains.kotlin.android` eklentisi **kullanılmaz**; Kotlin ayarları
   `kotlin { compilerOptions { } }` üst düzey bloğundadır. Sürümler yalnızca `gradle/libs.versions.toml`'da.
 - Gradle 9.6 wrapper, JDK 17 kaynak/hedef (CI JDK 21 ile derler), Kotlin 2.4.x, KSP 2.3.x, Hilt (KSP),
   Room (`androidx.room` eklentisi, şema `app/schemas/`), Compose BOM 2026.09, Material 3.

@@ -1,7 +1,7 @@
 [versions]
 # Derleme araçları (AGP 9 yerleşik Kotlin ile gelir; kotlin-android eklentisi uygulanmaz)
-agp = "9.4.0"
-kotlin = "2.4.10"
+agp = "9.4.1"
+kotlin = "2.4.21"
 ksp = "2.3.11"
 
 # Jetpack
@@ -26,12 +26,12 @@ coroutines = "1.11.0"
 serialization = "1.11.0"
 
 # Güvenlik
-sqlcipher = "4.18.0"
+sqlcipher = "4.19.1"
 
 # Test
 junit = "4.13.2"
 robolectric = "4.17"
-roborazzi = "1.74.0"
+roborazzi = "1.76.0"
 
 [libraries]
 # Compose
