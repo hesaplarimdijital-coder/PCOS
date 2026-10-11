@@ -1,6 +1,7 @@
 package com.ayla.pcos.di
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
@@ -15,6 +16,7 @@ import com.ayla.pcos.data.db.MedicationDao
 import com.ayla.pcos.data.db.PeriodDao
 import com.ayla.pcos.data.db.SleepDao
 import com.ayla.pcos.security.DatabaseKeyProvider
+import com.ayla.pcos.security.DatabaseKeyUnavailableException
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
+import java.io.File
 import java.time.Clock
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -69,12 +72,33 @@ object AppModule {
     fun provideDatabase(@ApplicationContext context: Context, keyProvider: DatabaseKeyProvider): AylaDatabase {
         // SQLCipher yerel kütüphanesi Room'dan önce yüklenmeli.
         System.loadLibrary("sqlcipher")
-        val factory = SupportOpenHelperFactory(keyProvider.passphrase())
+        val dbFile = context.getDatabasePath(AylaDatabase.NAME)
+        val passphrase = try {
+            keyProvider.passphrase(databaseExists = dbFile.exists() && dbFile.length() > 0L)
+        } catch (e: DatabaseKeyUnavailableException) {
+            // Keystore anahtarı kaybolmuş: eski dosya bu anahtarla bir daha açılamaz. Çökme döngüsü
+            // yerine dosyayı karantinaya al, yeni anahtarla temiz başla ve kullanıcıya bir kez söyle.
+            Log.e(TAG, "Veritabanı anahtarı kullanılamıyor; eski dosya karantinaya alınıyor", e)
+            quarantine(dbFile)
+            keyProvider.rotateAfterLoss()
+        }
+        val factory = SupportOpenHelperFactory(passphrase)
         return Room.databaseBuilder(context, AylaDatabase::class.java, AylaDatabase.NAME)
             .openHelperFactory(factory)
             .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
             .build()
     }
+
+    /** ayla.db ve yardımcı dosyalarını (-wal, -shm, -journal) zaman damgalı adla kenara koyar. */
+    private fun quarantine(dbFile: File) {
+        val stamp = System.currentTimeMillis()
+        listOf("", "-wal", "-shm", "-journal").forEach { suffix ->
+            val f = File(dbFile.path + suffix)
+            if (f.exists()) f.renameTo(File(dbFile.path + ".kilitli-$stamp" + suffix))
+        }
+    }
+
+    private const val TAG = "AppModule"
 
     @Provides fun providePeriodDao(db: AylaDatabase): PeriodDao = db.periodDao()
     @Provides fun provideDailyLogDao(db: AylaDatabase): DailyLogDao = db.dailyLogDao()

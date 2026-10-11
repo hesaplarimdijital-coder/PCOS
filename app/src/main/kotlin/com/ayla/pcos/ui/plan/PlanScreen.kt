@@ -39,7 +39,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -100,7 +100,7 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
             Text(stringResource(R.string.plan_title), style = MaterialTheme.typography.headlineMedium)
         }
         Spacer(Modifier.height(8.dp))
-        TabRow(selectedTabIndex = tab, containerColor = MaterialTheme.colorScheme.surface) {
+        PrimaryTabRow(selectedTabIndex = tab, containerColor = MaterialTheme.colorScheme.surface) {
             listOf(R.string.plan_tab_water_sleep, R.string.plan_tab_nutrition, R.string.plan_tab_movement).forEachIndexed { index, res ->
                 Tab(selected = tab == index, onClick = { tab = index }, text = { Text(stringResource(res), maxLines = 1) })
             }

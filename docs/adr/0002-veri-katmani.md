@@ -14,6 +14,12 @@ bulgusu "verim nerede?" kaygısı. Hesap, bulut ve analitik SDK istenmiyor.
 - `allowBackup=false`, `dataExtractionRules` tüm alanları dışlar; yedek yerine kullanıcı kontrolünde JSON dışa
   aktarma (`DataExporter`, sürümlü şema) ve tam silme.
 - Tarih/saat Room'da ISO metin, Instant epoch-millis (`Converters`).
+- **Anahtar kaybı politikası:** sarmalı parola açılamazsa (Keystore anahtarı sistem güncellemesi/kilit
+  sıfırlamasıyla geçersizleşmişse) asla sessizce yeni parola üretilmez — bu, dosyayı kalıcı olarak
+  okunamaz kılıp uygulamayı çökme döngüsüne sokar. Bunun yerine `ayla.db*` dosyaları
+  `ayla.db.kilitli-<zaman>` olarak karantinaya alınır, yeni anahtarla temiz başlanır ve kullanıcıya
+  tek seferlik "önceki kayıtların açılamadı" diyaloğu gösterilir (`DatabaseKeyProvider.rotateAfterLoss`,
+  `RootUiState.dataResetNotice`). Veritabanı dosyası varken sarmalı parola yoksa aynı yol izlenir.
 
 ## Sonuçlar
 + Cihaz kilidi + dosya şifresi iki katman; veri çalınsa da okunamaz. Kullanıcı taahhüdü "cihazda, şifreli".

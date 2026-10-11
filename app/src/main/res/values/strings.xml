@@ -312,6 +312,11 @@
     <string name="lock_unlock">Kilidi aç</string>
     <string name="lock_use_credential">PIN ile aç</string>
 
+    <!-- Veri sıfırlama bildirimi (Keystore anahtarı kaybı) -->
+    <string name="data_reset_title">Önceki kayıtların açılamadı</string>
+    <string name="data_reset_text">Telefonun güvenlik anahtarı değişmiş görünüyor (sistem güncellemesi ya da kilit sıfırlaması buna yol açabilir). Şifreli veriler bu anahtar olmadan okunamaz; Ayla temiz bir başlangıç yaptı. Ayarlar &gt; Verilerin bölümünden düzenli dışa aktarma yapmanı öneririz.</string>
+    <string name="action_understood">Anladım</string>
+
     <!-- Hata ve boş durumlar -->
     <string name="empty_today">Henüz kayıt yok. İlk adetini ekleyince döngünü birlikte okumaya başlarız.</string>
     <string name="error_generic">Bir şeyler ters gitti. Tekrar dener misin?</string>

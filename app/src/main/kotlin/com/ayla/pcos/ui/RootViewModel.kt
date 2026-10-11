@@ -3,6 +3,7 @@ package com.ayla.pcos.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
+import com.ayla.pcos.security.DatabaseKeyProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,11 +18,14 @@ data class RootUiState(
     val loading: Boolean = true,
     val onboardingDone: Boolean = false,
     val locked: Boolean = false,
+    /** Önceki veriler açılamadı ve yeni başlangıç yapıldı; kullanıcıya bir kez söylenir. */
+    val dataResetNotice: Boolean = false,
 )
 
 @HiltViewModel
 class RootViewModel @Inject constructor(
     private val prefs: UserPreferencesRepository,
+    private val keyProvider: DatabaseKeyProvider,
 ) : ViewModel() {
 
     private val unlocked = MutableStateFlow(false)
@@ -32,17 +36,21 @@ class RootViewModel @Inject constructor(
     val uiState: StateFlow<RootUiState> = combine(
         prefs.preferences.map { it.onboardingDone to it.appLockEnabled },
         unlocked,
-    ) { (onboardingDone, lockEnabled), isUnlocked ->
+        keyProvider.resetNoticePending,
+    ) { (onboardingDone, lockEnabled), isUnlocked, resetNotice ->
         RootUiState(
             loading = false,
             onboardingDone = onboardingDone,
             locked = lockEnabled && !isUnlocked,
+            dataResetNotice = resetNotice,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RootUiState())
 
     fun onUnlocked() {
         unlocked.value = true
     }
+
+    fun acknowledgeDataReset() = keyProvider.acknowledgeResetNotice()
 
     fun onBackgrounded(now: Long) {
         backgroundedAt = now

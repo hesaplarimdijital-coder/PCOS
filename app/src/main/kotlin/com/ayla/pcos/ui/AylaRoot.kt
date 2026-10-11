@@ -11,17 +11,22 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ayla.pcos.R
 import com.ayla.pcos.ui.calendar.CalendarScreen
 import com.ayla.pcos.ui.components.AltGezinme
 import com.ayla.pcos.ui.log.DailyLogScreen
@@ -67,6 +72,17 @@ fun AylaRoot(
         !state.onboardingDone -> OnboardingScreen()
         state.locked -> AppLockScreen(onUnlocked = viewModel::onUnlocked)
         else -> MainShell(openTarget = openTarget, onOpenTargetConsumed = onOpenTargetConsumed)
+    }
+
+    if (!state.loading && state.dataResetNotice) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(stringResource(R.string.data_reset_title)) },
+            text = { Text(stringResource(R.string.data_reset_text)) },
+            confirmButton = {
+                TextButton(onClick = viewModel::acknowledgeDataReset) { Text(stringResource(R.string.action_understood)) }
+            },
+        )
     }
 }
 
