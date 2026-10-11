@@ -1,11 +1,11 @@
 package com.ayla.pcos.ui.theme
 
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.TweenSpec
 
 /**
  * Hareket ilkeleri: mekânsal değişimler hafif taşan yaylarla, efektler (renk, opaklık)

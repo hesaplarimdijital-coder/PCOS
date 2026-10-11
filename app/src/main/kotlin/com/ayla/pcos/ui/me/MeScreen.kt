@@ -3,7 +3,6 @@ package com.ayla.pcos.ui.me
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,10 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.EditNote
+import androidx.compose.material.icons.rounded.IosShare
 import androidx.compose.material.icons.rounded.Medication
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.WaterDrop
@@ -38,6 +40,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -45,19 +48,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.material.icons.rounded.Description
-import androidx.compose.material.icons.rounded.IosShare
-import androidx.compose.ui.platform.LocalContext
-import com.ayla.pcos.ui.components.shareText
 import com.ayla.pcos.R
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SatirZemini
 import com.ayla.pcos.ui.components.SimgeZemini
+import com.ayla.pcos.ui.components.shareText
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalAylaColors
-import java.time.format.TextStyle
 import java.time.DayOfWeek
+import java.time.format.TextStyle
 
 /** Ben: döngü düzeni, takviye uyumu, su ve kayıt alışkanlığı; ayarlara giriş. Sayılar yargılamaz, gösterir. */
 @Composable

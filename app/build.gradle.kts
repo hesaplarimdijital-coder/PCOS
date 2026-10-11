@@ -50,6 +50,11 @@ android {
         }
     }
 
+    lint {
+        // Sürümler ADR-0001 gereği bilinçli olarak sabitlenir; "daha yeni sürüm var" uyarıları gürültüdür.
+        disable += setOf("NewerVersionAvailable", "AndroidGradlePluginVersion", "GradleDependency")
+    }
+
     testOptions {
         unitTests {
             // Robolectric ekran görüntüsü testleri kaynakları (font, string, tema) okur.

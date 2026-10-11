@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.LocalFlorist
 import androidx.compose.material3.Button
@@ -29,10 +30,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,17 +48,10 @@ import com.ayla.cycle.Confidence
 import com.ayla.cycle.CycleOverview
 import com.ayla.cycle.LongCycleAlert
 import com.ayla.cycle.Prediction
-import androidx.compose.material.icons.rounded.CalendarMonth
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalDensity
-import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
-import com.ayla.pcos.ui.components.TarihSeciciDialog
-import com.ayla.pcos.ui.theme.AylaExpressiveShapes
 import com.ayla.pcos.R
 import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.ui.components.AylaCard
+import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
 import com.ayla.pcos.ui.components.BantTuru
 import com.ayla.pcos.ui.components.DozSatiri
 import com.ayla.pcos.ui.components.HaleHalkasi
@@ -62,8 +60,12 @@ import com.ayla.pcos.ui.components.HapPaketi
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SectionHeader
 import com.ayla.pcos.ui.components.SuSatiri
-import com.ayla.pcos.ui.components.shareText
+import com.ayla.pcos.ui.components.TarihSeciciDialog
 import com.ayla.pcos.ui.components.UyariBandi
+import com.ayla.pcos.ui.components.openExactAlarmSettings
+import com.ayla.pcos.ui.components.openNotificationSettings
+import com.ayla.pcos.ui.components.shareText
+import com.ayla.pcos.ui.theme.AylaExpressiveShapes
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import java.time.LocalDate
 import java.time.LocalTime
@@ -238,13 +240,7 @@ internal fun TodayContent(
                     title = stringResource(R.string.onboarding_exact_alarm_title),
                     text = stringResource(R.string.settings_exact_alarm_missing),
                     actionLabel = stringResource(R.string.action_open_settings),
-                    onAction = {
-                        val intent = android.content.Intent(
-                            android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                            android.net.Uri.parse("package:${context.packageName}"),
-                        )
-                        runCatching { context.startActivity(intent) }
-                    },
+                    onAction = { openExactAlarmSettings(context) },
                 )
             }
         }
@@ -431,12 +427,6 @@ private fun PillHero(pill: PillModeState) {
     }
 }
 
-/** Uygulamanın sistem bildirim ayarları (Android 8+). */
-internal fun openNotificationSettings(context: android.content.Context) {
-    val intent = android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-        .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
-        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-    runCatching { context.startActivity(intent) }
 }
 
 /**

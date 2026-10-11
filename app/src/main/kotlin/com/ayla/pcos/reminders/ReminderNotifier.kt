@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import com.ayla.pcos.MainActivity
 import com.ayla.pcos.R
 import com.ayla.pcos.data.db.MedicationEntity
@@ -125,7 +126,7 @@ class ReminderNotifier @Inject constructor(@ApplicationContext private val conte
     private fun actionIntent(action: String, medicationId: Long, date: LocalDate, time: LocalTime, notificationId: Int): PendingIntent {
         val intent = Intent(context, ReminderActionReceiver::class.java).apply {
             this.action = action
-            data = android.net.Uri.parse("ayla://dose/$medicationId/$date/$time/$action")
+            data = "ayla://dose/$medicationId/$date/$time/$action".toUri()
             putExtra(ReminderScheduler.EXTRA_MEDICATION_ID, medicationId)
             putExtra(ReminderScheduler.EXTRA_DATE, date.toString())
             putExtra(ReminderScheduler.EXTRA_TIME, time.toString())

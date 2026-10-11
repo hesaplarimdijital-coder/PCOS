@@ -38,7 +38,7 @@ class ViewModelTesti : VeriTestOrtami() {
             }
         }
         val vm = today()
-        val state = bekle(vm.uiState) { it.pillMode != null && it.pillMode!!.takenPills.size == 11 }
+        val state = bekle(vm.uiState) { state -> state.pillMode?.takenPills?.size == 11 }
         val pill = assertNotNull(state.pillMode)
         assertEquals(12, pill.todayPill)
         assertFalse(pill.isPlacebo)

@@ -4,9 +4,10 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
+import androidx.core.content.edit
+import androidx.core.content.getSystemService
+import androidx.core.net.toUri
 import com.ayla.pcos.data.db.MedicationDao
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
@@ -38,18 +39,12 @@ class ReminderScheduler @Inject constructor(
     private val prefs: UserPreferencesRepository,
     private val clock: Clock,
 ) {
-    private val alarmManager: AlarmManager = context.getSystemService(AlarmManager::class.java)
+    private val alarmManager: AlarmManager = requireNotNull(context.getSystemService<AlarmManager>())
     private val registry by lazy { context.getSharedPreferences(REGISTRY_PREFS, Context.MODE_PRIVATE) }
 
     /** Android 12+ tam zamanlı alarm izni; daha eski sürümlerde her zaman true. */
     fun exactAlarmsAllowed(): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()
-
-    /** Kullanıcıyı sistemin tam zamanlı alarm ayarına götüren niyet (Android 12+). */
-    fun exactAlarmSettingsIntent(): Intent? {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return null
-        return Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
-    }
 
     suspend fun rescheduleAll() {
         val meds = medicationDao.getActive()
@@ -69,7 +64,7 @@ class ReminderScheduler @Inject constructor(
             cancel(doseIntent(medId, time, snoozed = false))
             cancel(doseIntent(medId, time, snoozed = true))
         }
-        registry.edit().putStringSet(KEY_DOSES, newKeys).apply()
+        registry.edit { putStringSet(KEY_DOSES, newKeys) }
 
         scheduleDailyCheck(ReminderPolicy.effectiveDailyCheckTime(p), earliestDate = today)
         if (p.waterRemindersEnabled) {
@@ -78,7 +73,7 @@ class ReminderScheduler @Inject constructor(
             if (ReminderPolicy.shouldRescheduleWater(storedAt, clock.instant(), p)) scheduleWater(p, fromNow = true)
         } else {
             cancel(simpleIntent(ReminderKind.WATER))
-            registry.edit().remove(KEY_WATER_AT).apply()
+            registry.edit { remove(KEY_WATER_AT) }
         }
         if (p.eveningRoutineEnabled) {
             scheduleAt(simpleIntent(ReminderKind.EVENING), nextOccurrence(p.eveningRoutineTime, today))
@@ -124,7 +119,7 @@ class ReminderScheduler @Inject constructor(
     fun scheduleWater(p: UserPreferences, fromNow: Boolean) {
         val at = ReminderPolicy.nextWater(ZonedDateTime.now(clock), p, fromNow)
         scheduleAt(simpleIntent(ReminderKind.WATER), at)
-        registry.edit().putLong(KEY_WATER_AT, at.toInstant().toEpochMilli()).apply()
+        registry.edit { putLong(KEY_WATER_AT, at.toInstant().toEpochMilli()) }
     }
 
     fun scheduleEvening(time: LocalTime, earliestDate: LocalDate) {
@@ -170,7 +165,7 @@ class ReminderScheduler @Inject constructor(
     private fun baseIntent(kind: ReminderKind, path: String): Intent =
         Intent(context, ReminderReceiver::class.java).apply {
             action = ACTION_FIRE
-            data = Uri.parse("ayla://reminder/${kind.name.lowercase()}/$path")
+            data = "ayla://reminder/${kind.name.lowercase()}/$path".toUri()
             putExtra(EXTRA_KIND, kind.name)
         }
 

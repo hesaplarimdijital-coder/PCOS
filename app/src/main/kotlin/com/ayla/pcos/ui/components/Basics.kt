@@ -10,14 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Eco
@@ -29,6 +21,14 @@ import androidx.compose.material.icons.rounded.Eco
 import androidx.compose.material.icons.rounded.Medication
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Today
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,7 +92,7 @@ fun SectionHeader(title: String, modifier: Modifier = Modifier, action: (@Compos
 
 /** 40 dp yuvarlak simge zemini (liste satırlarında). */
 @Composable
-fun SimgeZemini(icon: ImageVector, background: Color, tint: Color, contentDescription: String? = null, modifier: Modifier = Modifier) {
+fun SimgeZemini(icon: ImageVector, background: Color, tint: Color, modifier: Modifier = Modifier, contentDescription: String? = null) {
     androidx.compose.foundation.layout.Box(
         modifier = modifier.size(40.dp).background(background, CircleShape),
         contentAlignment = Alignment.Center,

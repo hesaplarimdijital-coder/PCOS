@@ -130,7 +130,7 @@ abstract class VeriTestOrtami {
     protected fun kuruluAlarmlar(): List<String> {
         val am = context.getSystemService(AlarmManager::class.java)
         return shadowOf(am).scheduledAlarms.mapNotNull { alarm ->
-            alarm.operation?.let { shadowOf(it).savedIntent.dataString }
+            alarm.getOperation()?.let { shadowOf(it).savedIntent.dataString }
         }
     }
 }

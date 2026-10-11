@@ -1,8 +1,5 @@
 package com.ayla.pcos.ui.me
 
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -69,8 +66,9 @@ import com.ayla.pcos.ui.components.DegerSatiri
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SaatSeciciDialog
 import com.ayla.pcos.ui.components.UyariBandi
+import com.ayla.pcos.ui.components.openExactAlarmSettings
+import com.ayla.pcos.ui.components.openNotificationSettings
 import com.ayla.pcos.ui.components.saatMetni
-import com.ayla.pcos.ui.today.openNotificationSettings
 import java.time.LocalTime
 
 /** Ayar sınırları; arayüz ve testler aynı değerleri kullanır. */
@@ -123,10 +121,7 @@ fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewMo
         onExport = { exportLauncher.launch(DataExporter.suggestedFileName()) },
         onWipe = { viewModel.wipeAll() },
         onOpenNotificationSettings = { openNotificationSettings(context) },
-        onOpenExactAlarmSettings = {
-            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
-            runCatching { context.startActivity(intent) }
-        },
+        onOpenExactAlarmSettings = { openExactAlarmSettings(context) },
     )
 }
 

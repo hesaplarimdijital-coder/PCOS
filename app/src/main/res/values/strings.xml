@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation,PluralsCandidate" tools:locale="tr">
+    <!-- PluralsCandidate: Türkçede sayıdan sonra isim çoğul eki almaz ("1 bardak", "8 bardak"); çeviri
+         eklenirse o dilin dosyasında <plurals> kullanılır. -->
     <string name="app_name">Ayla</string>
 
     <!-- Gezinme -->
@@ -17,7 +19,6 @@
     <string name="action_close">Kapat</string>
     <string name="action_add">Ekle</string>
     <string name="action_undo">Geri al</string>
-    <string name="action_skip">Atla</string>
     <string name="action_taken">Aldım</string>
     <string name="action_snooze">15 dk ertele</string>
     <string name="action_all">Tümü</string>
@@ -74,8 +75,6 @@
     <string name="today_notifications_off_text">İlaç ve su hatırlatmaların gelmeyecek. İstersen bildirim ayarlarından açabilirsin.</string>
     <string name="today_empty_title">Ritmini birlikte okuyalım</string>
     <string name="today_empty_pick">Son adet tarihini seç</string>
-    <string name="today_period_prompt_title">Adet başladı mı?</string>
-    <string name="today_period_prompt_text">Bugün başladıysa tek dokunuşla kaydet; başka bir gün için takvimi kullan.</string>
 
     <!-- Uzun döngü uyarıları -->
     <string name="alert_cycle_60_title">Döngünün %1$d. günündesin</string>
@@ -145,7 +144,6 @@
     <string name="onboarding_notifications_denied">İzin verilmedi. Ayla bildirimsiz de çalışır; istediğin zaman ayarlardan açabilirsin.</string>
     <string name="onboarding_open_notification_settings">Bildirim ayarlarını aç</string>
     <string name="onboarding_exact_alarm_granted">Tam zamanlı hatırlatma açık</string>
-    <string name="onboarding_step">Adım %1$d / %2$d</string>
     <string name="onboarding_start">Başlayalım</string>
     <string name="onboarding_disclaimer">Ayla tıbbi tavsiye vermez. Tanı ve tedavi için doktoruna danış.</string>
 
@@ -162,7 +160,6 @@
     <string name="log_measurements">Ölçümler</string>
     <string name="log_weight">Kilo (kg)</string>
     <string name="log_waist">Bel çevresi (cm)</string>
-    <string name="log_saved">Kaydedildi</string>
     <string name="mood_1">Çok düşük</string>
     <string name="mood_2">Düşük</string>
     <string name="mood_3">Orta</string>
@@ -208,13 +205,11 @@
     <string name="meds_adherence_title">Bu hafta</string>
     <!-- Türkçe ek sayıya göre değişir (11 i, 12 si); bu yüzden kesirli biçim. -->
     <string name="meds_adherence_text">%2$d/%1$d doz alındı</string>
-    <string name="meds_stock_days">%1$s: %2$d günlük stok kaldı.</string>
     <string name="meds_inositol_evidence_title">Inositol hakkında</string>
     <string name="meds_inositol_evidence_text">2023 uluslararası kılavuz inositolü deneysel kabul ediyor. Kullandığını doktoruna söyle; dozu kendin değiştirme.</string>
     <string name="meds_evidence_limited">Sınırlı kanıt</string>
     <string name="meds_remove">Listeden kaldır</string>
     <string name="meds_remove_confirm">%1$s listeden kaldırılsın mı? Geçmiş kayıtlar silinmez.</string>
-    <string name="meds_times_per_day">günde %1$d</string>
     <string name="meds_new_title">Yeni ilaç ya da takviye</string>
     <string name="meds_edit_title">İlacı düzenle</string>
     <string name="meds_kind">Tür</string>
@@ -257,7 +252,6 @@
     <string name="calendar_open_log">Günün kaydını aç</string>
     <string name="calendar_day_a11y_period">%1$s, kayıtlı adet</string>
     <string name="calendar_day_a11y_predicted">%1$s, tahmini adet aralığı</string>
-    <string name="calendar_cycle_length">%1$d günlük döngü</string>
     <string name="calendar_cycle_days">%1$d gün</string>
     <string name="calendar_cycle_options">Döngü seçenekleri</string>
     <string name="calendar_count_cycle">Ortalamaya kat</string>
@@ -278,14 +272,14 @@
     <string name="water_title">Su</string>
     <string name="water_of_goal">/ %1$d bardak</string>
     <string name="water_litres">%1$s L · hedef %2$s L</string>
-    <string name="water_add_cup">Bardak</string>
     <string name="sleep_title">Uyku</string>
     <string name="sleep_duration">%1$d sa %2$d dk</string>
     <string name="sleep_last_night">Dün gece · %1$s–%2$s</string>
     <string name="sleep_none">Henüz uyku kaydı yok.</string>
     <string name="sleep_add">Uyku ekle</string>
-    <string name="sleep_import_hc">Health Connect&#8217;ten al</string>
-    <string name="sleep_hc_unavailable">Health Connect bu cihazda kullanılamıyor.</string>
+    <!-- Health Connect uyku içe aktarma MVP 2 (#11) için hazır metinler. -->
+    <string name="sleep_import_hc" tools:ignore="UnusedResources">Health Connect&#8217;ten al</string>
+    <string name="sleep_hc_unavailable" tools:ignore="UnusedResources">Health Connect bu cihazda kullanılamıyor.</string>
     <string name="sleep_bedtime">Yatış</string>
     <string name="sleep_wake">Kalkış</string>
     <string name="sleep_quality">Kalite</string>
@@ -304,7 +298,6 @@
     <string name="me_days_this_week">%1$d/7 gün bu hafta</string>
     <string name="me_last_4_weeks">son 4 hafta</string>
     <string name="me_settings">Ayarlar</string>
-    <string name="me_privacy">Gizlilik ve güvenlik</string>
     <string name="me_settings_text">Profil, su hedefi, hatırlatmalar, gizlilik ve verilerin</string>
     <string name="me_cycle_trend_shorter">Son %1$d döngün art arda kısaldı</string>
     <string name="me_cycle_trend_text">Tipik aralık 21–35 gün; doğru yöndesin.</string>
@@ -355,7 +348,6 @@
     <string name="settings_cycle_notifications">Döngü bildirimleri</string>
     <string name="settings_progress_notifications">İlerleme bildirimleri</string>
     <string name="settings_quiet_hours">Sessiz saatler</string>
-    <string name="settings_quiet_hours_text">%1$s – %2$s · yalnızca ilaç hatırlatmaları gelir</string>
     <string name="settings_exact_alarm_missing">Hatırlatmalar tam saatinde çalmayabilir: tam zamanlı alarm izni kapalı.</string>
     <string name="settings_section_display">Görünüm</string>
     <string name="settings_hide_prediction">Tahmini gizle</string>
@@ -381,7 +373,6 @@
     <string name="lock_title">Ayla kilitli</string>
     <string name="lock_subtitle">Devam etmek için kimliğini doğrula</string>
     <string name="lock_unlock">Kilidi aç</string>
-    <string name="lock_use_credential">PIN ile aç</string>
 
     <!-- Doktor notu (paylaşım) -->
     <string name="note_title">Ayla · Doktor görüşmesi notu</string>
@@ -413,5 +404,4 @@
 
     <!-- Hata ve boş durumlar -->
     <string name="empty_today">Son adetinin başladığı günü seçince döngü gününü ve tahmini aralığı göstermeye başlarız. Tarihi tam hatırlamıyorsan yaklaşık bir gün de olur.</string>
-    <string name="error_generic">Bir şeyler ters gitti. Tekrar dener misin?</string>
 </resources>

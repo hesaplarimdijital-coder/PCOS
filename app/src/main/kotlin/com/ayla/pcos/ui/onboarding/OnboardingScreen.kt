@@ -1,12 +1,9 @@
 package com.ayla.pcos.ui.onboarding
 
 import android.Manifest
-import android.content.Context
 import android.app.AlarmManager
-import android.content.Intent
-import android.net.Uri
+import android.content.Context
 import android.os.Build
-import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,6 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Medication
@@ -58,6 +56,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,16 +65,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.getSystemService
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
-import com.ayla.pcos.ui.today.openNotificationSettings
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.pcos.R
 import com.ayla.pcos.data.prefs.Goal
 import com.ayla.pcos.ui.components.SimgeZemini
+import com.ayla.pcos.ui.components.openExactAlarmSettings
+import com.ayla.pcos.ui.components.openNotificationSettings
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import java.time.Instant
@@ -98,7 +97,7 @@ data class OnboardingPermissions(
 )
 
 private fun readPermissions(context: Context, denied: Boolean): OnboardingPermissions {
-    val alarmManager: AlarmManager? = context.getSystemService(AlarmManager::class.java)
+    val alarmManager: AlarmManager? = context.getSystemService<AlarmManager>()
     val exactGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) alarmManager?.canScheduleExactAlarms() == true else true
     return OnboardingPermissions(
         notificationsGranted = NotificationManagerCompat.from(context).areNotificationsEnabled(),
@@ -142,10 +141,7 @@ fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
                 openNotificationSettings(context)
             }
         },
-        onOpenExactAlarmSettings = {
-            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, Uri.parse("package:${context.packageName}"))
-            runCatching { context.startActivity(intent) }
-        },
+        onOpenExactAlarmSettings = { openExactAlarmSettings(context) },
     )
 }
 

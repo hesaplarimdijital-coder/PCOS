@@ -4,6 +4,7 @@ import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -77,19 +78,22 @@ class DatabaseKeyProvider @Inject constructor(@ApplicationContext private val co
         runCatching {
             KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }.deleteEntry(ALIAS)
         }
-        prefs.edit().remove(KEY_WRAPPED).putBoolean(KEY_RESET_NOTICE, true).apply()
+        prefs.edit {
+            remove(KEY_WRAPPED)
+            putBoolean(KEY_RESET_NOTICE, true)
+        }
         _resetNoticePending.value = true
         return createFresh()
     }
 
     fun acknowledgeResetNotice() {
-        prefs.edit().remove(KEY_RESET_NOTICE).apply()
+        prefs.edit { remove(KEY_RESET_NOTICE) }
         _resetNoticePending.value = false
     }
 
     private fun createFresh(): ByteArray {
         val fresh = ByteArray(32).also { SecureRandom().nextBytes(it) }
-        prefs.edit().putString(KEY_WRAPPED, wrap(fresh)).apply()
+        prefs.edit { putString(KEY_WRAPPED, wrap(fresh)) }
         return fresh
     }
 
