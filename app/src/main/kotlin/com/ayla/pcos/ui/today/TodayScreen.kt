@@ -62,6 +62,7 @@ import com.ayla.pcos.ui.components.HapPaketi
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SectionHeader
 import com.ayla.pcos.ui.components.SuSatiri
+import com.ayla.pcos.ui.components.shareText
 import com.ayla.pcos.ui.components.UyariBandi
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import java.time.LocalDate
@@ -83,6 +84,8 @@ fun TodayScreen(
     viewModel: TodayViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val shareTitle = stringResource(R.string.note_share)
     if (state.loading) {
         Box(Modifier.fillMaxSize())
         return
@@ -99,6 +102,9 @@ fun TodayScreen(
         onPeriodEnd = viewModel::endPeriodToday,
         onDismissNotificationBand = { viewModel.dismissNotificationBand() },
         onPeriodStartAt = { viewModel.startPeriodAt(it) },
+        onShareDoctorNote = {
+            viewModel.prepareDoctorNote { title, text -> shareText(context, title, text, shareTitle) }
+        },
     )
 }
 
@@ -116,6 +122,7 @@ internal fun TodayContent(
     onPeriodEnd: () -> Unit,
     onDismissNotificationBand: () -> Unit = {},
     onPeriodStartAt: (LocalDate) -> Unit = {},
+    onShareDoctorNote: () -> Unit = {},
     hour: Int = LocalTime.now().hour,
 ) {
     val overview = state.overview
@@ -191,6 +198,8 @@ internal fun TodayContent(
                     tur = BantTuru.DIKKAT,
                     title = if (alert == LongCycleAlert.SEE_DOCTOR) stringResource(R.string.alert_cycle_90_title, day) else stringResource(R.string.alert_cycle_60_title, day),
                     text = if (alert == LongCycleAlert.SEE_DOCTOR) stringResource(R.string.alert_cycle_90_text) else stringResource(R.string.alert_cycle_60_text),
+                    actionLabel = stringResource(R.string.alert_action_doctor_note),
+                    onAction = onShareDoctorNote,
                 )
             }
         }
@@ -200,6 +209,8 @@ internal fun TodayContent(
                     tur = BantTuru.DIKKAT,
                     title = stringResource(R.string.alert_few_periods_title),
                     text = stringResource(R.string.alert_few_periods_text),
+                    actionLabel = stringResource(R.string.alert_action_doctor_note),
+                    onAction = onShareDoctorNote,
                 )
             }
         }

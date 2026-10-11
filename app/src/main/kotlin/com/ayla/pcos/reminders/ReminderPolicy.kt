@@ -1,11 +1,13 @@
 package com.ayla.pcos.reminders
 
 import com.ayla.pcos.data.prefs.UserPreferences
+import java.time.DayOfWeek
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
+import java.time.temporal.TemporalAdjusters
 
 /**
  * Hatırlatma zamanlama kuralları; Android'e bağımlı değildir, JVM'de test edilir.
@@ -77,5 +79,21 @@ object ReminderPolicy {
         return at.isAfter(now.plus(maxAhead))
     }
 
+    /** Haftalık özetin günü ve saati: Pazar akşamı, sessiz saatlerden önce. */
+    val WEEKLY_DAY: DayOfWeek = DayOfWeek.SUNDAY
+    val WEEKLY_TIME: LocalTime = LocalTime.of(19, 0)
+
+    /** [now]'dan sonraki ilk [day] günü [time] anı (bugün o günse ve saat geçmediyse bugün). */
+    fun nextWeekly(now: ZonedDateTime, day: DayOfWeek = WEEKLY_DAY, time: LocalTime = WEEKLY_TIME): ZonedDateTime {
+        var candidate = now.toLocalDate().with(TemporalAdjusters.nextOrSame(day)).atTime(time).atZone(now.zone)
+        if (!candidate.isAfter(now)) candidate = candidate.plusWeeks(1)
+        return candidate
+    }
+
     const val MIN_WATER_INTERVAL_MINUTES = 15
+}
+
+/** Haftalık ilerleme özeti; hiç veri yoksa bildirim gönderilmez. */
+data class HaftalikOzet(val logDays: Int, val dosesTaken: Int, val dosesScheduled: Int, val waterGoalDays: Int) {
+    val isEmpty: Boolean get() = logDays == 0 && dosesScheduled == 0 && waterGoalDays == 0
 }

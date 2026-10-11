@@ -80,6 +80,13 @@ class ReminderNotifier @Inject constructor(@ApplicationContext private val conte
         notify(NotificationIds.stock(medication.id), builder)
     }
 
+    fun showWeekly(text: String, p: UserPreferences) {
+        val builder = base(NotificationChannels.PROGRESS, context.getString(R.string.notif_weekly_title), text, p, openTarget = "me")
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        notify(NotificationIds.WEEKLY, builder)
+    }
+
     fun cancel(id: Int) = manager.cancel(id)
 
     /** Kullanıcı uygulamanın bildirimlerini kapattıysa (ya da Android 13+ izni vermediyse) false. */

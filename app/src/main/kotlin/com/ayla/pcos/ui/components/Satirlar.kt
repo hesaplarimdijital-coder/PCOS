@@ -273,6 +273,8 @@ fun SuSatiri(cups: Int, goal: Int, onAdd: () -> Unit, modifier: Modifier = Modif
                 color = scheme.secondary,
                 trackColor = colors.cukur,
                 strokeCap = StrokeCap.Round,
+                gapSize = 0.dp,
+                drawStopIndicator = {},
             )
         }
         FilledIconButton(

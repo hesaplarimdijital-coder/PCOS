@@ -10,12 +10,14 @@ import com.ayla.pcos.data.repo.DailyLogRepository
 import com.ayla.pcos.data.repo.DateTicker
 import com.ayla.pcos.data.repo.HydrationRepository
 import com.ayla.pcos.data.repo.MedicationRepository
+import com.ayla.pcos.report.DoctorNoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import javax.inject.Inject
@@ -57,6 +59,7 @@ class MeViewModel @Inject constructor(
     dailyLogRepository: DailyLogRepository,
     prefs: UserPreferencesRepository,
     ticker: DateTicker,
+    private val doctorNote: DoctorNoteRepository,
 ) : ViewModel() {
 
     val uiState: StateFlow<MeUiState> = ticker.today
@@ -89,6 +92,11 @@ class MeViewModel @Inject constructor(
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MeUiState())
+
+    /** Doktor notunu hazırlar; metin hazır olunca [onReady] çağrılır. */
+    fun prepareDoctorNote(onReady: (title: String, text: String) -> Unit) = viewModelScope.launch {
+        onReady(doctorNote.title(), doctorNote.build())
+    }
 
     private fun eligibleLengths(overview: CycleOverview): List<Int> =
         overview.cycles.filter { it.countsForStats }.mapNotNull { it.lengthDays }

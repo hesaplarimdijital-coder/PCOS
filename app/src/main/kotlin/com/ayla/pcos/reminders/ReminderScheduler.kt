@@ -19,7 +19,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /** Alarmla tetiklenen hatırlatma türleri. */
-enum class ReminderKind { DOSE, DAILY_CHECK, WATER, EVENING }
+enum class ReminderKind { DOSE, DAILY_CHECK, WATER, EVENING, WEEKLY }
 
 /**
  * Tüm alarmların tek sahibi.
@@ -85,6 +85,12 @@ class ReminderScheduler @Inject constructor(
         } else {
             cancel(simpleIntent(ReminderKind.EVENING))
         }
+        if (p.progressNotificationsEnabled) scheduleWeekly() else cancel(simpleIntent(ReminderKind.WEEKLY))
+    }
+
+    /** Haftalık ilerleme özeti: bir sonraki Pazar 19:00. */
+    fun scheduleWeekly() {
+        scheduleAt(simpleIntent(ReminderKind.WEEKLY), ReminderPolicy.nextWeekly(ZonedDateTime.now(clock)))
     }
 
     /** [earliestDate] gününden başlayarak [time] saatinin bir sonraki geçerli anına doz alarmı kurar. */

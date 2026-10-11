@@ -52,6 +52,7 @@ object NotificationIds {
     const val CYCLE_ALERT = 1001
     const val WATER = 1002
     const val EVENING = 1003
+    const val WEEKLY = 1004
     const val STOCK_BASE = 20_000
 
     fun dose(medicationId: Long, time: String): Int = 30_000 + ("$medicationId:$time".hashCode() and 0xFFFF)

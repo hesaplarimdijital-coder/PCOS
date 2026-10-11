@@ -16,6 +16,7 @@ import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.data.repo.HydrationRepository
 import com.ayla.pcos.data.repo.MedicationRepository
 import com.ayla.pcos.reminders.ReminderNotifier
+import com.ayla.pcos.report.DoctorNoteRepository
 import com.ayla.pcos.reminders.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -72,6 +73,7 @@ class TodayViewModel @Inject constructor(
     private val ticker: DateTicker,
     private val scheduler: ReminderScheduler,
     private val notifier: ReminderNotifier,
+    private val doctorNote: DoctorNoteRepository,
 ) : ViewModel() {
 
     private val todayFlow: Flow<LocalDate> = ticker.today
@@ -144,6 +146,11 @@ class TodayViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TodayUiState())
 
     fun addWater() = viewModelScope.launch { hydrationRepository.addCup(ticker.now()) }
+
+    /** Doktor notunu hazırlar; metin hazır olunca [onReady] ana iş parçacığında çağrılır. */
+    fun prepareDoctorNote(onReady: (title: String, text: String) -> Unit) = viewModelScope.launch {
+        onReady(doctorNote.title(), doctorNote.build())
+    }
 
     fun dismissNotificationBand() = viewModelScope.launch { prefs.update { it.copy(notificationsBandDismissed = true) } }
 

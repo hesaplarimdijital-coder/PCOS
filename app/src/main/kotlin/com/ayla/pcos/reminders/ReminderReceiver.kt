@@ -10,12 +10,14 @@ import com.ayla.pcos.data.db.DoseStatus
 import com.ayla.pcos.data.db.MedicationDao
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.data.repo.CycleRepository
+import com.ayla.pcos.data.repo.DailyLogRepository
 import com.ayla.pcos.data.repo.HydrationRepository
 import com.ayla.pcos.data.repo.MedicationRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.LocalDate
@@ -37,6 +39,7 @@ class ReminderReceiver : BroadcastReceiver() {
     @Inject lateinit var medicationRepository: MedicationRepository
     @Inject lateinit var cycleRepository: CycleRepository
     @Inject lateinit var hydrationRepository: HydrationRepository
+    @Inject lateinit var dailyLogRepository: DailyLogRepository
     @Inject lateinit var prefs: UserPreferencesRepository
     @Inject lateinit var clock: Clock
 
@@ -54,6 +57,7 @@ class ReminderReceiver : BroadcastReceiver() {
                     ReminderKind.DAILY_CHECK -> handleDailyCheck(context)
                     ReminderKind.WATER -> handleWater()
                     ReminderKind.EVENING -> handleEvening()
+                    ReminderKind.WEEKLY -> handleWeekly(context)
                 }
             } catch (t: Throwable) {
                 Log.w(TAG, "Hatırlatma işlenemedi: $kind", t)
@@ -146,6 +150,30 @@ class ReminderReceiver : BroadcastReceiver() {
         if (!p.eveningRoutineEnabled) return
         notifier.showEvening(p)
         scheduler.scheduleEvening(p.eveningRoutineTime, earliestDate = LocalDate.now(clock).plusDays(1))
+    }
+
+    /** Pazar akşamı: son 7 günün nazik özeti. Veri yoksa ya da sessiz saatteyse gönderilmez. */
+    private suspend fun handleWeekly(context: Context) {
+        val p = prefs.current()
+        if (!p.progressNotificationsEnabled) return
+        val today = LocalDate.now(clock)
+        val from = today.minusDays(6)
+        val adherence = medicationRepository.observeAdherence(from, today).first()
+        val ozet = HaftalikOzet(
+            logDays = dailyLogRepository.observeRange(from, today).first().size,
+            dosesTaken = adherence.taken,
+            dosesScheduled = adherence.scheduled,
+            waterGoalDays = hydrationRepository.observeRange(from, today).first().count { it.cups >= p.waterGoalCups },
+        )
+        if (!ozet.isEmpty && !ReminderPolicy.isQuiet(LocalTime.now(clock), p)) {
+            val parts = buildList {
+                if (ozet.logDays > 0) add(context.getString(R.string.notif_weekly_logs, ozet.logDays))
+                if (ozet.dosesScheduled > 0) add(context.getString(R.string.notif_weekly_doses, ozet.dosesTaken, ozet.dosesScheduled))
+                if (ozet.waterGoalDays > 0) add(context.getString(R.string.notif_weekly_water, ozet.waterGoalDays))
+            }
+            if (parts.isNotEmpty()) notifier.showWeekly(context.getString(R.string.notif_weekly_text, parts.joinToString(" · ")), p)
+        }
+        scheduler.scheduleWeekly()
     }
 
     private companion object {

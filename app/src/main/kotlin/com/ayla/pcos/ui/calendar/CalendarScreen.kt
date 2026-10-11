@@ -562,7 +562,7 @@ private fun DonguKonumu(length: Int) {
     val scheme = MaterialTheme.colorScheme
     val maxDays = maxOf(60, length + 2).toFloat()
     val track = colors.cukur
-    val band = colors.basariAcik
+    val band = colors.basari.copy(alpha = 0.32f)
     val dot = scheme.primary
     val ring = colors.kart
     Canvas(modifier = Modifier.fillMaxWidth().height(12.dp)) {

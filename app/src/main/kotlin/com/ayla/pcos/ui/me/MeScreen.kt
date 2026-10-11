@@ -45,6 +45,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.IosShare
+import androidx.compose.ui.platform.LocalContext
+import com.ayla.pcos.ui.components.shareText
 import com.ayla.pcos.R
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.Overline
@@ -63,12 +67,18 @@ fun MeScreen(onOpenSettings: () -> Unit, viewModel: MeViewModel = hiltViewModel(
         Box(Modifier.fillMaxSize())
         return
     }
-    MeContent(state = state, onOpenSettings = onOpenSettings)
+    val context = LocalContext.current
+    val shareTitle = stringResource(R.string.note_share)
+    MeContent(
+        state = state,
+        onOpenSettings = onOpenSettings,
+        onShareDoctorNote = { viewModel.prepareDoctorNote { title, text -> shareText(context, title, text, shareTitle) } },
+    )
 }
 
 /** Durumsuz Ben içeriği; ekran görüntüsü testleri doğrudan bunu çizer. */
 @Composable
-internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit) {
+internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit, onShareDoctorNote: () -> Unit = {}) {
     val scheme = MaterialTheme.colorScheme
     val colors = LocalAylaColors.current
 
@@ -146,6 +156,15 @@ internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit) {
                 style = MaterialTheme.typography.bodySmall,
                 color = scheme.onSurfaceVariant,
             )
+        }
+
+        SatirZemini(onClick = onShareDoctorNote) {
+            SimgeZemini(icon = Icons.Rounded.Description, background = scheme.primaryContainer, tint = scheme.primary)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.me_doctor_note), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.me_doctor_note_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant, maxLines = 2)
+            }
+            Icon(Icons.Rounded.IosShare, contentDescription = null, tint = scheme.onSurfaceVariant)
         }
 
         SatirZemini(onClick = onOpenSettings) {

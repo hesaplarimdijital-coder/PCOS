@@ -99,6 +99,11 @@
     <string name="notif_cycle_60_text">İki aydır adet görmemişsin. Bu PCOS&#8217;ta sık olur; takipte kalalım.</string>
     <string name="notif_cycle_90_title">Döngünün %1$d. günündesin</string>
     <string name="notif_cycle_90_text">Üç aydan uzun adet görmemek rahim sağlığın için kontrol gerektirebilir. Doktoruna sormak için bir not hazırlayalım mı?</string>
+    <string name="notif_weekly_title">Haftan nasıl geçti?</string>
+    <string name="notif_weekly_logs">%1$d gün kayıt</string>
+    <string name="notif_weekly_doses">%1$d/%2$d doz</string>
+    <string name="notif_weekly_water">%1$d gün su hedefi</string>
+    <string name="notif_weekly_text">Bu hafta: %1$s. Küçük adımlar da sayılır.</string>
     <string name="notif_stock_title">%1$s stoğu azalıyor</string>
     <string name="notif_stock_text">Yaklaşık %1$d günlük kaldı.</string>
 
@@ -201,7 +206,8 @@
     <string name="meds_kind_contraceptive">Doğum kontrol hapı</string>
     <string name="meds_kind_herbal">Bitkisel</string>
     <string name="meds_adherence_title">Bu hafta</string>
-    <string name="meds_adherence_text">%1$d dozun %2$d&#8217;i alındı</string>
+    <!-- Türkçe ek sayıya göre değişir (11 i, 12 si); bu yüzden kesirli biçim. -->
+    <string name="meds_adherence_text">%2$d/%1$d doz alındı</string>
     <string name="meds_stock_days">%1$s: %2$d günlük stok kaldı.</string>
     <string name="meds_inositol_evidence_title">Inositol hakkında</string>
     <string name="meds_inositol_evidence_text">2023 uluslararası kılavuz inositolü deneysel kabul ediyor. Kullandığını doktoruna söyle; dozu kendin değiştirme.</string>
@@ -301,13 +307,13 @@
     <string name="me_privacy">Gizlilik ve güvenlik</string>
     <string name="me_settings_text">Profil, su hedefi, hatırlatmalar, gizlilik ve verilerin</string>
     <string name="me_cycle_trend_shorter">Son %1$d döngün art arda kısaldı</string>
-    <string name="me_cycle_trend_text">Hedef aralık 21–35 gün; doğru yöndesin.</string>
+    <string name="me_cycle_trend_text">Tipik aralık 21–35 gün; doğru yöndesin.</string>
     <string name="me_cycle_need_data">Döngü eğilimi için en az 3 tamamlanmış döngü gerekir.</string>
     <string name="me_title_anon">Senin ritmin</string>
     <string name="me_cycle_band">21–35 gün: tipik aralık</string>
     <string name="me_log_grid_a11y">Son 4 haftada %1$d gün kayıt tuttun.</string>
     <string name="me_cycle_stable">Döngülerin düzenli: ortalama %1$d gün (±%2$d).</string>
-    <string name="me_cycle_variable">Döngün %1$d–%2$d gün arasında değişiyor; PCOS&#8217;ta bu sık görülür. Hedef aralık 21–35 gün.</string>
+    <string name="me_cycle_variable">Döngün %1$d–%2$d gün arasında değişiyor; PCOS&#8217;ta bu sık görülür. Tipik aralık 21–35 gün.</string>
     <string name="me_cycle_lengths_a11y">Son döngü uzunlukları: %1$s gün</string>
 
     <!-- Ayarlar ve gizlilik -->
@@ -362,8 +368,8 @@
     <string name="settings_delete_all">Tüm verilerimi sil</string>
     <string name="settings_delete_confirm_title">Tüm veriler silinsin mi?</string>
     <string name="settings_delete_confirm_text">Adet, kayıt, ilaç, su ve uyku verilerin kalıcı olarak silinir. Bu işlem geri alınamaz.</string>
-    <string name="settings_water_goal">Günlük su hedefi</string>
-    <string name="settings_cup_size">Bardak hacmi (ml)</string>
+    <string name="settings_water_goal">Günlük hedef</string>
+    <string name="settings_cup_size">Bardak hacmi</string>
     <string name="settings_name">Adın</string>
     <string name="settings_goals">Önceliklerim</string>
     <string name="settings_about">Hakkında</string>
@@ -376,6 +382,29 @@
     <string name="lock_subtitle">Devam etmek için kimliğini doğrula</string>
     <string name="lock_unlock">Kilidi aç</string>
     <string name="lock_use_credential">PIN ile aç</string>
+
+    <!-- Doktor notu (paylaşım) -->
+    <string name="note_title">Ayla · Doktor görüşmesi notu</string>
+    <string name="note_prepared">Hazırlanma: %1$s</string>
+    <string name="note_section_cycle">Döngü</string>
+    <string name="note_no_period">Henüz adet kaydı yok.</string>
+    <string name="note_last_period">Son adet başlangıcı: %1$s (bugün döngünün %2$d. günü)</string>
+    <string name="note_cycle_lengths">Son döngü uzunlukları (yeniden eskiye): %1$s gün</string>
+    <string name="note_cycle_stats">Ortalama %1$d gün · en kısa %2$d · en uzun %3$d</string>
+    <string name="note_periods_year">Son 12 ayda adet sayısı: %1$d</string>
+    <string name="note_long_cycle">Not: %1$d gündür adet görülmedi.</string>
+    <string name="note_section_meds">İlaç ve takviyeler</string>
+    <string name="note_no_meds">Kayıtlı ilaç ya da takviye yok.</string>
+    <string name="note_pill_regimen">%1$d etken + %2$d plasebo</string>
+    <string name="note_adherence">son 4 hafta %1$d/%2$d doz</string>
+    <string name="note_section_symptoms">Son 4 hafta</string>
+    <string name="note_no_symptoms">Semptom kaydı yok.</string>
+    <string name="note_symptom_days">%1$s (%2$d gün)</string>
+    <string name="note_log_days">Günlük kayıt tutulan gün: %1$d</string>
+    <string name="note_disclaimer">Bu özet Ayla uygulamasından kullanıcı tarafından paylaşılmıştır; tanı ya da tıbbi tavsiye içermez.</string>
+    <string name="note_share">Doktor notunu paylaş</string>
+    <string name="me_doctor_note">Doktor notu</string>
+    <string name="me_doctor_note_text">Döngü, ilaç ve semptom özetini doktorunla paylaş</string>
 
     <!-- Veri sıfırlama bildirimi (Keystore anahtarı kaybı) -->
     <string name="data_reset_title">Önceki kayıtların açılamadı</string>

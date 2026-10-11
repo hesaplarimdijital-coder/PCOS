@@ -108,6 +108,24 @@ class ReminderPolicyTest {
     }
 
     @Test
+    fun `haftalik ozet bir sonraki pazar 19da`() {
+        // 12 Ekim 2026 Pazartesi → 18 Ekim Pazar
+        val monday = LocalDate.of(2026, 10, 12)
+        assertEquals(at(LocalDate.of(2026, 10, 18), LocalTime.of(19, 0)), ReminderPolicy.nextWeekly(at(monday, LocalTime.of(10, 0))))
+        // Pazar 18:00 → aynı gün 19:00; Pazar 19:00 → bir hafta sonra
+        val sunday = LocalDate.of(2026, 10, 18)
+        assertEquals(at(sunday, LocalTime.of(19, 0)), ReminderPolicy.nextWeekly(at(sunday, LocalTime.of(18, 0))))
+        assertEquals(at(sunday.plusWeeks(1), LocalTime.of(19, 0)), ReminderPolicy.nextWeekly(at(sunday, LocalTime.of(19, 0))))
+    }
+
+    @Test
+    fun `veri yoksa haftalik ozet bos sayilir`() {
+        assertTrue(HaftalikOzet(0, 0, 0, 0).isEmpty)
+        assertFalse(HaftalikOzet(logDays = 1, dosesTaken = 0, dosesScheduled = 0, waterGoalDays = 0).isEmpty)
+        assertFalse(HaftalikOzet(logDays = 0, dosesTaken = 0, dosesScheduled = 14, waterGoalDays = 0).isEmpty)
+    }
+
+    @Test
     fun `su alarmi gecerliyse yeniden kurulmaz`() {
         val now = at(day, LocalTime.of(10, 0)).toInstant()
         assertTrue(ReminderPolicy.shouldRescheduleWater(0L, now, defaults))
