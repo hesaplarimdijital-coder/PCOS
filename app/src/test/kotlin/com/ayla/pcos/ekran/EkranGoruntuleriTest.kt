@@ -166,6 +166,8 @@ class EkranGoruntuleriTest {
         Bugun(Ornek.bugunDongu.copy(notificationsOff = true))
     }
 
+    @Test fun t20_simge() = ekran("20-simge") { SimgeOnizleme() }
+
     @Test fun t14_kilit() = ekran("14-kilit") {
         AppLockContent(title = "Ayla kilitli", subtitle = "Devam etmek için kimliğini doğrula", onUnlock = {})
     }

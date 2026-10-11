@@ -1,23 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Ayla simgesi: döngü halkası (300°, beyaz), halkanın ucunda "bugün" noktası, boşlukta tahmin
+  hâlesini anıştıran üç küçük nokta ve ortada hilal (ay). Tüm şekiller 108 dp tuvalin ortasındaki
+  66 dp güvenli dairenin içindedir (en dış nokta r≈31).
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Döngü halkası: tepeden saat yönünde 300° -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="6.5"
+        android:strokeLineCap="round"
+        android:pathData="M54,32 A22,22 0 1,1 34.95,43" />
+    <!-- Tahmin hâlesi: boşlukta üç nokta -->
+    <path android:fillColor="#F29A63" android:pathData="M31.79,35.36 m-2.2,0 a2.2,2.2 0 1,1 4.4,0 a2.2,2.2 0 1,1 -4.4,0" />
+    <path android:fillColor="#F29A63" android:pathData="M39.5,28.89 m-2.2,0 a2.2,2.2 0 1,1 4.4,0 a2.2,2.2 0 1,1 -4.4,0" />
+    <path android:fillColor="#F29A63" android:pathData="M48.96,25.44 m-2.2,0 a2.2,2.2 0 1,1 4.4,0 a2.2,2.2 0 1,1 -4.4,0" />
+    <!-- Bugün noktası -->
     <path
         android:fillColor="#F29A63"
-        android:pathData="M54,42 m-15,0 a15,15 0 1,1 30,0 a15,15 0 1,1 -30,0" />
-    <path
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="3"
-        android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M32,66 A24,24 0 0,0 76,66" />
+        android:strokeWidth="2.5"
+        android:pathData="M34.95,43 m-5.2,0 a5.2,5.2 0 1,1 10.4,0 a5.2,5.2 0 1,1 -10.4,0" />
+    <!-- Hilal -->
     <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="3"
-        android:strokeLineCap="round"
-        android:strokeAlpha="0.5"
-        android:fillColor="#00000000"
-        android:pathData="M26,70 A32,32 0 0,0 82,70" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M63.90,55.40 A10,10 0 1,1 52.60,44.10 A8,8 0 1,0 63.90,55.40 Z" />
 </vector>
