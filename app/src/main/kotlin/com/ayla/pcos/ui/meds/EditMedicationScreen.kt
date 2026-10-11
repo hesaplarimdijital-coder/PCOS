@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -153,7 +154,13 @@ internal fun EditMedicationContent(
                         MedicationKind.HERBAL to R.string.meds_kind_herbal,
                         MedicationKind.CONTRACEPTIVE to R.string.meds_kind_contraceptive,
                     ).forEach { (kind, labelRes) ->
-                        FilterChip(selected = state.kind == kind, onClick = { onKind(kind) }, label = { CipEtiketi(stringResource(labelRes)) })
+                        // Seçim renk tek başına değil, onay simgesiyle de görünür.
+                        FilterChip(
+                            selected = state.kind == kind,
+                            onClick = { onKind(kind) },
+                            label = { CipEtiketi(stringResource(labelRes)) },
+                            leadingIcon = if (state.kind == kind) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
+                        )
                     }
                 }
             }
