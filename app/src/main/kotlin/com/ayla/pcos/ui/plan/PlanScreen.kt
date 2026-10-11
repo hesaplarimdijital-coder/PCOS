@@ -1,10 +1,18 @@
 package com.ayla.pcos.ui.plan
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +62,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -72,11 +85,15 @@ import com.ayla.pcos.ui.components.SectionHeader
 import com.ayla.pcos.ui.components.SimgeZemini
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalAylaColors
+import com.ayla.pcos.ui.theme.LocalReducedMotion
+import com.ayla.pcos.ui.theme.hareket
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import kotlin.math.PI
+import kotlin.math.sin
 
 private val trLocale: Locale = Locale.forLanguageTag("tr")
 private val dayMonth: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM", trLocale)
@@ -113,6 +130,7 @@ internal fun PlanContent(
 ) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     var showSleepDialog by remember { mutableStateOf(false) }
+    val reduced = LocalReducedMotion.current
 
     Column(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp)) {
@@ -133,7 +151,13 @@ internal fun PlanContent(
         }
         AnimatedContent(
             targetState = tab,
-            transitionSpec = { fadeIn(AylaMotion.enter(240)) togetherWith fadeOut(AylaMotion.enter(120)) },
+            transitionSpec = {
+                if (reduced) {
+                    EnterTransition.None togetherWith ExitTransition.None
+                } else {
+                    fadeIn(AylaMotion.enter(240)) togetherWith fadeOut(AylaMotion.enter(120))
+                }
+            },
             label = "planSekme",
         ) { selectedTab ->
             Column(
@@ -180,30 +204,19 @@ private fun SuKarti(state: PlanUiState, onAdd: () -> Unit, onRemove: () -> Unit)
     val goalLitres = String.format(trLocale, "%.1f", state.waterGoal * state.cupMl / 1000.0)
     val fraction by animateFloatAsState(
         targetValue = (state.waterCups.toFloat() / state.waterGoal.coerceAtLeast(1)).coerceIn(0f, 1f),
-        animationSpec = AylaMotion.slow(),
+        animationSpec = hareket(AylaMotion.slow()),
         label = "suDolum",
     )
     val progressText = stringResource(R.string.today_water_progress, state.waterCups, state.waterGoal)
 
     AylaCard {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            // Bardak: dışı ince çizgi, içi aşağıdan yukarı dolar.
-            Box(
-                modifier = Modifier
-                    .width(44.dp)
-                    .height(72.dp)
-                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomStart = 14.dp, bottomEnd = 14.dp))
-                    .background(colors.cukur)
-                    .semantics { contentDescription = progressText },
-                contentAlignment = Alignment.BottomCenter,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(fraction.coerceIn(0f, 1f))
-                        .background(scheme.secondary.copy(alpha = 0.85f)),
-                )
-            }
+            SuBardagi(
+                fraction = fraction,
+                water = scheme.secondary,
+                track = colors.cukur,
+                contentDescription = progressText,
+            )
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Icon(Icons.Rounded.WaterDrop, contentDescription = null, tint = scheme.secondary, modifier = Modifier.size(18.dp))
@@ -241,6 +254,59 @@ private fun SuKarti(state: PlanUiState, onAdd: () -> Unit, onRemove: () -> Unit)
     }
 }
 
+/**
+ * Su bardağı: içi aşağıdan yukarı dolar; yüzeyde iki katmanlı hafif dalga, sol kenarda cam parıltısı.
+ * "Animasyonları kaldır" açıkken dalga durur (durağan çizilir). Boş ve tam dolu uçta dalga söner.
+ */
+@Composable
+private fun SuBardagi(fraction: Float, water: Color, track: Color, contentDescription: String) {
+    val phase = if (LocalReducedMotion.current) {
+        0f
+    } else {
+        val wave = rememberInfiniteTransition(label = "dalga")
+        val animated by wave.animateFloat(
+            initialValue = 0f,
+            targetValue = (2 * PI).toFloat(),
+            animationSpec = infiniteRepeatable(tween(2600, easing = LinearEasing)),
+            label = "dalgaFazi",
+        )
+        animated
+    }
+    Canvas(
+        modifier = Modifier
+            .width(44.dp)
+            .height(72.dp)
+            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp, bottomStart = 14.dp, bottomEnd = 14.dp))
+            .semantics { this.contentDescription = contentDescription },
+    ) {
+        drawRect(track)
+        val f = fraction.coerceIn(0f, 1f)
+        if (f > 0f) {
+            val level = size.height * (1f - f)
+            val amplitude = 2.5.dp.toPx() * (minOf(f, 1f - f) * 8f).coerceIn(0f, 1f)
+            fun wavePath(shift: Float) = Path().apply {
+                moveTo(0f, size.height)
+                val steps = 22
+                for (i in 0..steps) {
+                    val x = size.width * i / steps
+                    lineTo(x, level + amplitude * sin(phase + shift + x / size.width * 2f * PI.toFloat()))
+                }
+                lineTo(size.width, size.height)
+                close()
+            }
+            drawPath(wavePath(PI.toFloat()), water.copy(alpha = 0.45f))
+            drawPath(wavePath(0f), water.copy(alpha = 0.85f))
+        }
+        // Cam parıltısı: temadan bağımsız ışık yansıması, yalnızca süs.
+        drawRoundRect(
+            color = Color.White.copy(alpha = 0.22f),
+            topLeft = Offset(size.width * 0.16f, size.height * 0.14f),
+            size = Size(size.width * 0.1f, size.height * 0.62f),
+            cornerRadius = CornerRadius(size.width * 0.05f),
+        )
+    }
+}
+
 /** Yedi küçük çubuk; hedefe ulaşan günler dolu renkte. Renk tek başına bilgi taşımaz: altta sayı var. */
 @Composable
 private fun HaftalikCubuklar(values: List<Int>, goal: Int, labels: List<String>) {
@@ -259,7 +325,7 @@ private fun HaftalikCubuklar(values: List<Int>, goal: Int, labels: List<String>)
                         .background(colors.cukur),
                     contentAlignment = Alignment.BottomCenter,
                 ) {
-                    val fraction by animateFloatAsState(targetValue = value.toFloat() / max, animationSpec = AylaMotion.slow(), label = "cubuk$index")
+                    val fraction by animateFloatAsState(targetValue = value.toFloat() / max, animationSpec = hareket(AylaMotion.slow()), label = "cubuk$index")
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -286,7 +352,13 @@ private fun UykuKarti(state: PlanUiState, onAdd: () -> Unit, onDelete: (SleepEnt
         Spacer(Modifier.height(8.dp))
         val night = state.lastNight
         if (night == null) {
-            Text(stringResource(R.string.sleep_none), style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                SimgeZemini(icon = Icons.Rounded.Bedtime, background = colors.lavantaAcik, tint = colors.lavanta)
+                Column {
+                    Text(stringResource(R.string.sleep_none), style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.sleep_none_hint), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+                }
+            }
         } else {
             val zone = ZoneId.systemDefault()
             val d = night.duration

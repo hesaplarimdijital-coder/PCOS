@@ -223,7 +223,7 @@ internal fun calendarGridRange(month: YearMonth): Pair<LocalDate, LocalDate> {
 }
 
 /**
- * Ay ızgarası: 5 ya da 6 hafta × 7 gün (Pazartesi başlar). Son hafta tamamen sonraki aya aitse
+ * Ay ızgarası: 4–6 hafta × 7 gün (Pazartesi başlar). Tamamen sonraki aya ait sondaki haftalar
  * gösterilmez. Saf fonksiyon; ViewModel ve ekran görüntüsü testleri kullanır.
  */
 internal fun buildCalendarWeeks(
@@ -250,5 +250,6 @@ internal fun buildCalendarWeeks(
             )
         }
     }
-    return if (weeks.last().none { it.inMonth }) weeks.dropLast(1) else weeks
+    // Tamamı sonraki aya ait sondaki haftalar çizilmez (ör. Pazartesi başlayan 28 günlük Şubat: 4 hafta).
+    return weeks.dropLastWhile { week -> week.none { it.inMonth } }
 }

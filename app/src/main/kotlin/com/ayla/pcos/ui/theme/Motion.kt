@@ -1,11 +1,14 @@
 package com.ayla.pcos.ui.theme
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.runtime.Composable
 
 /**
  * Hareket ilkeleri: mekânsal değişimler hafif taşan yaylarla, efektler (renk, opaklık)
@@ -26,3 +29,10 @@ object AylaMotion {
 
     fun <T> enter(durationMillis: Int = 420): TweenSpec<T> = tween(durationMillis, easing = emphasizedDecelerate)
 }
+
+/**
+ * "Animasyonları kaldır" açıkken ([LocalReducedMotion]) anında biten, aksi hâlde verilen hareket.
+ * Dolum, çubuk ve ölçüt gibi değer animasyonları bununla beslenir: `hareket(AylaMotion.slow())`.
+ */
+@Composable
+fun <T> hareket(spec: AnimationSpec<T>): AnimationSpec<T> = if (LocalReducedMotion.current) snap() else spec

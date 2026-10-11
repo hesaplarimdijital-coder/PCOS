@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -41,9 +42,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -56,7 +60,10 @@ import com.ayla.pcos.ui.components.SimgeZemini
 import com.ayla.pcos.ui.components.shareText
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalAylaColors
+import com.ayla.pcos.ui.theme.hareket
 import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 
 /** Ben: döngü düzeni, takviye uyumu, su ve kayıt alışkanlığı; ayarlara giriş. Sayılar yargılamaz, gösterir. */
@@ -103,7 +110,7 @@ internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit, onShareDoct
             Spacer(Modifier.height(4.dp))
             val trendText = when (val t = state.trend) {
                 CycleTrend.NeedData -> stringResource(R.string.me_cycle_need_data)
-                is CycleTrend.Shortening -> stringResource(R.string.me_cycle_trend_shorter, t.count) + " " + stringResource(R.string.me_cycle_trend_text)
+                is CycleTrend.Shortening -> stringResource(R.string.me_cycle_trend_shorter, t.count)
                 is CycleTrend.Stable -> stringResource(R.string.me_cycle_stable, t.mean, t.deviation)
                 is CycleTrend.Variable -> stringResource(R.string.me_cycle_variable, t.shortest, t.longest)
             }
@@ -149,7 +156,12 @@ internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit, onShareDoct
             Spacer(Modifier.height(12.dp))
             Overline(stringResource(R.string.me_last_4_weeks))
             Spacer(Modifier.height(6.dp))
-            KayitIzgarasi(cells = state.logGrid, filled = colors.lavanta, empty = colors.cukur)
+            KayitIzgarasi(
+                cells = state.logGrid,
+                firstMonday = state.today.with(DayOfWeek.MONDAY).minusWeeks(3),
+                filled = colors.lavanta,
+                empty = colors.cukur,
+            )
             Spacer(Modifier.height(8.dp))
             Text(
                 stringResource(R.string.me_log_grid_a11y, state.logGrid.count { it == true }),
@@ -197,7 +209,7 @@ private fun OlcutKarti(
     barColor: Color,
     extra: (@Composable () -> Unit)? = null,
 ) {
-    val animated by animateFloatAsState(targetValue = fraction.coerceIn(0f, 1f), animationSpec = AylaMotion.slow(), label = "olcut")
+    val animated by animateFloatAsState(targetValue = fraction.coerceIn(0f, 1f), animationSpec = hareket(AylaMotion.slow()), label = "olcut")
     AylaCard {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             SimgeZemini(icon = icon, background = background, tint = tint)
@@ -233,15 +245,28 @@ private fun DonguCubuklari(lengths: List<Int>) {
     val bar = scheme.primary.copy(alpha = 0.85f)
     val band = colors.basariAcik
     val bandLine = colors.basari
+    // Bant sınırları sağdaki dar sütunda yazılır; çubuklar ve altlarındaki sayılar o sütuna taşmaz.
+    val measurer = rememberTextMeasurer()
+    val labelStyle = MaterialTheme.typography.labelSmall.copy(color = colors.basari)
+    val upperLabel = remember(measurer, labelStyle) { measurer.measure(TYPICAL_MAX.toString(), labelStyle) }
+    val lowerLabel = remember(measurer, labelStyle) { measurer.measure(TYPICAL_MIN.toString(), labelStyle) }
+    val density = LocalDensity.current
+    val gutterPx = maxOf(upperLabel.size.width, lowerLabel.size.width) + with(density) { 8.dp.roundToPx() }
+    val gutter = with(density) { gutterPx.toDp() }
     Column(modifier = Modifier.semantics { contentDescription = a11y }) {
         Canvas(modifier = Modifier.fillMaxWidth().height(96.dp)) {
             val h = size.height
+            val plotWidth = size.width - gutterPx
             fun y(days: Int): Float = h - (days.toFloat() / maxLen) * h
-            // Hedef bandı 21–35
-            drawRect(band, topLeft = Offset(0f, y(35)), size = Size(size.width, y(21) - y(35)))
-            drawLine(bandLine.copy(alpha = 0.5f), Offset(0f, y(35)), Offset(size.width, y(35)), strokeWidth = 1f)
-            drawLine(bandLine.copy(alpha = 0.5f), Offset(0f, y(21)), Offset(size.width, y(21)), strokeWidth = 1f)
-            val slot = size.width / lengths.size
+            // Tipik aralık bandı 21–35
+            drawRect(band, topLeft = Offset(0f, y(TYPICAL_MAX)), size = Size(plotWidth, y(TYPICAL_MIN) - y(TYPICAL_MAX)))
+            drawLine(bandLine.copy(alpha = 0.5f), Offset(0f, y(TYPICAL_MAX)), Offset(plotWidth, y(TYPICAL_MAX)), strokeWidth = 1f)
+            drawLine(bandLine.copy(alpha = 0.5f), Offset(0f, y(TYPICAL_MIN)), Offset(plotWidth, y(TYPICAL_MIN)), strokeWidth = 1f)
+            listOf(upperLabel to TYPICAL_MAX, lowerLabel to TYPICAL_MIN).forEach { (label, days) ->
+                val top = (y(days) - label.size.height / 2f).coerceIn(0f, h - label.size.height)
+                drawText(label, topLeft = Offset(size.width - label.size.width, top))
+            }
+            val slot = plotWidth / lengths.size
             val barWidth = (slot * 0.34f).coerceAtMost(18.dp.toPx())
             lengths.forEachIndexed { index, len ->
                 val left = slot * index + (slot - barWidth) / 2f
@@ -254,7 +279,7 @@ private fun DonguCubuklari(lengths: List<Int>) {
                 )
             }
         }
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth().padding(end = gutter)) {
             lengths.forEach { len ->
                 Text(
                     len.toString(),
@@ -273,13 +298,18 @@ private fun DonguCubuklari(lengths: List<Int>) {
     }
 }
 
-/** 4 hafta × 7 gün nokta ızgarası (Pazartesi başlar): kayıt olan günler dolu, gelecek günler boş halka. */
+/**
+ * 4 hafta × 7 gün nokta ızgarası (Pazartesi başlar): kayıt olan günler dolu, gelecek günler boş halka.
+ * Her satırın solunda o haftanın Pazartesi tarihi yazar; haftalar böylece birbirinden ayrışır.
+ */
 @Composable
-private fun KayitIzgarasi(cells: List<Boolean?>, filled: Color, empty: Color) {
+private fun KayitIzgarasi(cells: List<Boolean?>, firstMonday: LocalDate, filled: Color, empty: Color) {
     val scheme = MaterialTheme.colorScheme
     val tr = java.util.Locale.forLanguageTag("tr")
+    val weekLabel = remember { DateTimeFormatter.ofPattern("d MMM", tr) }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(modifier = Modifier.fillMaxWidth()) {
+            Spacer(Modifier.weight(WEEK_LABEL_WEIGHT))
             (1..7).map(DayOfWeek::of).forEach { dow ->
                 Text(
                     dow.getDisplayName(TextStyle.NARROW, tr),
@@ -290,8 +320,16 @@ private fun KayitIzgarasi(cells: List<Boolean?>, filled: Color, empty: Color) {
                 )
             }
         }
-        cells.chunked(7).forEach { week ->
-            Row(modifier = Modifier.fillMaxWidth()) {
+        cells.chunked(7).forEachIndexed { index, week ->
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    firstMonday.plusWeeks(index.toLong()).format(weekLabel).trimEnd('.'),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = scheme.onSurfaceVariant,
+                    maxLines = 1,
+                    softWrap = false,
+                    modifier = Modifier.weight(WEEK_LABEL_WEIGHT),
+                )
                 week.forEach { on ->
                     Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                         when (on) {
@@ -305,3 +343,10 @@ private fun KayitIzgarasi(cells: List<Boolean?>, filled: Color, empty: Color) {
         }
     }
 }
+
+/** Tipik döngü aralığı (gün); grafikteki bant ve etiketleri. */
+private const val TYPICAL_MIN = 21
+private const val TYPICAL_MAX = 35
+
+/** Kayıt ızgarasında hafta etiketi sütununun, bir gün sütununa göre genişliği. */
+private const val WEEK_LABEL_WEIGHT = 1.6f

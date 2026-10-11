@@ -1,5 +1,6 @@
 package com.ayla.pcos.ekran
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onRoot
@@ -68,12 +70,24 @@ class EkranGoruntuleriTest {
         sekme: Screen.Tab? = null,
         koyu: Boolean = false,
         yaziOlcegi: Float = 1f,
+        sistemYaziOlcegi: Float? = null,
         content: @Composable () -> Unit,
     ) {
         compose.setContent {
             AylaTheme(darkTheme = koyu, reducedMotion = true) {
                 val density = LocalDensity.current
-                CompositionLocalProvider(LocalDensity provides Density(density.density, yaziOlcegi)) {
+                val context = LocalContext.current
+                // yaziOlcegi: doğrusal ölçek (sınama için abartılı). sistemYaziOlcegi: cihazdaki gibi
+                // yapılandırmadan okunur; Android 14+ büyük metni doğrusal olmayan biçimde daha az büyütür.
+                val olcekli = remember(context, yaziOlcegi, sistemYaziOlcegi) {
+                    if (sistemYaziOlcegi != null) {
+                        val cfg = Configuration(context.resources.configuration).apply { fontScale = sistemYaziOlcegi }
+                        Density(context.createConfigurationContext(cfg))
+                    } else {
+                        Density(density.density, yaziOlcegi)
+                    }
+                }
+                CompositionLocalProvider(LocalDensity provides olcekli) {
                     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                         if (sekme != null) {
                             Scaffold(
@@ -206,6 +220,33 @@ class EkranGoruntuleriTest {
 
     @Test fun t25_koyu_takvim_bos_secim() = ekran("25-takvim-secimsiz", sekme = Screen.Calendar) { Takvim(secili = false) }
 
+    @Config(qualifiers = KUCUK)
+    @Test fun t27_kucuk_ekran_takvim() = ekran("27-kucuk-takvim", sekme = Screen.Calendar) { Takvim() }
+
+    @Test fun t28_planim_uyku_bos() = ekran("28-planim-uyku-bos", sekme = Screen.Plan) {
+        PlanContent(
+            state = Ornek.plan.copy(lastNight = null, sleepWeek = emptyList()),
+            onAddCup = {}, onRemoveCup = {}, onAddSleep = { _, _, _ -> }, onDeleteSleep = {}, onEveningRoutine = {},
+        )
+    }
+
+    // --- Sistem yazı boyutu %200 (Android 14+ en büyük ayar), tüm içerik ---
+
+    @Config(qualifiers = UZUN)
+    @Test fun y01_yazi200_bugun() = ekran("y01-yazi200-bugun", sekme = Screen.Today, sistemYaziOlcegi = 2f) { Bugun(Ornek.bugunDongu) }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y02_yazi200_takvim() = ekran("y02-yazi200-takvim", sekme = Screen.Calendar, sistemYaziOlcegi = 2f) { Takvim() }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y03_yazi200_planim() = ekran("y03-yazi200-planim", sekme = Screen.Plan, sistemYaziOlcegi = 2f) { Plan() }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y04_yazi200_ben() = ekran("y04-yazi200-ben", sekme = Screen.Me, sistemYaziOlcegi = 2f) { MeContent(state = Ornek.ben, onOpenSettings = {}) }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y05_yazi200_ilaclar() = ekran("y05-yazi200-ilaclar", sekme = Screen.Meds, sistemYaziOlcegi = 2f) { Ilaclar() }
+
     // --- İnceleme: tüm içerik (uzun) ---
 
     @Config(qualifiers = UZUN)
@@ -240,3 +281,4 @@ class EkranGoruntuleriTest {
 
 internal const val TELEFON = "w393dp-h852dp-xhdpi"
 internal const val UZUN = "w393dp-h1800dp-xhdpi"
+internal const val KUCUK = "w360dp-h740dp-xhdpi"

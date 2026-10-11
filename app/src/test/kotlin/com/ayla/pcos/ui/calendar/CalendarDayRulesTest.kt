@@ -3,7 +3,9 @@ package com.ayla.pcos.ui.calendar
 import com.ayla.cycle.CycleEngine
 import com.ayla.cycle.PeriodRecord
 import org.junit.Test
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -90,5 +92,32 @@ class CalendarDayRulesTest {
         assertTrue(r.canMarkStart)
         assertTrue(r.canMarkEnd)
         assertFalse(r.canUnmark)
+    }
+
+    private fun weeks(month: YearMonth) =
+        buildCalendarWeeks(month, today, emptyList(), engine.overview(emptyList(), today).prediction, emptySet(), engine)
+
+    @Test
+    fun `ay izgarasi pazartesi baslar ve yalnizca gereken kadar hafta tasir`() {
+        // Ağustos 2026 Cumartesi başlar: 6 hafta. Mart 2027 Pazartesi başlar: 5 hafta.
+        // Şubat 2027 Pazartesi başlar ve 28 gündür: tamamı Mart olan satır çizilmez, 4 hafta.
+        assertEquals(6, weeks(YearMonth.of(2026, 8)).size)
+        assertEquals(5, weeks(YearMonth.of(2027, 3)).size)
+        assertEquals(4, weeks(YearMonth.of(2027, 2)).size)
+        listOf(YearMonth.of(2026, 8), YearMonth.of(2026, 10), YearMonth.of(2027, 2)).forEach { month ->
+            val grid = weeks(month)
+            assertTrue(grid.all { week -> week.size == 7 && week.first().date.dayOfWeek == DayOfWeek.MONDAY })
+            assertEquals(month.lengthOfMonth(), grid.flatten().count { it.inMonth })
+            assertTrue(grid.first().any { it.date == month.atDay(1) })
+            assertTrue(grid.last().any { it.date == month.atEndOfMonth() })
+        }
+    }
+
+    @Test
+    fun `izgarada bugun ve gelecek gunler isaretlenir`() {
+        val days = weeks(YearMonth.from(today)).flatten()
+        assertEquals(listOf(today), days.filter { it.isToday }.map { it.date })
+        assertTrue(days.filter { it.date.isAfter(today) }.all { it.isFuture })
+        assertTrue(days.filter { !it.date.isAfter(today) }.none { it.isFuture })
     }
 }

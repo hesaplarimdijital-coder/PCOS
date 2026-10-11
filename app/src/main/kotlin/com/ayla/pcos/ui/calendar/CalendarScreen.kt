@@ -2,6 +2,8 @@ package com.ayla.pcos.ui.calendar
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -196,8 +198,8 @@ internal fun CalendarContent(
 
         AnimatedVisibility(
             visible = state.selected != null && state.actions != null,
-            enter = expandVertically(AylaMotion.spatial()) + fadeIn(),
-            exit = shrinkVertically(tween(180)) + fadeOut(tween(120)),
+            enter = if (reduced) EnterTransition.None else expandVertically(AylaMotion.spatial()) + fadeIn(),
+            exit = if (reduced) ExitTransition.None else shrinkVertically(tween(180)) + fadeOut(tween(120)),
         ) {
             val date = state.selected
             val actions = state.actions
@@ -333,13 +335,14 @@ private fun GunHucresi(day: CalendarDay, selected: Boolean, onClick: () -> Unit,
     val selectedRing = scheme.onSurface
     val dashed = colors.fazAdet
 
+    // Dokunma alanı hücrenin tamamıdır (360 dp genişlikte ≈ 45 dp); görsel boşluk içeride kalır.
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .padding(2.dp)
-            .alpha(if (day.inMonth) 1f else 0.38f)
             .selectable(selected = selected, onClick = onClick, role = Role.Button)
-            .semantics { contentDescription = a11y },
+            .semantics { contentDescription = a11y }
+            .padding(2.dp)
+            .alpha(if (day.inMonth) 1f else 0.38f),
         contentAlignment = Alignment.Center,
     ) {
         Box(

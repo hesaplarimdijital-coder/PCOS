@@ -16,10 +16,13 @@ permissions:
 env:
   GRADLE_OPTS: -Dorg.gradle.console=plain
 
+# Koşucu imajı sabit: ubuntu-latest Ekim 2026'da Ubuntu 26'ya geçiyor; Android SDK içeriği değişirse
+# CI kod değişmeden kırılmasın. Yükseltme bilinçli bir commit'le yapılır.
+
 jobs:
   build:
     name: Derle ve test et
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
       contents: write # Room şemasını depoya geri yazmak için
@@ -91,7 +94,7 @@ jobs:
 
       - name: Test raporları
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: test-raporlari
           path: |
@@ -101,7 +104,7 @@ jobs:
 
       - name: Room şeması
         if: success()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: room-semasi
           path: app/schemas
@@ -109,7 +112,7 @@ jobs:
 
       - name: Debug APK
         if: success()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ayla-debug-apk
           path: app/build/outputs/apk/debug/*.apk
@@ -133,7 +136,7 @@ jobs:
 
   ekran:
     name: Ekran görüntüleri
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     # Görsel belgeler ve inceleme içindir; altyapı oturana kadar ana derlemeyi kırmızıya çevirmez.
     continue-on-error: true
@@ -229,7 +232,7 @@ jobs:
 
       - name: Ekran görüntüleri artefaktı
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: ekran-goruntuleri
           path: app/build/ekran
@@ -237,7 +240,7 @@ jobs:
 
   release-check:
     name: Sürüm derlemesi (R8) ve lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - name: Kaynağı al
@@ -320,7 +323,7 @@ jobs:
 
       - name: Lint raporu
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: lint-raporu
           path: app/build/reports/lint-results-debug.*

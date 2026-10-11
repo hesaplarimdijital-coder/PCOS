@@ -47,6 +47,55 @@ class ViewModelTesti : VeriTestOrtami() {
     }
 
     @Test
+    fun `paket bitince yeni paket birinci hapla baslar, eski paketin haplari sayilmaz`() {
+        calistir {
+            val id = meds.add(
+                MedicationEntity(
+                    name = "Hap", doseText = "1 tablet", kind = MedicationKind.CONTRACEPTIVE,
+                    times = listOf(LocalTime.of(22, 0)), pillActiveDays = 24, pillPlaceboDays = 4,
+                    packStartDate = bugun.minusDays(28),
+                ),
+            )
+            // Önceki paketin son etken hapı
+            db.doseEventDao().upsert(
+                DoseEventEntity(medicationId = id, date = bugun.minusDays(5), time = LocalTime.of(22, 0), status = DoseStatus.TAKEN),
+            )
+        }
+        val pill = assertNotNull(bekle(today().uiState) { it.pillMode != null }.pillMode)
+        assertEquals(1, pill.todayPill)
+        assertFalse(pill.isPlacebo)
+        assertEquals(bugun, pill.packStart)
+        assertTrue(pill.takenPills.isEmpty())
+    }
+
+    @Test
+    fun `plasebo gununde hap plasebo olarak isaretlenir`() {
+        calistir {
+            meds.add(
+                MedicationEntity(
+                    name = "Hap", doseText = "1 tablet", kind = MedicationKind.CONTRACEPTIVE,
+                    times = listOf(LocalTime.of(22, 0)), pillActiveDays = 24, pillPlaceboDays = 4,
+                    packStartDate = bugun.minusDays(25),
+                ),
+            )
+        }
+        val pill = assertNotNull(bekle(today().uiState) { it.pillMode != null }.pillMode)
+        assertEquals(26, pill.todayPill)
+        assertTrue(pill.isPlacebo)
+        assertEquals(bugun.minusDays(25), pill.packStart)
+    }
+
+    @Test
+    fun `acik adet bugun bitirilir`() {
+        calistir { cycles.startPeriod(bugun.minusDays(4)) }
+        val vm = today()
+        bekle(vm.uiState) { it.openPeriod != null }
+        vm.endPeriodToday()
+        bekle(vm.uiState) { !it.loading && it.openPeriod == null }
+        assertEquals(bugun, calistir { db.periodDao().getAll().single().endDate })
+    }
+
+    @Test
     fun `paketteki gecmis hapa dokunmak o gunu isaretler, gelecek hap degismez`() {
         calistir {
             meds.add(
