@@ -90,7 +90,7 @@ class CalendarViewModel @Inject constructor(
     private val selected = MutableStateFlow<LocalDate?>(null)
 
     private val snapshot = month.flatMapLatest { m ->
-        val (gridStart, gridEnd) = gridRange(m)
+        val (gridStart, gridEnd) = calendarGridRange(m)
         combine(
             cycleRepository.periods,
             cycleRepository.overview,
@@ -100,19 +100,7 @@ class CalendarViewModel @Inject constructor(
         ) { periods, overview, preferences, today, logs ->
             val records = periods.map { PeriodRecord(it.startDate, it.endDate, it.excludedFromStats) }
             val prediction = if (preferences.hidePrediction) Prediction.NotEnoughData else overview.prediction
-            val logDates = logs.map { it.date }.toSet()
-            val starts = periods.map { it.startDate }.toSet()
-            val weeks = buildWeeks(gridStart) { date ->
-                CalendarDay(
-                    date = date,
-                    inMonth = YearMonth.from(date) == m,
-                    kind = engine.dayKind(date, records, prediction, today),
-                    isPeriodStart = date in starts,
-                    hasLog = date in logDates,
-                    isToday = date == today,
-                    isFuture = date.isAfter(today),
-                )
-            }
+            val weeks = buildCalendarWeeks(m, today, records, prediction, logs.map { it.date }.toSet(), engine)
             MonthSnapshot(m, today, weeks, periods, overview, preferences.hidePrediction)
         }
     }
@@ -175,24 +163,6 @@ class CalendarViewModel @Inject constructor(
             cycle = rules.cycle,
         )
     }
-
-    private companion object {
-        /** Izgaranın ilk ve son günü: ayın ilk gününü içeren Pazartesiden 6 hafta. */
-        fun gridRange(month: YearMonth): Pair<LocalDate, LocalDate> {
-            val first = month.atDay(1)
-            val offset = (first.dayOfWeek.value - DayOfWeek.MONDAY.value + 7) % 7
-            val start = first.minusDays(offset.toLong())
-            return start to start.plusDays(6 * 7 - 1L)
-        }
-
-        fun buildWeeks(gridStart: LocalDate, cell: (LocalDate) -> CalendarDay): List<List<CalendarDay>> {
-            val weeks = (0 until 6).map { week ->
-                (0 until 7).map { day -> cell(gridStart.plusDays((week * 7 + day).toLong())) }
-            }
-            // Son hafta tamamen sonraki aya aitse gösterilmez (5 satırlık aylar).
-            return if (weeks.last().none { it.inMonth }) weeks.dropLast(1) else weeks
-        }
-    }
 }
 
 /** Takvimde bir güne uygulanabilecek düzenleme kuralları; saf, test edilebilir. */
@@ -239,4 +209,43 @@ fun calendarDayRules(
         containingStart = containing?.start,
         cycle = containing?.let { c -> cycles.firstOrNull { it.start == c.start } },
     )
+}
+
+/** Izgaranın ilk ve son günü: ayın ilk gününü içeren Pazartesiden 6 hafta. */
+internal fun calendarGridRange(month: YearMonth): Pair<LocalDate, LocalDate> {
+    val first = month.atDay(1)
+    val offset = (first.dayOfWeek.value - DayOfWeek.MONDAY.value + 7) % 7
+    val start = first.minusDays(offset.toLong())
+    return start to start.plusDays(6 * 7 - 1L)
+}
+
+/**
+ * Ay ızgarası: 5 ya da 6 hafta × 7 gün (Pazartesi başlar). Son hafta tamamen sonraki aya aitse
+ * gösterilmez. Saf fonksiyon; ViewModel ve ekran görüntüsü testleri kullanır.
+ */
+internal fun buildCalendarWeeks(
+    month: YearMonth,
+    today: LocalDate,
+    records: List<PeriodRecord>,
+    prediction: Prediction,
+    logDates: Set<LocalDate>,
+    engine: CycleEngine,
+): List<List<CalendarDay>> {
+    val (gridStart, _) = calendarGridRange(month)
+    val starts = records.map { it.start }.toSet()
+    val weeks = (0 until 6).map { week ->
+        (0 until 7).map { day ->
+            val date = gridStart.plusDays((week * 7 + day).toLong())
+            CalendarDay(
+                date = date,
+                inMonth = YearMonth.from(date) == month,
+                kind = engine.dayKind(date, records, prediction, today),
+                isPeriodStart = date in starts,
+                hasLog = date in logDates,
+                isToday = date == today,
+                isFuture = date.isAfter(today),
+            )
+        }
+    }
+    return if (weeks.last().none { it.inMonth }) weeks.dropLast(1) else weeks
 }

@@ -49,6 +49,35 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    testOptions {
+        unitTests {
+            // Robolectric ekran görüntüsü testleri kaynakları (font, string, tema) okur.
+            isIncludeAndroidResources = true
+        }
+    }
+}
+
+// Ekran görüntüleri (com.ayla.pcos.ekran) yalnızca -Pekran ile çalışır ve app/build/ekran altına PNG yazar.
+// Diğer birim testleri bu bayraktan etkilenmez.
+val ekranGoruntuleri = providers.gradleProperty("ekran").isPresent
+tasks.withType<Test>().configureEach {
+    maxHeapSize = "3g"
+    // Robolectric, JDK 17+ üzerinde bu modüllere yansıma erişimi ister.
+    jvmArgs(
+        "--add-opens=java.base/java.lang=ALL-UNNAMED",
+        "--add-opens=java.base/java.util=ALL-UNNAMED",
+        "--add-opens=java.base/java.io=ALL-UNNAMED",
+        "--add-opens=java.base/java.net=ALL-UNNAMED",
+        "--add-opens=java.base/java.security=ALL-UNNAMED",
+        "--add-opens=java.base/java.text=ALL-UNNAMED",
+        "--add-opens=java.base/jdk.internal.access=ALL-UNNAMED",
+        "--add-opens=java.desktop/java.awt.font=ALL-UNNAMED",
+    )
+    systemProperty("roborazzi.test.record", ekranGoruntuleri.toString())
+    if (!ekranGoruntuleri) {
+        filter { excludeTestsMatching("com.ayla.pcos.ekran.*") }
+    }
 }
 
 kotlin {
@@ -112,4 +141,8 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(composeBom)
+    testImplementation(libs.compose.ui.test.junit4)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
 }

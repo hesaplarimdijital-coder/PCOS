@@ -55,6 +55,26 @@ import java.time.LocalTime
  */
 @Composable
 fun AddMedicationScreen(onDone: () -> Unit, viewModel: MedsViewModel = hiltViewModel()) {
+    AddMedicationContent(
+        onBack = onDone,
+        onTemplate = { template ->
+            viewModel.addTemplate(template)
+            onDone()
+        },
+        onSaveCustom = { name, dose, kind, times, withFood, stock ->
+            viewModel.addCustom(name = name, doseText = dose, kind = kind, times = times, withFood = withFood, stock = stock)
+            onDone()
+        },
+    )
+}
+
+/** Durumsuz ilaç ekleme içeriği; form durumu ekran içinde tutulur. */
+@Composable
+internal fun AddMedicationContent(
+    onBack: () -> Unit,
+    onTemplate: (MedicationTemplates.Template) -> Unit,
+    onSaveCustom: (name: String, dose: String, kind: MedicationKind, times: List<LocalTime>, withFood: Boolean?, stock: Int?) -> Unit,
+) {
     var name by rememberSaveable { mutableStateOf("") }
     var dose by rememberSaveable { mutableStateOf("") }
     var kind by rememberSaveable { mutableStateOf(MedicationKind.SUPPLEMENT) }
@@ -65,7 +85,7 @@ fun AddMedicationScreen(onDone: () -> Unit, viewModel: MedsViewModel = hiltViewM
 
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
         Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onDone) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
             Text(stringResource(R.string.meds_add_title), style = MaterialTheme.typography.headlineSmall)
         }
 
@@ -74,10 +94,7 @@ fun AddMedicationScreen(onDone: () -> Unit, viewModel: MedsViewModel = hiltViewM
         Spacer(Modifier.height(8.dp))
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             MedicationTemplates.all.forEach { template ->
-                SatirZemini(onClick = {
-                    viewModel.addTemplate(template)
-                    onDone()
-                }) {
+                SatirZemini(onClick = { onTemplate(template) }) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(template.name, style = MaterialTheme.typography.titleMedium)
                         Text(
@@ -151,17 +168,7 @@ fun AddMedicationScreen(onDone: () -> Unit, viewModel: MedsViewModel = hiltViewM
 
         Spacer(Modifier.height(24.dp))
         Button(
-            onClick = {
-                viewModel.addCustom(
-                    name = name,
-                    doseText = dose,
-                    kind = kind,
-                    times = times.toList(),
-                    withFood = withFood,
-                    stock = stock.toIntOrNull(),
-                )
-                onDone()
-            },
+            onClick = { onSaveCustom(name, dose, kind, times.toList(), withFood, stock.toIntOrNull()) },
             enabled = name.isNotBlank() && times.isNotEmpty(),
             modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
         ) { Text(stringResource(R.string.action_save)) }

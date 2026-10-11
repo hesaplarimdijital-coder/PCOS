@@ -131,6 +131,110 @@ jobs:
             echo "Şema değişmedi."
           fi
 
+  ekran:
+    name: Ekran görüntüleri
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # Görsel belgeler ve inceleme içindir; altyapı oturana kadar ana derlemeyi kırmızıya çevirmez.
+    continue-on-error: true
+    permissions:
+      contents: write # ekran-goruntuleri dalına yazmak için
+    steps:
+      - name: Kaynağı al
+        uses: actions/checkout@v5
+
+      - name: JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
+      - name: Ekranları çiz (Robolectric + Roborazzi)
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew :app:testDebugUnitTest -Pekran --tests 'com.ayla.pcos.ekran.*' --no-daemon --stacktrace 2>&1 | tee build-ekran.log
+
+      - name: Hataları açıklama olarak yayımla
+        if: failure()
+        shell: bash
+        run: |
+          set +e +o pipefail
+          grep -E '^e: ' build-ekran.log | sed 's#file:///home/runner/work/[^/]*/[^/]*/##' | head -10 | while IFS= read -r line; do
+            echo "::error title=Kotlin::$(printf '%s' "$line" | sed 's/%/%25/g')"
+          done
+          grep -A 8 'What went wrong' build-ekran.log | head -12 | while IFS= read -r line; do
+            echo "::error title=Gradle::$(printf '%s' "$line" | sed 's/%/%25/g')"
+          done
+          python3 - <<'PY'
+          import glob, xml.etree.ElementTree as ET
+          n = 0
+          for f in glob.glob('app/build/test-results/testDebugUnitTest/*.xml'):
+              for case in ET.parse(f).getroot().iter('testcase'):
+                  for tag in ('failure', 'error'):
+                      el = case.find(tag)
+                      if el is None:
+                          continue
+                      text = (el.get('message') or '') + '\n' + (el.text or '')
+                      lines = [l.strip() for l in text.splitlines() if l.strip()][:8]
+                      msg = '%0A'.join(l.replace('%', '%25') for l in lines)
+                      print(f"::error title=Ekran {case.get('name')}::{msg}")
+                      n += 1
+                      if n >= 6:
+                          raise SystemExit(0)
+          PY
+
+      - name: Görüntü özeti
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          if [ -d app/build/ekran ]; then
+            n=$(ls app/build/ekran/*.png 2>/dev/null | wc -l)
+            echo "::notice title=Ekran görüntüleri::$n görüntü: $(cd app/build/ekran && ls *.png | tr '\n' ' ')"
+          else
+            echo "::warning title=Ekran görüntüleri::görüntü üretilmedi"
+          fi
+
+      - name: ekran-goruntuleri dalına yükle
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          src="$PWD/app/build/ekran"
+          dir="$(mktemp -d)"
+          cp "$src"/*.png "$dir"/
+          cd "$dir"
+          {
+            echo "# Ayla ekran görüntüleri"
+            echo
+            echo "Kaynak commit: ${GITHUB_SHA::7} · CI tarafından üretilir, elle düzenlenmez."
+            echo
+            for f in *.png; do echo "### ${f%.png}"; echo; echo "![${f%.png}]($f)"; echo; done
+          } > README.md
+          git init -q -b ekran-goruntuleri
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "Ekran görüntüleri (${GITHUB_SHA::7})"
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" ekran-goruntuleri
+          echo "::notice title=Ekran görüntüleri::ekran-goruntuleri dalına yüklendi"
+
+      - name: Ekran görüntüleri artefaktı
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: ekran-goruntuleri
+          path: app/build/ekran
+          if-no-files-found: ignore
+
   release-check:
     name: Sürüm derlemesi (R8) ve lint
     runs-on: ubuntu-latest

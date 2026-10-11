@@ -12,20 +12,25 @@ import androidx.compose.ui.platform.LocalContext
 /** Sistemde "animasyonları kaldır" açıksa true; bileşenler morf ve dalga gibi süsleri atlar. */
 val LocalReducedMotion = staticCompositionLocalOf { false }
 
+/**
+ * @param reducedMotion null ise sistem ayarından okunur; ekran görüntüsü testleri belirleyici çıktı için true verir.
+ */
 @Composable
 fun AylaTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    reducedMotion: Boolean? = null,
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
-    val reducedMotion = remember(context) {
+    val systemReducedMotion = remember(context) {
         val scale = Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f)
         scale == 0f
     }
+    val effectiveReducedMotion = reducedMotion ?: systemReducedMotion
     val aylaColors = if (darkTheme) AylaDarkColors else AylaLightColors
     CompositionLocalProvider(
         LocalAylaColors provides aylaColors,
-        LocalReducedMotion provides reducedMotion,
+        LocalReducedMotion provides effectiveReducedMotion,
     ) {
         MaterialTheme(
             colorScheme = if (darkTheme) AylaDarkColorScheme else AylaLightColorScheme,

@@ -68,6 +68,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.cycle.DayKind
 import com.ayla.cycle.ExclusionReason
 import com.ayla.pcos.R
+import com.ayla.pcos.data.db.PeriodEntity
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SatirZemini
@@ -100,7 +101,34 @@ fun CalendarScreen(onOpenLog: (LocalDate) -> Unit, viewModel: CalendarViewModel 
         Box(Modifier.fillMaxSize())
         return
     }
+    CalendarContent(
+        state = state,
+        onPrevious = { viewModel.previousMonth() },
+        onNext = { viewModel.nextMonth() },
+        onToday = { viewModel.goToToday() },
+        onSelect = { viewModel.select(it) },
+        onOpenLog = onOpenLog,
+        onMarkStart = { viewModel.markPeriodStart(it) },
+        onMarkEnd = { viewModel.markPeriodEnd(it) },
+        onUnmark = { viewModel.unmarkPeriod(it) },
+        onExcluded = { period, excluded -> viewModel.setExcluded(period, excluded) },
+    )
+}
 
+/** Durumsuz takvim içeriği; ekran görüntüsü testleri doğrudan bunu çizer. */
+@Composable
+internal fun CalendarContent(
+    state: CalendarUiState,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+    onToday: () -> Unit,
+    onSelect: (LocalDate) -> Unit,
+    onOpenLog: (LocalDate) -> Unit,
+    onMarkStart: (LocalDate) -> Unit,
+    onMarkEnd: (LocalDate) -> Unit,
+    onUnmark: (PeriodEntity) -> Unit,
+    onExcluded: (PeriodEntity, Boolean) -> Unit,
+) {
     // Ay geçişi sırasında eski ay da çizilebilsin diye hücreler ay bazında hatırlanır.
     val cache = remember { mutableStateMapOf<YearMonth, List<List<CalendarDay>>>() }
     SideEffect { cache[state.month] = state.weeks }
@@ -116,13 +144,13 @@ fun CalendarScreen(onOpenLog: (LocalDate) -> Unit, viewModel: CalendarViewModel 
                 Overline(state.month.format(monthYear))
                 Text(stringResource(R.string.calendar_title), style = MaterialTheme.typography.headlineMedium)
             }
-            IconButton(onClick = viewModel::goToToday) {
+            IconButton(onClick = onToday) {
                 Icon(Icons.Rounded.Today, contentDescription = stringResource(R.string.label_today))
             }
         }
 
         Spacer(Modifier.height(8.dp))
-        AyGezinme(month = state.month, onPrevious = viewModel::previousMonth, onNext = viewModel::nextMonth)
+        AyGezinme(month = state.month, onPrevious = onPrevious, onNext = onNext)
         Spacer(Modifier.height(8.dp))
         HaftaBasliklari()
 
@@ -141,7 +169,7 @@ fun CalendarScreen(onOpenLog: (LocalDate) -> Unit, viewModel: CalendarViewModel 
             label = "ayGecisi",
         ) { targetMonth ->
             val weeks = cache[targetMonth] ?: if (targetMonth == state.month) state.weeks else emptyList()
-            AyIzgarasi(weeks = weeks, selected = state.selected, onSelect = viewModel::select)
+            AyIzgarasi(weeks = weeks, selected = state.selected, onSelect = onSelect)
         }
 
         Spacer(Modifier.height(10.dp))
@@ -162,10 +190,10 @@ fun CalendarScreen(onOpenLog: (LocalDate) -> Unit, viewModel: CalendarViewModel 
                         day = state.weeks.flatten().firstOrNull { it.date == date },
                         actions = actions,
                         onOpenLog = { onOpenLog(date) },
-                        onMarkStart = { viewModel.markPeriodStart(date) },
-                        onMarkEnd = { viewModel.markPeriodEnd(date) },
-                        onUnmark = { actions.period?.let(viewModel::unmarkPeriod) },
-                        onExcluded = { excluded -> actions.period?.let { viewModel.setExcluded(it, excluded) } },
+                        onMarkStart = { onMarkStart(date) },
+                        onMarkEnd = { onMarkEnd(date) },
+                        onUnmark = { actions.period?.let(onUnmark) },
+                        onExcluded = { excluded -> actions.period?.let { onExcluded(it, excluded) } },
                     )
                 }
             }
@@ -200,7 +228,7 @@ fun CalendarScreen(onOpenLog: (LocalDate) -> Unit, viewModel: CalendarViewModel 
             state.history.forEach { row ->
                 DonguSatiri(
                     row = row,
-                    onExcluded = { excluded -> row.period?.let { viewModel.setExcluded(it, excluded) } },
+                    onExcluded = { excluded -> row.period?.let { onExcluded(it, excluded) } },
                 )
             }
         }

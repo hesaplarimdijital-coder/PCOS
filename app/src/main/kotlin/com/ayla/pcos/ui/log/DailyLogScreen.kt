@@ -44,13 +44,41 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /** Günlük kayıt: ruh hâli, enerji, kanama, semptomlar, not; isteğe bağlı ölçümler. 30 saniyede doldurulur. */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(date) { viewModel.load(date) }
     if (!state.loaded || state.date != date) return
+    DailyLogContent(
+        state = state,
+        onClose = onClose,
+        onMood = { viewModel.setMood(it) },
+        onEnergy = { viewModel.setEnergy(it) },
+        onFlow = { viewModel.setFlow(it) },
+        onSymptom = { viewModel.toggleSymptom(it) },
+        onWeight = { viewModel.setWeight(it) },
+        onWaist = { viewModel.setWaist(it) },
+        onNote = { viewModel.setNote(it) },
+        onSave = { viewModel.save(onClose) },
+    )
+}
 
+/** Durumsuz günlük kayıt içeriği; ekran görüntüsü testleri doğrudan bunu çizer. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun DailyLogContent(
+    state: DailyLogUiState,
+    onClose: () -> Unit,
+    onMood: (Int) -> Unit,
+    onEnergy: (Int) -> Unit,
+    onFlow: (Int) -> Unit,
+    onSymptom: (String) -> Unit,
+    onWeight: (String) -> Unit,
+    onWaist: (String) -> Unit,
+    onNote: (String) -> Unit,
+    onSave: () -> Unit,
+) {
+    val date = state.date
     val dateText = date.format(DateTimeFormatter.ofPattern("d MMMM", Locale.forLanguageTag("tr")))
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -69,7 +97,7 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
                     labels.forEachIndexed { index, res ->
                         SegmentedButton(
                             selected = state.mood == index + 1,
-                            onClick = { viewModel.setMood(index + 1) },
+                            onClick = { onMood(index + 1) },
                             shape = SegmentedButtonDefaults.itemShape(index = index, count = labels.size),
                             label = { Text((index + 1).toString()) },
                         )
@@ -84,7 +112,7 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
                     labels.forEachIndexed { index, res ->
                         SegmentedButton(
                             selected = state.energy == index + 1,
-                            onClick = { viewModel.setEnergy(index + 1) },
+                            onClick = { onEnergy(index + 1) },
                             shape = SegmentedButtonDefaults.itemShape(index = index, count = labels.size),
                             label = { Text(stringResource(res)) },
                         )
@@ -97,7 +125,7 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
                     listOf(R.string.flow_0, R.string.flow_1, R.string.flow_2, R.string.flow_3, R.string.flow_4).forEachIndexed { index, res ->
                         FilterChip(
                             selected = state.flow == index,
-                            onClick = { viewModel.setFlow(index) },
+                            onClick = { onFlow(index) },
                             label = { Text(stringResource(res)) },
                             leadingIcon = if (state.flow == index) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
                         )
@@ -111,7 +139,7 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
                         val selected = key in state.symptoms
                         FilterChip(
                             selected = selected,
-                            onClick = { viewModel.toggleSymptom(key) },
+                            onClick = { onSymptom(key) },
                             label = { Text(stringResource(symptomLabel(key))) },
                             leadingIcon = if (selected) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
                         )
@@ -124,7 +152,7 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = state.weightKg,
-                            onValueChange = viewModel::setWeight,
+                            onValueChange = onWeight,
                             label = { Text(stringResource(R.string.log_weight)) },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -133,7 +161,7 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
                         )
                         OutlinedTextField(
                             value = state.waistCm,
-                            onValueChange = viewModel::setWaist,
+                            onValueChange = onWaist,
                             label = { Text(stringResource(R.string.log_waist)) },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -147,7 +175,7 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
             Bolum(stringResource(R.string.log_note)) {
                 OutlinedTextField(
                     value = state.note,
-                    onValueChange = viewModel::setNote,
+                    onValueChange = onNote,
                     placeholder = { Text(stringResource(R.string.log_note_hint)) },
                     minLines = 2,
                     modifier = Modifier.fillMaxWidth(),
@@ -157,7 +185,7 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
             Spacer(Modifier.height(16.dp))
         }
         Button(
-            onClick = { viewModel.save(onClose) },
+            onClick = onSave,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 16.dp),
         ) {
             Icon(Icons.Rounded.Check, contentDescription = null)

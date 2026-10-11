@@ -83,8 +83,31 @@ import java.util.Locale
 @Composable
 fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
     BackHandler(enabled = state.step > 0) { viewModel.back() }
+    OnboardingContent(
+        state = state,
+        onBack = { viewModel.back() },
+        onNext = { viewModel.next() },
+        onFinish = { viewModel.finish() },
+        onName = { viewModel.setName(it) },
+        onToggleGoal = { viewModel.toggleGoal(it) },
+        onLastPeriod = { viewModel.setLastPeriod(it) },
+        onConsent = { p, a, r -> viewModel.setConsent(p, a, r) },
+    )
+}
+
+/** Durumsuz karşılama içeriği; ekran görüntüsü testleri doğrudan bunu çizer. */
+@Composable
+internal fun OnboardingContent(
+    state: OnboardingState,
+    onBack: () -> Unit,
+    onNext: () -> Unit,
+    onFinish: () -> Unit,
+    onName: (String) -> Unit,
+    onToggleGoal: (Goal) -> Unit,
+    onLastPeriod: (LocalDate?) -> Unit,
+    onConsent: (Boolean?, Boolean?, Boolean?) -> Unit,
+) {
 
     Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
         Row(
@@ -93,7 +116,7 @@ fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             if (state.step > 0) {
-                IconButton(onClick = viewModel::back) {
+                IconButton(onClick = onBack) {
                     Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.action_back))
                 }
             } else {
@@ -117,17 +140,17 @@ fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
             Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
                 Spacer(Modifier.height(16.dp))
                 when (step) {
-                    0 -> WelcomeStep(state.name, viewModel::setName)
-                    1 -> GoalsStep(state.goals, viewModel::toggleGoal)
-                    2 -> LastPeriodStep(state.lastPeriod, viewModel::setLastPeriod)
-                    else -> ConsentStep(state, viewModel::setConsent)
+                    0 -> WelcomeStep(state.name, onName)
+                    1 -> GoalsStep(state.goals, onToggleGoal)
+                    2 -> LastPeriodStep(state.lastPeriod, onLastPeriod)
+                    else -> ConsentStep(state, onConsent)
                 }
                 Spacer(Modifier.height(24.dp))
             }
         }
 
         Button(
-            onClick = { if (state.step == OnboardingState.STEP_COUNT - 1) viewModel.finish() else viewModel.next() },
+            onClick = { if (state.step == OnboardingState.STEP_COUNT - 1) onFinish() else onNext() },
             enabled = !state.saving,
             modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
         ) {

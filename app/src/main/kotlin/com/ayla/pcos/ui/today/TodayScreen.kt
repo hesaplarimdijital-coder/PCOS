@@ -44,6 +44,7 @@ import com.ayla.cycle.CycleOverview
 import com.ayla.cycle.LongCycleAlert
 import com.ayla.cycle.Prediction
 import com.ayla.pcos.R
+import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.BantTuru
 import com.ayla.pcos.ui.components.DozSatiri
@@ -91,17 +92,19 @@ fun TodayScreen(
     )
 }
 
+/** Durumsuz içerik; ekran görüntüsü testleri ve önizlemeler doğrudan bunu çizer. */
 @Composable
-private fun TodayContent(
+internal fun TodayContent(
     state: TodayUiState,
     onOpenLog: () -> Unit,
     onOpenMeds: () -> Unit,
     onOpenSettings: () -> Unit,
     onAddWater: () -> Unit,
-    onTaken: (com.ayla.pcos.data.repo.DoseItem) -> Unit,
-    onUndo: (com.ayla.pcos.data.repo.DoseItem) -> Unit,
+    onTaken: (DoseItem) -> Unit,
+    onUndo: (DoseItem) -> Unit,
     onPeriodStart: () -> Unit,
     onPeriodEnd: () -> Unit,
+    hour: Int = LocalTime.now().hour,
 ) {
     val overview = state.overview
     LazyColumn(
@@ -118,7 +121,7 @@ private fun TodayContent(
                 Column {
                     val dateLine = state.today.dayOfWeek.getDisplayName(TextStyle.FULL, trLocale) + " · " + state.today.format(dayMonth)
                     Overline(dateLine)
-                    Text(greeting(state.displayName), style = MaterialTheme.typography.headlineMedium)
+                    Text(greeting(state.displayName, hour), style = MaterialTheme.typography.headlineMedium)
                 }
                 IconButton(onClick = onOpenSettings) {
                     Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.me_privacy))
@@ -227,8 +230,7 @@ private fun TodayContent(
 }
 
 @Composable
-private fun greeting(name: String): String {
-    val hour = LocalTime.now().hour
+private fun greeting(name: String, hour: Int): String {
     val hasName = name.isNotBlank()
     return when {
         hour < 12 -> if (hasName) stringResource(R.string.today_greeting_morning, name) else stringResource(R.string.today_greeting_morning_anon)

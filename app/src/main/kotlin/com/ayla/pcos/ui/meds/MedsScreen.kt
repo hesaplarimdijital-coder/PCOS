@@ -35,6 +35,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.pcos.R
 import com.ayla.pcos.data.db.MedicationEntity
+import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.BantTuru
 import com.ayla.pcos.ui.components.DozSatiri
@@ -46,6 +47,24 @@ import kotlin.math.roundToInt
 @Composable
 fun MedsScreen(onAdd: () -> Unit, viewModel: MedsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    MedsContent(
+        state = state,
+        onAdd = onAdd,
+        onTaken = { viewModel.markTaken(it) },
+        onUndo = { viewModel.undo(it) },
+        onRemove = { viewModel.remove(it) },
+    )
+}
+
+/** Durumsuz İlaçlar içeriği; ekran görüntüsü testleri doğrudan bunu çizer. */
+@Composable
+internal fun MedsContent(
+    state: MedsUiState,
+    onAdd: () -> Unit,
+    onTaken: (DoseItem) -> Unit,
+    onUndo: (DoseItem) -> Unit,
+    onRemove: (MedicationEntity) -> Unit,
+) {
     var pendingRemoval by remember { mutableStateOf<MedicationEntity?>(null) }
 
     LazyColumn(
@@ -79,7 +98,7 @@ fun MedsScreen(onAdd: () -> Unit, viewModel: MedsViewModel = hiltViewModel()) {
         } else {
             item { Overline(stringResource(R.string.label_today)) }
             items(state.todayDoses, key = { "${it.medication.id}-${it.time}" }) { dose ->
-                DozSatiri(item = dose, onTaken = { viewModel.markTaken(dose) }, onUndo = { viewModel.undo(dose) })
+                DozSatiri(item = dose, onTaken = { onTaken(dose) }, onUndo = { onUndo(dose) })
             }
 
             item {
@@ -123,7 +142,7 @@ fun MedsScreen(onAdd: () -> Unit, viewModel: MedsViewModel = hiltViewModel()) {
             text = { Text(stringResource(R.string.meds_remove_confirm, med.name)) },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.remove(med)
+                    onRemove(med)
                     pendingRemoval = null
                 }) { Text(stringResource(R.string.meds_remove)) }
             },

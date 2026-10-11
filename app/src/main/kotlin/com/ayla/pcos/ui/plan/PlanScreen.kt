@@ -86,13 +86,33 @@ private val hourMinute: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 @Composable
 fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    var tab by rememberSaveable { mutableIntStateOf(0) }
-    var showSleepDialog by remember { mutableStateOf(false) }
-
     if (state.loading) {
         Box(Modifier.fillMaxSize())
         return
     }
+    PlanContent(
+        state = state,
+        onAddCup = { viewModel.addCup() },
+        onRemoveCup = { viewModel.removeCup() },
+        onAddSleep = { bed, wake, quality -> viewModel.addSleep(bed, wake, quality) },
+        onDeleteSleep = { viewModel.deleteSleep(it) },
+        onEveningRoutine = { viewModel.setEveningRoutine(it) },
+    )
+}
+
+/** Durumsuz Planım içeriği; ekran görüntüsü testleri doğrudan bunu çizer. */
+@Composable
+internal fun PlanContent(
+    state: PlanUiState,
+    onAddCup: () -> Unit,
+    onRemoveCup: () -> Unit,
+    onAddSleep: (LocalTime, LocalTime, Int?) -> Unit,
+    onDeleteSleep: (SleepEntity) -> Unit,
+    onEveningRoutine: (Boolean) -> Unit,
+    initialTab: Int = 0,
+) {
+    var tab by rememberSaveable { mutableIntStateOf(initialTab) }
+    var showSleepDialog by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp)) {
@@ -119,12 +139,12 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
             ) {
                 when (selectedTab) {
                     0 -> {
-                        SuKarti(state = state, onAdd = viewModel::addCup, onRemove = viewModel::removeCup)
-                        UykuKarti(state = state, onAdd = { showSleepDialog = true }, onDelete = viewModel::deleteSleep)
+                        SuKarti(state = state, onAdd = onAddCup, onRemove = onRemoveCup)
+                        UykuKarti(state = state, onAdd = { showSleepDialog = true }, onDelete = onDeleteSleep)
                         AksamRutiniSatiri(
                             enabled = state.eveningRoutineEnabled,
                             time = state.eveningRoutineTime,
-                            onChange = viewModel::setEveningRoutine,
+                            onChange = onEveningRoutine,
                         )
                     }
                     1 -> YakindaKarti(stringResource(R.string.plan_nutrition_preview))
@@ -139,7 +159,7 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
             onDismiss = { showSleepDialog = false },
             onSave = { bed, wake, quality ->
                 showSleepDialog = false
-                viewModel.addSleep(bed, wake, quality)
+                onAddSleep(bed, wake, quality)
             },
         )
     }

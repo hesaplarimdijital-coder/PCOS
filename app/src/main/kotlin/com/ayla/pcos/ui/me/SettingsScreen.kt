@@ -44,6 +44,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.pcos.BuildConfig
 import com.ayla.pcos.R
+import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.export.DataExporter
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.BantTuru
@@ -56,7 +57,6 @@ import java.time.format.DateTimeFormatter
 fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
-    var confirmWipe by remember { mutableStateOf(false) }
     val exportDone = stringResource(R.string.export_done)
     val exportFailed = stringResource(R.string.export_failed)
 
@@ -71,6 +71,30 @@ fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewMo
     }
 
     val p = prefs ?: return
+    SettingsContent(
+        prefs = p,
+        exactAlarmsAllowed = viewModel.exactAlarmsAllowed(),
+        snackbar = snackbar,
+        onBack = onBack,
+        onUpdate = { transform -> viewModel.update(transform) },
+        onExport = { exportLauncher.launch(DataExporter.suggestedFileName()) },
+        onWipe = { viewModel.wipeAll() },
+    )
+}
+
+/** Durumsuz ayarlar içeriği; ekran görüntüsü testleri doğrudan bunu çizer. */
+@Composable
+internal fun SettingsContent(
+    prefs: UserPreferences,
+    exactAlarmsAllowed: Boolean,
+    snackbar: SnackbarHostState,
+    onBack: () -> Unit,
+    onUpdate: ((UserPreferences) -> UserPreferences) -> Unit,
+    onExport: () -> Unit,
+    onWipe: () -> Unit,
+) {
+    val p = prefs
+    var confirmWipe by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp)) {
             Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -83,51 +107,51 @@ fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewMo
             }
 
             Grup(stringResource(R.string.settings_section_protection)) {
-                AyarSatiri(R.string.settings_app_lock, R.string.settings_app_lock_text, p.appLockEnabled) { v -> viewModel.update { it.copy(appLockEnabled = v) } }
+                AyarSatiri(R.string.settings_app_lock, R.string.settings_app_lock_text, p.appLockEnabled) { v -> onUpdate { it.copy(appLockEnabled = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.settings_block_screenshots, R.string.settings_block_screenshots_text, p.blockScreenshots) { v -> viewModel.update { it.copy(blockScreenshots = v) } }
+                AyarSatiri(R.string.settings_block_screenshots, R.string.settings_block_screenshots_text, p.blockScreenshots) { v -> onUpdate { it.copy(blockScreenshots = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.settings_hidden_notifications, R.string.settings_hidden_notifications_text, p.hideNotificationContent) { v -> viewModel.update { it.copy(hideNotificationContent = v) } }
+                AyarSatiri(R.string.settings_hidden_notifications, R.string.settings_hidden_notifications_text, p.hideNotificationContent) { v -> onUpdate { it.copy(hideNotificationContent = v) } }
             }
 
             Grup(stringResource(R.string.settings_section_consent)) {
-                AyarSatiri(R.string.consent_personalization_title, R.string.consent_personalization_text, p.consentPersonalization) { v -> viewModel.update { it.copy(consentPersonalization = v) } }
+                AyarSatiri(R.string.consent_personalization_title, R.string.consent_personalization_text, p.consentPersonalization) { v -> onUpdate { it.copy(consentPersonalization = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.consent_analytics_title, R.string.consent_analytics_text, p.consentAnalytics) { v -> viewModel.update { it.copy(consentAnalytics = v) } }
+                AyarSatiri(R.string.consent_analytics_title, R.string.consent_analytics_text, p.consentAnalytics) { v -> onUpdate { it.copy(consentAnalytics = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.consent_research_title, R.string.consent_research_text, p.consentResearch) { v -> viewModel.update { it.copy(consentResearch = v) } }
+                AyarSatiri(R.string.consent_research_title, R.string.consent_research_text, p.consentResearch) { v -> onUpdate { it.copy(consentResearch = v) } }
             }
 
             Grup(stringResource(R.string.settings_section_notifications)) {
-                if (!viewModel.exactAlarmsAllowed()) {
+                if (!exactAlarmsAllowed) {
                     UyariBandi(tur = BantTuru.BILGI, title = stringResource(R.string.onboarding_exact_alarm_title), text = stringResource(R.string.settings_exact_alarm_missing))
                     Spacer(Modifier.height(8.dp))
                 }
-                AyarSatiri(R.string.settings_water_reminders, null, p.waterRemindersEnabled) { v -> viewModel.update { it.copy(waterRemindersEnabled = v) } }
+                AyarSatiri(R.string.settings_water_reminders, null, p.waterRemindersEnabled) { v -> onUpdate { it.copy(waterRemindersEnabled = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.settings_cycle_notifications, null, p.cycleNotificationsEnabled) { v -> viewModel.update { it.copy(cycleNotificationsEnabled = v) } }
+                AyarSatiri(R.string.settings_cycle_notifications, null, p.cycleNotificationsEnabled) { v -> onUpdate { it.copy(cycleNotificationsEnabled = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.settings_progress_notifications, null, p.progressNotificationsEnabled) { v -> viewModel.update { it.copy(progressNotificationsEnabled = v) } }
+                AyarSatiri(R.string.settings_progress_notifications, null, p.progressNotificationsEnabled) { v -> onUpdate { it.copy(progressNotificationsEnabled = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.evening_routine_title, null, p.eveningRoutineEnabled) { v -> viewModel.update { it.copy(eveningRoutineEnabled = v) } }
+                AyarSatiri(R.string.evening_routine_title, null, p.eveningRoutineEnabled) { v -> onUpdate { it.copy(eveningRoutineEnabled = v) } }
                 HorizontalDivider()
                 val fmt = remember { DateTimeFormatter.ofPattern("HH:mm") }
                 AyarSatiriMetin(
                     R.string.settings_quiet_hours,
                     stringResource(R.string.settings_quiet_hours_text, p.quietHoursStart.format(fmt), p.quietHoursEnd.format(fmt)),
                     p.quietHoursEnabled,
-                ) { v -> viewModel.update { it.copy(quietHoursEnabled = v) } }
+                ) { v -> onUpdate { it.copy(quietHoursEnabled = v) } }
             }
 
             Grup(stringResource(R.string.settings_section_display)) {
-                AyarSatiri(R.string.settings_hide_prediction, R.string.settings_hide_prediction_text, p.hidePrediction) { v -> viewModel.update { it.copy(hidePrediction = v) } }
+                AyarSatiri(R.string.settings_hide_prediction, R.string.settings_hide_prediction_text, p.hidePrediction) { v -> onUpdate { it.copy(hidePrediction = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.settings_show_body, R.string.settings_show_body_text, p.showBodyMeasurements) { v -> viewModel.update { it.copy(showBodyMeasurements = v) } }
+                AyarSatiri(R.string.settings_show_body, R.string.settings_show_body_text, p.showBodyMeasurements) { v -> onUpdate { it.copy(showBodyMeasurements = v) } }
             }
 
             Grup(stringResource(R.string.settings_section_data)) {
                 EylemSatiri(Icons.Rounded.Download, R.string.settings_export, R.string.settings_export_text) {
-                    exportLauncher.launch(DataExporter.suggestedFileName())
+                    onExport()
                 }
                 HorizontalDivider()
                 EylemSatiri(Icons.Rounded.Delete, R.string.settings_delete_all, null, destructive = true) { confirmWipe = true }
@@ -152,7 +176,7 @@ fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewMo
             confirmButton = {
                 TextButton(onClick = {
                     confirmWipe = false
-                    viewModel.wipeAll()
+                    onWipe()
                 }) { Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = { TextButton(onClick = { confirmWipe = false }) { Text(stringResource(R.string.action_cancel)) } },

@@ -59,6 +59,12 @@ fun MeScreen(onOpenSettings: () -> Unit, viewModel: MeViewModel = hiltViewModel(
         Box(Modifier.fillMaxSize())
         return
     }
+    MeContent(state = state, onOpenSettings = onOpenSettings)
+}
+
+/** Durumsuz Ben içeriği; ekran görüntüsü testleri doğrudan bunu çizer. */
+@Composable
+internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     val colors = LocalAylaColors.current
 

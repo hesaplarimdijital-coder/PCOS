@@ -70,7 +70,12 @@ fun AppLockScreen(onUnlocked: () -> Unit) {
     }
 
     LaunchedEffect(Unit) { authenticate() }
+    AppLockContent(title = title, subtitle = subtitle, onUnlock = authenticate)
+}
 
+/** Durumsuz kilit ekranı içeriği. */
+@Composable
+internal fun AppLockContent(title: String, subtitle: String, onUnlock: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,7 +97,7 @@ fun AppLockScreen(onUnlocked: () -> Unit) {
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(24.dp))
-        Button(onClick = authenticate) { Text(stringResource(R.string.lock_unlock)) }
+        Button(onClick = onUnlock) { Text(stringResource(R.string.lock_unlock)) }
     }
 }
 
