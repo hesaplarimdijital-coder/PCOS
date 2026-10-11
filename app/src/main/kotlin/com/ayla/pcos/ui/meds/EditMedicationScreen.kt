@@ -1,12 +1,13 @@
 package com.ayla.pcos.ui.meds
 
-import com.ayla.pcos.ui.components.CipEtiketi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -52,6 +53,7 @@ import com.ayla.pcos.R
 import com.ayla.pcos.data.db.MedicationKind
 import com.ayla.pcos.ui.components.AdimSayaci
 import com.ayla.pcos.ui.components.AylaCard
+import com.ayla.pcos.ui.components.CipEtiketi
 import com.ayla.pcos.ui.components.DegerSatiri
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SaatSeciciDialog
@@ -182,12 +184,13 @@ internal fun EditMedicationContent(
                 Bolum(stringResource(R.string.meds_regimen)) {
                     val regimens = listOf(PillRegimen.R21_7, PillRegimen.R24_4, PillRegimen.CONTINUOUS_28)
                     val labels = listOf(R.string.meds_regimen_21_7, R.string.meds_regimen_24_4, R.string.meds_regimen_28)
-                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                         regimens.forEachIndexed { index, regimen ->
                             SegmentedButton(
                                 selected = state.regimen == regimen,
                                 onClick = { onRegimen(regimen) },
                                 shape = SegmentedButtonDefaults.itemShape(index = index, count = regimens.size),
+                                modifier = Modifier.fillMaxHeight(),
                                 icon = segmentSimgesi(state.regimen == regimen),
                                 label = { SegmentEtiketi(stringResource(labels[index]), state.regimen == regimen) },
                             )
@@ -205,12 +208,13 @@ internal fun EditMedicationContent(
                 Bolum(stringResource(R.string.meds_food)) {
                     val options = listOf(YemekTercihi.YEMEKLE, YemekTercihi.AC_KARNA, YemekTercihi.FARK_ETMEZ)
                     val labels = listOf(R.string.meds_with_food, R.string.meds_without_food, R.string.meds_food_any)
-                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                         options.forEachIndexed { index, option ->
                             SegmentedButton(
                                 selected = state.food == option,
                                 onClick = { onFood(option) },
                                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                                modifier = Modifier.fillMaxHeight(),
                                 icon = segmentSimgesi(state.food == option),
                                 label = { SegmentEtiketi(stringResource(labels[index]), state.food == option) },
                             )

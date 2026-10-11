@@ -50,6 +50,11 @@ Arayüz dili **Türkçe**; ürün tonu sıcak, yargılamayan, kanıta bağlı.
   `ui/<alan>/<Alan>Screen.kt` + `<Alan>ViewModel.kt`. Her ekran `XxxScreen` (ViewModel bağlar) ve
   durumsuz `internal fun XxxContent(state, callback'ler)` olarak ikiye ayrılır.
 - Büyük yazı: `LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI` (1,3) iken satırlar dikey düzene geçer.
+  Sistem yazı boyutu %200 ekran görüntüleri `y0N` serisidir (`sistemYaziOlcegi = 2f`); yeni ekran oraya da eklenir.
+  Satırda metin + sağda düğme/değer varsa metin sütunu `Modifier.weight(1f)` alır (yoksa sağdaki öğe sıkışır).
+- Animasyon değerleri `hareket(AylaMotion.slow())` ile beslenir; "Animasyonları kaldır" açıkken anında biter.
+- Yerelde derlenemediği için sık CI kırıcıları: `strings.xml`'de kesme işareti `\'` ya da `&#8217;` olmalı;
+  ters tırnaklı test adlarında `. ; : / [ ] < >` kullanılmaz (dex reddeder).
 - Renk tek başına anlam taşımaz (ikon/metin/biçim eşlik eder); her etkileşimli öğe ≥ 48 dp ve
   `contentDescription` taşır; `LocalReducedMotion` açıkken süs animasyonları durur.
 - `fillMaxHeight(fraction)`/`fillMaxWidth(fraction)` yay animasyonlarında `coerceIn(0f, 1f)` ile beslenir.

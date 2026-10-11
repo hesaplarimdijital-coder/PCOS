@@ -263,6 +263,9 @@ class EkranGoruntuleriTest {
     }
 
     @Config(qualifiers = UZUN)
+    @Test fun y09_yazi200_ilac_formu() = ekran("y09-yazi200-ilac-formu", sistemYaziOlcegi = 2f) { IlacFormu(Ornek.ilacDuzenle) }
+
+    @Config(qualifiers = UZUN)
     @Test fun y08_yazi200_gunluk() = ekran("y08-yazi200-gunluk", sistemYaziOlcegi = 2f) {
         DailyLogContent(
             state = Ornek.gunlukKayit, onClose = {}, onMood = {}, onEnergy = {}, onFlow = {}, onSymptom = {},

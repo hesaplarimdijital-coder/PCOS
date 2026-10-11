@@ -327,6 +327,11 @@
     <string name="settings_interval_90">1,5 sa</string>
     <string name="settings_interval_120">2 sa</string>
     <string name="settings_interval_180">3 sa</string>
+    <string name="settings_water_interval_hours">Hatırlatma aralığı (saat)</string>
+    <string name="settings_interval_60_short">1</string>
+    <string name="settings_interval_90_short">1,5</string>
+    <string name="settings_interval_120_short">2</string>
+    <string name="settings_interval_180_short">3</string>
     <string name="settings_active_start">Su hatırlatması başlangıcı</string>
     <string name="settings_active_end">Su hatırlatması bitişi</string>
     <string name="settings_cycle_notifications_text">60. ve 90. gün uyarıları, yılda 4\'ten az adet işareti</string>

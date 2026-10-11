@@ -1,6 +1,5 @@
 package com.ayla.pcos.ui.me
 
-import com.ayla.pcos.ui.components.CipEtiketi
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -8,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -49,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -62,7 +64,9 @@ import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.export.DataExporter
 import com.ayla.pcos.ui.components.AdimSayaci
 import com.ayla.pcos.ui.components.AylaCard
+import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
 import com.ayla.pcos.ui.components.BantTuru
+import com.ayla.pcos.ui.components.CipEtiketi
 import com.ayla.pcos.ui.components.DegerSatiri
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SaatSeciciDialog
@@ -191,7 +195,13 @@ internal fun SettingsContent(
                 HorizontalDivider()
                 AyarSatiri(R.string.settings_water_reminders, null, p.waterRemindersEnabled) { v -> onUpdate { it.copy(waterRemindersEnabled = v) } }
                 if (p.waterRemindersEnabled) {
-                    Text(stringResource(R.string.settings_water_interval), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        stringResource(
+                            if (LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI) R.string.settings_water_interval_hours else R.string.settings_water_interval,
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                     Spacer(Modifier.height(6.dp))
                     AralikSecimi(selected = p.waterIntervalMinutes) { minutes -> onUpdate { it.copy(waterIntervalMinutes = minutes) } }
                     Spacer(Modifier.height(4.dp))
@@ -398,13 +408,19 @@ private fun HedefSecimi(selected: Set<Goal>, onToggle: (Goal) -> Unit) {
 @Composable
 private fun AralikSecimi(selected: Int, onSelect: (Int) -> Unit) {
     val options = AyarSinirlari.waterIntervals
-    val labels = listOf(R.string.settings_interval_60, R.string.settings_interval_90, R.string.settings_interval_120, R.string.settings_interval_180)
-    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+    // Büyük yazıda "1,5 sa" segmente sığmaz; birim başlığa taşınır ("Hatırlatma aralığı (saat)").
+    val labels = if (LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI) {
+        listOf(R.string.settings_interval_60_short, R.string.settings_interval_90_short, R.string.settings_interval_120_short, R.string.settings_interval_180_short)
+    } else {
+        listOf(R.string.settings_interval_60, R.string.settings_interval_90, R.string.settings_interval_120, R.string.settings_interval_180)
+    }
+    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
         options.forEachIndexed { index, minutes ->
             SegmentedButton(
                 selected = selected == minutes,
                 onClick = { onSelect(minutes) },
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                modifier = Modifier.fillMaxHeight(),
                 icon = segmentSimgesi(selected == minutes),
                 label = { SegmentEtiketi(stringResource(labels[index]), selected == minutes) },
             )

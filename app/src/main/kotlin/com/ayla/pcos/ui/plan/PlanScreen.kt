@@ -17,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -501,12 +502,13 @@ private fun UykuEkleDialog(onDismiss: () -> Unit, onSave: (LocalTime, LocalTime,
                 1 -> TimePicker(state = wakeState)
                 else -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     val labels = listOf(R.string.sleep_quality_1, R.string.sleep_quality_2, R.string.sleep_quality_3)
-                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                         labels.forEachIndexed { index, res ->
                             SegmentedButton(
                                 selected = quality == index + 1,
                                 onClick = { quality = if (quality == index + 1) null else index + 1 },
                                 shape = SegmentedButtonDefaults.itemShape(index = index, count = labels.size),
+                                modifier = Modifier.fillMaxHeight(),
                                 icon = segmentSimgesi(quality == index + 1),
                                 label = { SegmentEtiketi(stringResource(res), quality == index + 1) },
                             )

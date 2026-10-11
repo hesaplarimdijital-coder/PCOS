@@ -1,12 +1,13 @@
 package com.ayla.pcos.ui.log
 
-import com.ayla.pcos.ui.components.CipEtiketi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,6 +47,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.pcos.R
 import com.ayla.pcos.data.repo.SymptomCatalog
+import com.ayla.pcos.ui.components.CipEtiketi
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SegmentEtiketi
 import com.ayla.pcos.ui.components.segmentSimgesi
@@ -130,13 +132,14 @@ internal fun DailyLogContent(
             }
 
             Bolum(stringResource(R.string.log_energy)) {
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                     val labels = listOf(R.string.energy_1, R.string.energy_2, R.string.energy_3)
                     labels.forEachIndexed { index, res ->
                         SegmentedButton(
                             selected = state.energy == index + 1,
                             onClick = { onEnergy(index + 1) },
                             shape = SegmentedButtonDefaults.itemShape(index = index, count = labels.size),
+                            modifier = Modifier.fillMaxHeight(),
                             icon = segmentSimgesi(state.energy == index + 1),
                             label = { SegmentEtiketi(stringResource(res), state.energy == index + 1) },
                         )

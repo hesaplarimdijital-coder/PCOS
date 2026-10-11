@@ -7,8 +7,9 @@ takip uygulaması. Düzensiz döngüler için aralıklı tahmin ve açık güven
 > Ayla tıbbi tavsiye vermez. Tanı ve tedavi için doktorunuza danışın.
 
 ## Durum
-MVP 1 geliştirme aşamasında. Derleme ve testler GitHub Actions'ta (`.github/workflows/android.yml`);
-her `main` push'unda debug APK artefakt olarak üretilir.
+MVP 1 kod olarak tamamlandı; ilk gerçek cihaz testi bekleniyor ([docs/ilk-cihaz-testi.md](docs/ilk-cihaz-testi.md)).
+Derleme ve testler GitHub Actions'ta (`.github/workflows/android.yml`); her `main` push'unda debug APK
+artefakt olarak üretilir.
 
 ## Ekranlar
 
@@ -31,13 +32,14 @@ ve [`ekran-goruntuleri`](https://github.com/hesaplarimdijital-coder/PCOS/tree/ek
 - **Ben**: döngü düzeni (21–35 gün tipik aralık), takviye uyumu, su/kayıt haftası, 4 haftalık kayıt ızgarası, **doktor notu** (döngü, ilaç ve semptom özeti; paylaşım menüsüyle).
 - **Hatırlatmalar**: tam saatinde doz alarmı (Aldım / 15 dk ertele), su, akşam rutini, Pazar akşamı nazik haftalık özet; sessiz saatlere uyar.
 - **Gizlilik**: SQLCipher + Android Keystore, uygulama kilidi (biyometri/PIN), ekran görüntüsü engeli, gizli bildirim, KVKK rızaları, JSON dışa aktarma, tam silme; anahtar kaybında veri ezilmez.
-- **Erişilebilirlik**: büyük yazıda dikey düzen, renk tek başına anlam taşımaz, animasyonları kaldır ayarına saygı, 48 dp dokunma alanları.
+- **Erişilebilirlik**: sistem yazı boyutu %200'de kesilme yok (büyük yazıda dikey düzen; görüntüler `y01`–`y08`), iki temada WCAG AA kontrast (otomatik test), renk tek başına anlam taşımaz, animasyonları kaldır ayarına saygı, 48 dp dokunma alanları.
 - Uzun döngü uyarıları (60/90. gün) ve yılda 4'ten az adet işareti; hap modunda tahmin kapalı.
 
 ## Teknik
 AGP 9.4 (yerleşik Kotlin 2.4), Gradle 9.6, Compose BOM 2026.09 / Material 3, Hilt (KSP), Room 2.8 + SQLCipher,
 DataStore, AlarmManager tam alarmlar. `compileSdk/targetSdk 37` (Android 17), `minSdk 28`.
-Modüller: `:app` ve saf Kotlin `:core:cycle` (döngü motoru, 32 birim testi).
+Modüller: `:app` ve saf Kotlin `:core:cycle` (döngü motoru, 32 birim testi). Uygulamada 109 test: saf kurallar,
+Robolectric + bellek içi Room ile depo/ViewModel testleri, tema kontrastı; ayrıca ekran görüntüleri.
 
 ```bash
 ./gradlew :core:cycle:test                         # döngü motoru testleri
