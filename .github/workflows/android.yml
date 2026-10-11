@@ -289,6 +289,18 @@ jobs:
           from collections import Counter
           counts = Counter(i.get('id') for i in root.findall('issue') if i.get('severity') == 'Warning')
           print("::notice title=Lint uyarı dağılımı::" + ", ".join(f"{k}×{v}" for k, v in counts.most_common(12)))
+          # Tüm uyarılar tek açıklamada (adım başına açıklama sınırı nedeniyle): kimlik, dosya:satır, ileti
+          rows = []
+          for issue in root.findall('issue'):
+              if issue.get('severity') != 'Warning':
+                  continue
+              loc = issue.find('location')
+              path = (loc.get('file') or '').split('/PCOS/')[-1].split('/pcos/')[-1] if loc is not None else ''
+              line = loc.get('line') if loc is not None else ''
+              msg = issue.get('message', '').replace('%', '%25').replace('\n', ' ')[:160]
+              rows.append(f"{issue.get('id')} {path}:{line} {msg}")
+          if rows:
+              print("::notice title=Lint uyarıları::" + "%0A".join(rows[:80]))
           n = 0
           for issue in root.findall('issue'):
               if issue.get('severity') != 'Error':
