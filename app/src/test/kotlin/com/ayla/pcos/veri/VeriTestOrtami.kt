@@ -127,10 +127,11 @@ abstract class VeriTestOrtami {
     }
 
     /** Kurulu alarmların veri URI'leri (ör. ayla://reminder/dose/1/09:00). */
+    @Suppress("DEPRECATION") // ScheduledAlarm.operation alanı Robolectric'te eskimiş ama erişimcisi yok
     protected fun kuruluAlarmlar(): List<String> {
         val am = context.getSystemService(AlarmManager::class.java)
         return shadowOf(am).scheduledAlarms.mapNotNull { alarm ->
-            alarm.getOperation()?.let { shadowOf(it).savedIntent.dataString }
+            alarm.operation?.let { shadowOf(it).savedIntent.dataString }
         }
     }
 }

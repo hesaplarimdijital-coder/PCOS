@@ -2,6 +2,11 @@ package com.ayla.pcos.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.res.stringResource
+import com.ayla.pcos.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +37,7 @@ fun HapPaketi(
     takenPills: Set<Int>,
     contentDescription: String,
     modifier: Modifier = Modifier,
+    onPillClick: ((Int) -> Unit)? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
     val colors = LocalAylaColors.current
@@ -51,7 +57,20 @@ fun HapPaketi(
                     val placebo = number > regimen.activeDays
                     val taken = number in takenPills
                     val isToday = number == todayPill
-                    val base = Modifier.weight(1f).aspectRatio(1f)
+                    val label = pillLabel(number, placebo, isToday)
+                    val clickable = onPillClick != null && number <= todayPill
+                    val base = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f)
+                        .clip(CircleShape)
+                        .then(
+                            if (clickable) {
+                                Modifier.toggleable(value = taken, role = Role.Checkbox, onValueChange = { onPillClick?.invoke(number) })
+                            } else {
+                                Modifier
+                            },
+                        )
+                        .semantics { this.contentDescription = label }
                     val styled = when {
                         taken -> base.background(scheme.primary, CircleShape)
                         isToday -> base.border(3.dp, scheme.primary, CircleShape)
@@ -74,4 +93,12 @@ fun HapPaketi(
             }
         }
     }
+}
+
+@Composable
+private fun pillLabel(number: Int, placebo: Boolean, isToday: Boolean): String {
+    val parts = mutableListOf(stringResource(R.string.today_pill_number, number))
+    if (placebo) parts += stringResource(R.string.pill_placebo)
+    if (isToday) parts += stringResource(R.string.label_today)
+    return parts.joinToString(", ")
 }

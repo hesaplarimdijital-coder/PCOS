@@ -107,6 +107,7 @@ fun TodayScreen(
         onShareDoctorNote = {
             viewModel.prepareDoctorNote { title, text -> shareText(context, title, text, shareTitle) }
         },
+        onPillClick = { viewModel.togglePill(it) },
     )
 }
 
@@ -125,7 +126,8 @@ internal fun TodayContent(
     onDismissNotificationBand: () -> Unit = {},
     onPeriodStartAt: (LocalDate) -> Unit = {},
     onShareDoctorNote: () -> Unit = {},
-    hour: Int = LocalTime.now().hour,
+    onPillClick: (Int) -> Unit = {},
+    now: LocalTime = LocalTime.now(),
 ) {
     val overview = state.overview
     LazyColumn(
@@ -142,7 +144,7 @@ internal fun TodayContent(
                 Column {
                     val dateLine = state.today.dayOfWeek.getDisplayName(TextStyle.FULL, trLocale) + " · " + state.today.format(dayMonth)
                     Overline(dateLine)
-                    Text(greeting(state.displayName, hour), style = MaterialTheme.typography.headlineMedium)
+                    Text(greeting(state.displayName, now.hour), style = MaterialTheme.typography.headlineMedium)
                 }
                 IconButton(onClick = onOpenSettings) {
                     Icon(Icons.Outlined.AccountCircle, contentDescription = stringResource(R.string.me_settings))
@@ -153,7 +155,7 @@ internal fun TodayContent(
         val noPeriodYet = state.pillMode == null && overview?.lastPeriodStart == null
         item {
             when {
-                state.pillMode != null -> PillHero(state.pillMode)
+                state.pillMode != null -> PillHero(state.pillMode, hapUyarisi(state.pillMode, state.today, now), onPillClick)
                 noPeriodYet -> IlkAdetKarti(today = state.today, onPick = onPeriodStartAt)
                 else -> CycleHero(overview, hidePrediction = state.hidePrediction, today = state.today)
             }
@@ -393,7 +395,7 @@ private fun GuvenRozeti(confidence: Confidence, text: String) {
 }
 
 @Composable
-private fun PillHero(pill: PillModeState) {
+private fun PillHero(pill: PillModeState, uyari: HapUyarisi, onPillClick: (Int) -> Unit) {
     val timeText = pill.medication.times.firstOrNull()?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: ""
     AylaCard {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
@@ -417,7 +419,20 @@ private fun PillHero(pill: PillModeState) {
             todayPill = pill.todayPill,
             takenPills = pill.takenPills,
             contentDescription = stringResource(R.string.today_pill_pack_a11y, pill.regimen.packLength, pill.todayPill),
+            onPillClick = onPillClick,
         )
+        if (uyari != HapUyarisi.YOK) {
+            Spacer(Modifier.height(12.dp))
+            val colors = LocalAylaColors.current
+            val (text, tint, bg) = when (uyari) {
+                HapUyarisi.DUN_ISARETLENMEDI -> Triple(stringResource(R.string.today_pill_missed_yesterday, pill.todayPill - 1), colors.uyari, colors.uyariAcik)
+                HapUyarisi.BUGUN_BEKLIYOR -> Triple(stringResource(R.string.today_pill_pending, pill.todayPill), colors.uyari, colors.uyariAcik)
+                else -> Triple(stringResource(R.string.today_pill_placebo_day), colors.lavanta, colors.lavantaAcik)
+            }
+            Surface(shape = MaterialTheme.shapes.small, color = bg) {
+                Text(text, style = MaterialTheme.typography.bodyMedium, color = tint, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
+            }
+        }
         Spacer(Modifier.height(12.dp))
         Text(
             stringResource(R.string.today_pill_note),

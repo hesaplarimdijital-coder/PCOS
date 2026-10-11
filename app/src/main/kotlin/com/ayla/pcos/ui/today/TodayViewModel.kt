@@ -30,6 +30,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
@@ -40,7 +42,30 @@ data class PillModeState(
     val todayPill: Int,
     val isPlacebo: Boolean,
     val takenPills: Set<Int>,
+    /** İçinde bulunulan paketin ilk günü (hap numarasından tarihe geçmek için). */
+    val packStart: LocalDate,
 )
+
+/** Hap kartındaki tek satırlık hatırlatma; öncelik sırasıyla. */
+enum class HapUyarisi { YOK, DUN_ISARETLENMEDI, PLASEBO, BUGUN_BEKLIYOR }
+
+/**
+ * - Dünkü etken hap işaretlenmemişse (ve ilaç dün uygulamada kayıtlıysa) → DUN_ISARETLENMEDI
+ * - Bugün plasebo günüyse → PLASEBO (bilgi)
+ * - Bugünkü hap alınmadı ve saat geçtiyse → BUGUN_BEKLIYOR
+ * Paketin ilk günü önceki paketin son hapı bilinmediği için dün denetlenmez.
+ */
+fun hapUyarisi(pill: PillModeState, today: LocalDate, now: LocalTime, zone: ZoneId = ZoneId.systemDefault()): HapUyarisi {
+    val yesterday = pill.todayPill - 1
+    val addedOn = pill.medication.createdAt.atZone(zone).toLocalDate()
+    if (yesterday >= 1 && yesterday <= pill.regimen.activeDays && yesterday !in pill.takenPills && !addedOn.isAfter(today.minusDays(1))) {
+        return HapUyarisi.DUN_ISARETLENMEDI
+    }
+    if (pill.isPlacebo) return HapUyarisi.PLASEBO
+    val doseTime = pill.medication.times.firstOrNull() ?: return HapUyarisi.YOK
+    if (pill.todayPill !in pill.takenPills && now.isAfter(doseTime)) return HapUyarisi.BUGUN_BEKLIYOR
+    return HapUyarisi.YOK
+}
 
 data class TodayUiState(
     val loading: Boolean = true,
@@ -96,7 +121,7 @@ class TodayViewModel @Inject constructor(
                 val currentPackStart = packStart.plusDays(((status.packNumber - 1) * regimen.packLength).toLong())
                 medicationRepository.observeTakenDates(med.id, currentPackStart, today).map { takenDates ->
                     val takenPills = takenDates.map { ChronoUnit.DAYS.between(currentPackStart, it).toInt() + 1 }.toSet()
-                    PillModeState(med, regimen, status.pillNumber, status.isPlacebo, takenPills)
+                    PillModeState(med, regimen, status.pillNumber, status.isPlacebo, takenPills, currentPackStart)
                 }
             }
         }
@@ -158,6 +183,22 @@ class TodayViewModel @Inject constructor(
         if (item.status == DoseStatus.TAKEN) return@launch
         medicationRepository.markTaken(item.medication.id, item.date, item.time)
         scheduler.cancelSnooze(item.medication.id, item.time)
+    }
+
+    /**
+     * Paketteki bir hapa dokunma: o günün dozunu alındı ↔ bekliyor arasında değiştirir. Gelecek günler
+     * değiştirilemez; geçmiş günü düzeltmenin tek yolu budur.
+     */
+    fun togglePill(number: Int) = viewModelScope.launch {
+        val pill = uiState.value.pillMode ?: return@launch
+        val date = pill.packStart.plusDays((number - 1).toLong())
+        if (date.isAfter(ticker.now())) return@launch
+        val time = pill.medication.times.firstOrNull() ?: return@launch
+        if (number in pill.takenPills) {
+            medicationRepository.markPending(pill.medication.id, date, time)
+        } else {
+            medicationRepository.markTaken(pill.medication.id, date, time)
+        }
     }
 
     fun undoTaken(item: DoseItem) = viewModelScope.launch {

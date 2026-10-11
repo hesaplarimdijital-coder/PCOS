@@ -39,6 +39,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+import java.time.LocalTime
 import java.util.TimeZone
 
 /**
@@ -93,9 +94,9 @@ class EkranGoruntuleriTest {
     }
 
     @Composable
-    private fun Bugun(state: TodayUiState, hour: Int = 10) = TodayContent(
+    private fun Bugun(state: TodayUiState, hour: Int = 10, minute: Int = 0) = TodayContent(
         state = state, onOpenLog = {}, onOpenMeds = {}, onOpenSettings = {}, onAddWater = {},
-        onTaken = {}, onUndo = {}, onPeriodStart = {}, onPeriodEnd = {}, hour = hour,
+        onTaken = {}, onUndo = {}, onPeriodStart = {}, onPeriodEnd = {}, now = LocalTime.of(hour, minute),
     )
 
     @Composable
@@ -186,6 +187,8 @@ class EkranGoruntuleriTest {
             onWeight = {}, onWaist = {}, onNote = {}, onSave = {},
         )
     }
+
+    @Test fun t26_bugun_hap_dun_isaretlenmedi() = ekran("26-bugun-hap-dun", sekme = Screen.Today) { Bugun(Ornek.bugunHapDunKacti, hour = 9) }
 
     @Test fun t21_koyu_ben() = ekran("21-koyu-ben", sekme = Screen.Me, koyu = true) { MeContent(state = Ornek.ben, onOpenSettings = {}) }
 

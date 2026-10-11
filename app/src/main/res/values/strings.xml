@@ -67,7 +67,11 @@
     <string name="today_pill_regimen">%1$d/%2$d düzen · her gün %3$s</string>
     <string name="today_pill_number">%1$d. hap</string>
     <string name="today_pill_note">Hap kullanırken döngü tahmini yapılmaz. Plasebo günlerindeki kanama doğal adet değil, çekilme kanamasıdır.</string>
-    <string name="today_pill_pack_a11y">Pakette %1$d hap: bugün %2$d. hap</string>
+    <string name="today_pill_pack_a11y">Pakette %1$d hap: bugün %2$d. hap. Geçmiş bir günü düzeltmek için hapa dokun.</string>
+    <string name="today_pill_pending">Bugünkü hap (%1$d) henüz işaretlenmedi.</string>
+    <string name="today_pill_missed_yesterday">Dünkü hap (%1$d) işaretlenmemiş. Aldıysan paketteki hapa dokunarak işaretle; almadıysan ne yapacağını prospektüste bulabilir ya da eczacına sorabilirsin.</string>
+    <string name="today_pill_placebo_day">Plasebo günü: bu günlerde çekilme kanaması olabilir.</string>
+    <string name="pill_placebo">plasebo</string>
     <string name="today_ring_a11y">Döngünün %1$d. günü. Tahmini adet %2$s ile %3$s arası, güven %4$s.</string>
     <string name="today_ring_a11y_no_prediction">Döngünün %1$d. günü. Henüz tahmin yok.</string>
     <string name="today_ring_a11y_past">Döngünün %1$d. günü. Döngü beklenenden uzun sürüyor.</string>
@@ -364,7 +368,6 @@
     <string name="settings_cup_size">Bardak hacmi</string>
     <string name="settings_name">Adın</string>
     <string name="settings_goals">Önceliklerim</string>
-    <string name="settings_about">Hakkında</string>
     <string name="settings_about_text">Ayla %1$s · Tıbbi tavsiye vermez. Kaynaklar ve kanıt düzeyleri için docs klasörüne bak.</string>
     <string name="export_done">Dışa aktarıldı</string>
     <string name="export_failed">Dışa aktarma başarısız oldu</string>

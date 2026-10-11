@@ -97,6 +97,7 @@ internal object Ornek {
         id = 4, name = "Doğum kontrol hapı", doseText = "1 tablet", kind = MedicationKind.CONTRACEPTIVE,
         form = MedicationForm.TABLET, times = listOf(LocalTime.of(22, 0)), withFood = null,
         pillActiveDays = 24, pillPlaceboDays = 4, packStartDate = bugun.minusDays(11),
+        createdAt = instant(bugun.minusDays(30), LocalTime.NOON),
     )
 
     private fun alindi(med: MedicationEntity, time: LocalTime, at: LocalTime) = DoseItem(
@@ -124,9 +125,11 @@ internal object Ornek {
 
     val bugunHap = TodayUiState(
         loading = false, today = bugun, displayName = "Elif", overview = genelBakis,
-        pillMode = PillModeState(hap, PillRegimen.R24_4, todayPill = 12, isPlacebo = false, takenPills = (1..11).toSet()),
+        pillMode = PillModeState(hap, PillRegimen.R24_4, todayPill = 12, isPlacebo = false, takenPills = (1..11).toSet(), packStart = bugun.minusDays(11)),
         doses = listOf(bekliyor(hap, LocalTime.of(22, 0))), hasMedications = true, waterCups = 3, waterGoal = 8,
     )
+
+    val bugunHapDunKacti = bugunHap.copy(pillMode = bugunHap.pillMode!!.copy(takenPills = (1..10).toSet()))
 
     val bugunBos = TodayUiState(loading = false, today = bugun, displayName = "", overview = engine.overview(emptyList(), bugun))
 

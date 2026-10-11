@@ -46,6 +46,26 @@ class ViewModelTesti : VeriTestOrtami() {
     }
 
     @Test
+    fun `paketteki gecmis hapa dokunmak o gunu isaretler, gelecek hap degismez`() {
+        calistir {
+            meds.add(
+                MedicationEntity(
+                    name = "Hap", doseText = "1 tablet", kind = MedicationKind.CONTRACEPTIVE,
+                    times = listOf(LocalTime.of(22, 0)), pillActiveDays = 21, pillPlaceboDays = 7,
+                    packStartDate = bugun.minusDays(4),
+                ),
+            )
+        }
+        val vm = today()
+        bekle(vm.uiState) { it.pillMode?.todayPill == 5 }
+        vm.togglePill(3)
+        assertEquals(setOf(3), bekle(vm.uiState) { it.pillMode?.takenPills == setOf(3) }.pillMode?.takenPills)
+        vm.togglePill(9) // gelecek
+        vm.togglePill(3) // geri al
+        bekle(vm.uiState) { it.pillMode?.takenPills?.isEmpty() == true }
+    }
+
+    @Test
     fun `bildirimler kapaliyken bant gorunur, kapatilinca gizlenir, izin acilinca sifirlanir`() {
         calistir { meds.add(MedicationEntity(name = "D vitamini", doseText = "1", kind = MedicationKind.SUPPLEMENT, times = listOf(LocalTime.of(13, 0)))) }
         bildirimleriAc(false)
