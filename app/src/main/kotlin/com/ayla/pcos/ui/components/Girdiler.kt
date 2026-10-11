@@ -129,16 +129,21 @@ fun CipEtiketi(text: String) {
     Text(text, modifier = Modifier.padding(vertical = 6.dp))
 }
 
-/** Bölümlü düğme etiketi: büyük yazıda iki satıra kadar kırılır ve seçiliyse kalınlaşır. */
+/**
+ * Bölümlü düğme etiketi: büyük yazıda iki satıra kadar kırılır, seçiliyse kalınlaşır ve en fazla
+ * [DAR_ALAN_YAZI_SINIRI] ölçeğinde büyür ("Yemekle" segmentte "Yemekl/e" diye bölünmez).
+ */
 @Composable
 fun SegmentEtiketi(text: String, selected: Boolean) {
     val buyuk = LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI
-    Text(
-        text,
-        maxLines = if (buyuk) 2 else 1,
-        textAlign = TextAlign.Center,
-        fontWeight = if (buyuk && selected) FontWeight.Bold else null,
-    )
+    YaziOlcegiSiniri {
+        Text(
+            text,
+            maxLines = if (buyuk) 2 else 1,
+            textAlign = TextAlign.Center,
+            fontWeight = if (buyuk && selected) FontWeight.Bold else null,
+        )
+    }
 }
 
 /**

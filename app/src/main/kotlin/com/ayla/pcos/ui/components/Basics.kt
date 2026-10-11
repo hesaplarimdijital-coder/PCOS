@@ -134,19 +134,29 @@ fun AltGezinme(selected: Screen.Tab, onSelect: (Screen.Tab) -> Unit) {
 }
 
 /**
- * Beş sekme 393 dp'ye sığmalı: sistem yazı boyutu %200'e çıktığında etiket [GEZINME_YAZI_SINIRI]
+ * Beş sekme 393 dp'ye sığmalı: sistem yazı boyutu %200'e çıktığında etiket [DAR_ALAN_YAZI_SINIRI]
  * ölçeğinde durur (simge ve ekran okuyucu metni değişmez); aksi hâlde "Bugü", "Takvi" diye kesilir.
  */
 @Composable
 private fun GezinmeEtiketi(text: String) {
-    val density = LocalDensity.current
-    val capped = if (density.fontScale > GEZINME_YAZI_SINIRI) Density(density.density, GEZINME_YAZI_SINIRI) else density
-    CompositionLocalProvider(LocalDensity provides capped) {
+    YaziOlcegiSiniri {
         Text(text, maxLines = 1, softWrap = false)
     }
 }
 
-private const val GEZINME_YAZI_SINIRI = 1.5f
+/** Sabit genişlikli dar alanlarda (alt gezinme, bölümlü düğme) yazının büyüyebileceği en yüksek ölçek. */
+const val DAR_ALAN_YAZI_SINIRI = 1.5f
+
+/**
+ * İçeriği en fazla [max] yazı ölçeğiyle çizer; daha küçük ölçeklerde hiçbir şey değiştirmez. Yalnızca
+ * genişliği sabit ve tek sözcüklük etiketler için: metin yine büyür, ama sözcük ortasından bölünmez.
+ */
+@Composable
+fun YaziOlcegiSiniri(max: Float = DAR_ALAN_YAZI_SINIRI, content: @Composable () -> Unit) {
+    val density = LocalDensity.current
+    val capped = if (density.fontScale > max) Density(density.density, max) else density
+    CompositionLocalProvider(LocalDensity provides capped, content = content)
+}
 
 private fun Screen.Tab.icon(selected: Boolean): ImageVector = when (this) {
     Screen.Today -> if (selected) Icons.Rounded.Today else Icons.Outlined.Today
