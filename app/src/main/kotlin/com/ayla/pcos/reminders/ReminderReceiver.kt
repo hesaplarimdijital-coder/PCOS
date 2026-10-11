@@ -91,9 +91,12 @@ class ReminderReceiver : BroadcastReceiver() {
         val p = prefs.current()
         medicationRepository.markOldPendingAsMissed(today)
 
+        // Alarm gecikip sessiz saate sarktıysa uyarılar gösterilmez ve "gösterildi" sayılmaz; yarın tekrar denenir.
+        val quietNow = ReminderPolicy.isQuiet(LocalTime.now(clock), p)
+
         val overview = cycleRepository.snapshot()
         val lastStart = overview.lastPeriodStart
-        if (p.cycleNotificationsEnabled && lastStart != null) {
+        if (!quietNow && p.cycleNotificationsEnabled && lastStart != null) {
             val alert = overview.flags.longCycle
             val key = when (alert) {
                 LongCycleAlert.NONE -> null
@@ -114,14 +117,16 @@ class ReminderReceiver : BroadcastReceiver() {
         }
 
         // Stok uyarısı: kalan gün sayısı eşiğin altındaysa
-        medicationDao.getActive().forEach { med ->
-            val stock = med.stockCount ?: return@forEach
-            val perDay = med.times.size.coerceAtLeast(1)
-            val daysLeft = stock / perDay
-            if (daysLeft <= med.stockWarnDays) notifier.showStock(med, daysLeft, p)
+        if (!quietNow) {
+            medicationDao.getActive().forEach { med ->
+                val stock = med.stockCount ?: return@forEach
+                val perDay = med.times.size.coerceAtLeast(1)
+                val daysLeft = stock / perDay
+                if (daysLeft <= med.stockWarnDays) notifier.showStock(med, daysLeft, p)
+            }
         }
 
-        scheduler.scheduleDailyCheck(p.dailyCheckTime, earliestDate = today.plusDays(1))
+        scheduler.scheduleDailyCheck(ReminderPolicy.effectiveDailyCheckTime(p), earliestDate = today.plusDays(1))
     }
 
     private suspend fun handleWater() {
@@ -130,11 +135,12 @@ class ReminderReceiver : BroadcastReceiver() {
         val now = ZonedDateTime.now(clock).toLocalTime()
         val today = LocalDate.now(clock)
         val cups = hydrationRepository.cups(today)
-        val withinActive = !now.isBefore(p.activeHoursStart) && !now.isAfter(p.activeHoursEnd)
-        if (withinActive && cups < p.waterGoalCups) notifier.showWater(cups, p.waterGoalCups, p)
+        val allowed = ReminderPolicy.isActive(now, p) && !ReminderPolicy.isQuiet(now, p)
+        if (allowed && cups < p.waterGoalCups) notifier.showWater(cups, p.waterGoalCups, p)
         scheduler.scheduleWater(p, fromNow = true)
     }
 
+    /** Akşam rutini sessiz saatten muaftır: kullanıcının kendi seçtiği yatış işaretidir. */
     private suspend fun handleEvening() {
         val p = prefs.current()
         if (!p.eveningRoutineEnabled) return

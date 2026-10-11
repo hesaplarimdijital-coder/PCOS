@@ -13,7 +13,6 @@ import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Clock
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -72,8 +71,15 @@ class ReminderScheduler @Inject constructor(
         }
         registry.edit().putStringSet(KEY_DOSES, newKeys).apply()
 
-        scheduleDailyCheck(p.dailyCheckTime, earliestDate = today)
-        if (p.waterRemindersEnabled) scheduleWater(p, fromNow = true) else cancel(simpleIntent(ReminderKind.WATER))
+        scheduleDailyCheck(ReminderPolicy.effectiveDailyCheckTime(p), earliestDate = today)
+        if (p.waterRemindersEnabled) {
+            // Her açılışta ileri atmamak için kayıtlı alarm hâlâ geçerliyse dokunulmaz.
+            val storedAt = registry.getLong(KEY_WATER_AT, 0L)
+            if (ReminderPolicy.shouldRescheduleWater(storedAt, clock.instant(), p)) scheduleWater(p, fromNow = true)
+        } else {
+            cancel(simpleIntent(ReminderKind.WATER))
+            registry.edit().remove(KEY_WATER_AT).apply()
+        }
         if (p.eveningRoutineEnabled) {
             scheduleAt(simpleIntent(ReminderKind.EVENING), nextOccurrence(p.eveningRoutineTime, today))
         } else {
@@ -110,16 +116,9 @@ class ReminderScheduler @Inject constructor(
      * Aktif saat dışına düşerse bir sonraki günün başlangıcına kayar.
      */
     fun scheduleWater(p: UserPreferences, fromNow: Boolean) {
-        val now = ZonedDateTime.now(clock)
-        var candidate = if (fromNow) now.plusMinutes(p.waterIntervalMinutes.toLong()) else now.plusMinutes(1)
-        val startToday = now.toLocalDate().atTime(p.activeHoursStart).atZone(clock.zone)
-        val endToday = now.toLocalDate().atTime(p.activeHoursEnd).atZone(clock.zone)
-        candidate = when {
-            candidate.isBefore(startToday) -> startToday.plusMinutes(p.waterIntervalMinutes.toLong())
-            candidate.isAfter(endToday) -> startToday.plusDays(1).plusMinutes(p.waterIntervalMinutes.toLong())
-            else -> candidate
-        }
-        scheduleAt(simpleIntent(ReminderKind.WATER), candidate)
+        val at = ReminderPolicy.nextWater(ZonedDateTime.now(clock), p, fromNow)
+        scheduleAt(simpleIntent(ReminderKind.WATER), at)
+        registry.edit().putLong(KEY_WATER_AT, at.toInstant().toEpochMilli()).apply()
     }
 
     fun scheduleEvening(time: LocalTime, earliestDate: LocalDate) {
@@ -128,12 +127,8 @@ class ReminderScheduler @Inject constructor(
 
     // --- iç yardımcılar ---
 
-    private fun nextOccurrence(time: LocalTime, earliestDate: LocalDate): ZonedDateTime {
-        val now = ZonedDateTime.now(clock)
-        var candidate = LocalDateTime.of(earliestDate, time).atZone(clock.zone)
-        while (!candidate.isAfter(now)) candidate = candidate.plusDays(1)
-        return candidate
-    }
+    private fun nextOccurrence(time: LocalTime, earliestDate: LocalDate): ZonedDateTime =
+        ReminderPolicy.nextOccurrence(time, earliestDate, ZonedDateTime.now(clock))
 
     private fun scheduleAt(intent: Intent, at: ZonedDateTime) {
         val pending = pendingIntent(intent)
@@ -203,5 +198,6 @@ class ReminderScheduler @Inject constructor(
         private const val FALLBACK_WINDOW_MS = 10L * 60L * 1000L
         private const val REGISTRY_PREFS = "ayla_reminder_registry"
         private const val KEY_DOSES = "dose_keys"
+        private const val KEY_WATER_AT = "water_at"
     }
 }
