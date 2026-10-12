@@ -3,11 +3,14 @@ package com.ayla.pcos.ui.me
 import android.content.res.Resources
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -16,15 +19,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ayla.pcos.R
 import com.ayla.pcos.reminders.AlarmLogEntry
 import com.ayla.pcos.reminders.AlarmLogSummary
+import com.ayla.pcos.reminders.LATE_THRESHOLD
 import com.ayla.pcos.reminders.ReminderKind
 import com.ayla.pcos.reminders.summarizeAlarmLog
+import com.ayla.pcos.ui.components.yaziOlcekli
+import com.ayla.pcos.ui.theme.LocalAylaColors
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -94,7 +102,10 @@ internal object AlarmLogText {
             add("")
             addAll(summary(resources, summarizeAlarmLog(entries, now)))
             add("")
-            entries.asReversed().forEach { add(entry(resources, it, zone)) }
+            entries.asReversed().forEach { e ->
+                val line = entry(resources, e, zone)
+                add(if (e.delay > LATE_THRESHOLD) resources.getString(R.string.alarm_log_late_marker, line) else line)
+            }
         }.joinToString("\n").trimEnd()
 }
 
@@ -126,13 +137,7 @@ internal fun HatirlatmaGunluguDialog(
                         Text(line, style = MaterialTheme.typography.bodyMedium)
                     }
                     HorizontalDivider()
-                    entries.asReversed().take(DIALOG_ENTRY_LIMIT).forEach { entry ->
-                        Text(
-                            AlarmLogText.entry(resources, entry, zone),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    entries.asReversed().take(DIALOG_ENTRY_LIMIT).forEach { entry -> GunlukSatiri(entry, zone) }
                     HorizontalDivider()
                 }
                 Text(
@@ -156,4 +161,28 @@ internal fun HatirlatmaGunluguDialog(
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
         },
     )
+}
+
+/** Günlük satırı; 10 dakikayı aşan gecikme simge ve kalın yazıyla işaretlenir (renk tek başına değil). */
+@Composable
+private fun GunlukSatiri(entry: AlarmLogEntry, zone: ZoneId) {
+    val resources = LocalResources.current
+    val late = entry.delay > LATE_THRESHOLD
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.Top) {
+        if (late) {
+            Icon(
+                Icons.Rounded.WarningAmber,
+                contentDescription = stringResource(R.string.alarm_log_late_a11y),
+                tint = LocalAylaColors.current.uyari,
+                modifier = Modifier.size(yaziOlcekli(16.dp)),
+            )
+        }
+        Text(
+            AlarmLogText.entry(resources, entry, zone),
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = if (late) FontWeight.SemiBold else null,
+            color = if (late) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+    }
 }

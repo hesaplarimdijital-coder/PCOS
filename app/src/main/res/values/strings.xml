@@ -419,17 +419,17 @@
 
     <!-- Pil tasarrufu ve hatırlatma günlüğü (#17) -->
     <string name="battery_band_title">Hatırlatmaların gecikmesin</string>
-    <string name="battery_band_text">Bazı telefonlar pil tasarrufu için arka plandaki uygulamaları uyutur; doz hatırlatmaları bu yüzden gecikebilir. Açılan ekranda Pil bölümünden Ayla\'yı &#8220;Kısıtlanmamış&#8221; yapabilirsin (adı telefona göre değişir).</string>
+    <string name="battery_band_text">Bazı telefonlar pil tasarrufu için arka plandaki uygulamaları uyutur; doz hatırlatmaları bu yüzden gecikebilir. Açılan ekranda Pil bölümünden Ayla&#8217;yı &#8220;Kısıtlanmamış&#8221; yapabilirsin (adı telefona göre değişir).</string>
     <string name="battery_restricted_title">Arka plan kullanımı kısıtlı</string>
-    <string name="battery_restricted_text">Ayla\'nın arka planda çalışması kısıtlanmış; bu durumda hatırlatmalar hiç gelmeyebilir. Açılan ekranda Pil bölümünden kısıtlamayı kaldırabilirsin.</string>
+    <string name="battery_restricted_text">Ayla&#8217;nın arka planda çalışması kısıtlanmış; bu durumda hatırlatmalar hiç gelmeyebilir. Açılan ekranda Pil bölümünden kısıtlamayı kaldırabilirsin.</string>
     <string name="battery_open_settings">Pil ayarlarını aç</string>
-    <string name="battery_unrestricted">Pil tasarrufu kısıtlamıyor</string>
+    <string name="battery_unrestricted">Pil ayarı uygun</string>
     <string name="battery_unrestricted_text">Ayla arka planda kısıtlanmıyor; hatırlatmalar zamanında çalabilir.</string>
-    <string name="battery_oem_xiaomi">Xiaomi, Redmi ve POCO\'da ayrıca: uygulama bilgilerinde &#8220;Otomatik başlatma&#8221;yı aç, pil tasarrufunu &#8220;Kısıtlama yok&#8221; yap.</string>
-    <string name="battery_oem_samsung">Samsung\'da ayrıca: pil ayarlarındaki &#8220;Arka plan kullanım sınırları&#8221; bölümünde Ayla uyuyan uygulamalar arasındaysa listeden çıkar.</string>
-    <string name="battery_oem_huawei">Huawei ve Honor\'da ayrıca: pil ayarlarındaki &#8220;Uygulama başlatma&#8221; bölümünde Ayla\'yı elle yönet ve arka planda çalışmasına izin ver.</string>
-    <string name="battery_oem_oppo">OPPO, realme ve OnePlus\'ta ayrıca: uygulama bilgilerinde otomatik başlatmaya ve arka plan etkinliğine izin ver.</string>
-    <string name="battery_oem_vivo">vivo ve iQOO\'da ayrıca: pil ayarlarında Ayla\'ya arka planda yüksek güç kullanımı izni ver.</string>
+    <string name="battery_oem_xiaomi">Xiaomi, Redmi ve POCO&#8217;da ayrıca: uygulama bilgilerinde &#8220;Otomatik başlatma&#8221;yı aç, pil tasarrufunu &#8220;Kısıtlama yok&#8221; yap.</string>
+    <string name="battery_oem_samsung">Samsung&#8217;da ayrıca: pil ayarlarındaki &#8220;Arka plan kullanım sınırları&#8221; bölümünde Ayla uyuyan uygulamalar arasındaysa listeden çıkar.</string>
+    <string name="battery_oem_huawei">Huawei ve Honor&#8217;da ayrıca: pil ayarlarındaki &#8220;Uygulama başlatma&#8221; bölümünde Ayla&#8217;yı elle yönet ve arka planda çalışmasına izin ver.</string>
+    <string name="battery_oem_oppo">OPPO, realme ve OnePlus&#8217;ta ayrıca: uygulama bilgilerinde otomatik başlatmaya ve arka plan etkinliğine izin ver.</string>
+    <string name="battery_oem_vivo">vivo ve iQOO&#8217;da ayrıca: pil ayarlarında Ayla&#8217;ya arka planda yüksek güç kullanımı izni ver.</string>
     <string name="battery_status_unrestricted">kısıtlanmıyor</string>
     <string name="battery_status_optimized">pil optimizasyonu açık</string>
     <string name="battery_status_restricted">arka plan kısıtlı</string>
@@ -442,9 +442,9 @@
     <string name="alarm_log_on_time">Hepsi 10 dakika içinde çaldı.</string>
     <string name="alarm_log_entry">%1$s · %2$s planlandı, %3$s çaldı (+%4$s) · %5$s</string>
     <string name="alarm_log_exact">tam zamanlı</string>
-    <string name="alarm_log_window">10 dk pencereli</string>
-    <string name="alarm_log_delay_seconds">%1$d sn</string>
-    <string name="alarm_log_delay_minutes">%1$d dk</string>
+    <string name="alarm_log_window">10&#160;dk pencereli</string>
+    <string name="alarm_log_delay_seconds">%1$d&#160;sn</string>
+    <string name="alarm_log_delay_minutes">%1$d&#160;dk</string>
     <string name="alarm_log_privacy">Günlükte yalnızca hatırlatma türü ve saatler var, ilaç adı yok. Telefonunda kalır; paylaşırsan yalnızca seçtiğin yere gider.</string>
     <string name="alarm_log_share">Paylaş</string>
     <string name="alarm_log_clear">Temizle</string>
@@ -452,13 +452,15 @@
     <string name="alarm_log_share_device">Cihaz: %1$s · Android %2$s</string>
     <string name="alarm_log_share_exact">Tam zamanlı alarm izni: %1$s</string>
     <string name="alarm_log_share_battery">Pil durumu: %1$s</string>
-    <string name="state_on">açık</string>
-    <string name="state_off">kapalı</string>
+    <string name="alarm_log_state_on">açık</string>
+    <string name="alarm_log_state_off">kapalı</string>
     <string name="alarm_kind_dose">Doz</string>
     <string name="alarm_kind_daily_check">Günlük kontrol</string>
     <string name="alarm_kind_water">Su</string>
     <string name="alarm_kind_evening">Akşam rutini</string>
     <string name="alarm_kind_weekly">Haftalık özet</string>
+    <string name="alarm_log_late_a11y">Geç çaldı</string>
+    <string name="alarm_log_late_marker">GEÇ · %1$s</string>
 
     <!-- Uygulama kilidi -->
     <string name="lock_title">Ayla kilitli</string>

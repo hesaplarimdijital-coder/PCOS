@@ -274,8 +274,10 @@ class EkranGoruntuleriTest {
         HatirlatmaGunluguDialog(entries = Ornek.alarmGunlugu, onShare = {}, onClear = {}, onDismiss = {}, now = Ornek.alarmSimdi, zone = Ornek.zone)
     }
 
-    @Config(qualifiers = UZUN)
-    @Test fun y13_yazi200_hatirlatma_gunlugu() = ekran("y13-yazi200-hatirlatma-gunlugu", sistemYaziOlcegi = 2f, tumEkran = true) {
+    // Diyalog kendi penceresinde çizilir ve LocalDensity'yi pencereden yeniden okur; %200 yazı bu yüzden
+    // cihaz yapılandırmasıyla (fontScale) verilir.
+    @Config(qualifiers = UZUN, fontScale = 2f)
+    @Test fun y13_yazi200_hatirlatma_gunlugu() = ekran("y13-yazi200-hatirlatma-gunlugu", tumEkran = true) {
         HatirlatmaGunluguDialog(entries = Ornek.alarmGunlugu, onShare = {}, onClear = {}, onDismiss = {}, now = Ornek.alarmSimdi, zone = Ornek.zone)
     }
 
@@ -374,7 +376,7 @@ class EkranGoruntuleriTest {
     @Config(qualifiers = UZUN)
     @Test fun u05_ben_tum() = ekran("u05-ben-tum", sekme = Screen.Me) { MeContent(state = Ornek.ben, onOpenSettings = {}) }
 
-    @Config(qualifiers = UZUN)
+    @Config(qualifiers = AYARLAR_TUM)
     @Test fun u06_ayarlar_tum() = ekran("u06-ayarlar-tum") {
         SettingsContent(
             prefs = Ornek.ayarlar, exactAlarmsAllowed = false, snackbar = remember { SnackbarHostState() },
@@ -395,3 +397,4 @@ internal const val UZUN = "w393dp-h1800dp-xhdpi"
 internal const val KUCUK = "w360dp-h740dp-xhdpi"
 internal const val BESLENME_TUM = "w393dp-h5200dp-xhdpi"
 internal const val HAREKET_TUM = "w393dp-h3400dp-xhdpi"
+internal const val AYARLAR_TUM = "w393dp-h2900dp-xhdpi"

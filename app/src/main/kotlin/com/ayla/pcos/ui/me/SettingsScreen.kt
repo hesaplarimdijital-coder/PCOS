@@ -193,7 +193,7 @@ fun SettingsScreen(
             // Cihaz ve izin satırları gecikmenin nedenini anlamaya yarar; ilaç adı günlükte zaten yok.
             val deviceLines = listOf(
                 resources.getString(R.string.alarm_log_share_device, "${Build.MANUFACTURER} ${Build.MODEL}", Build.VERSION.RELEASE),
-                resources.getString(R.string.alarm_log_share_exact, resources.getString(if (exactAllowed) R.string.state_on else R.string.state_off)),
+                resources.getString(R.string.alarm_log_share_exact, resources.getString(if (exactAllowed) R.string.alarm_log_state_on else R.string.alarm_log_state_off)),
                 resources.getString(R.string.alarm_log_share_battery, resources.getString(battery.labelRes())),
             )
             val subject = resources.getString(R.string.alarm_log_share_subject)

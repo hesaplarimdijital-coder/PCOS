@@ -68,17 +68,17 @@ class AlarmGunluguTesti : VeriTestOrtami() {
     @Test
     fun `gecikme saniye ya da dakika olarak yazilir`() {
         val r = context.resources
-        assertEquals("0 sn", AlarmLogText.delay(r, Duration.ofSeconds(-4)))
-        assertEquals("59 sn", AlarmLogText.delay(r, Duration.ofSeconds(59)))
-        assertEquals("1 dk", AlarmLogText.delay(r, Duration.ofSeconds(60)))
-        assertEquals("23 dk", AlarmLogText.delay(r, Duration.ofSeconds(23 * 60 + 40)))
+        assertEquals("0\u00A0sn", AlarmLogText.delay(r, Duration.ofSeconds(-4)))
+        assertEquals("59\u00A0sn", AlarmLogText.delay(r, Duration.ofSeconds(59)))
+        assertEquals("1\u00A0dk", AlarmLogText.delay(r, Duration.ofSeconds(60)))
+        assertEquals("23\u00A0dk", AlarmLogText.delay(r, Duration.ofSeconds(23 * 60 + 40)))
     }
 
     @Test
     fun `kayit satiri tur, planlanan ve calan saati, gecikmeyi ve alarm turunu gosterir`() {
         val satir = AlarmLogText.entry(context.resources, kayit(dokuz, gecikmeSn = 12), zone)
         assertTrue(satir.startsWith("Doz · "), satir)
-        assertTrue("09:00 planlandı, 09:00:12 çaldı (+12 sn) · tam zamanlı" in satir, satir)
+        assertTrue("09:00 planlandı, 09:00:12 çaldı (+12\u00A0sn) · tam zamanlı" in satir, satir)
     }
 
     @Test
@@ -94,7 +94,7 @@ class AlarmGunluguTesti : VeriTestOrtami() {
         assertTrue(satirlar.any { it.startsWith("Son 48 saatte 2 hatırlatma çaldı.") }, metin)
         assertTrue(satirlar.any { it.startsWith("1 tanesi 10 dakikadan fazla gecikti") }, metin)
         val yeniSira = satirlar.indexOfFirst { it.startsWith("Doz · ") }
-        val eskiSira = satirlar.indexOfFirst { it.startsWith("Akşam rutini · ") }
+        val eskiSira = satirlar.indexOfFirst { it.startsWith("GEÇ · Akşam rutini · ") }
         assertTrue(yeniSira in 0 until eskiSira, metin)
     }
 }
