@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -20,9 +18,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,9 +37,7 @@ import com.ayla.pcos.R
 import com.ayla.pcos.ui.components.CipEtiketi
 import com.ayla.pcos.ui.components.DegerSatiri
 import com.ayla.pcos.ui.components.SaatSeciciDialog
-import com.ayla.pcos.ui.components.SegmentEtiketi
 import com.ayla.pcos.ui.components.saatMetni
-import com.ayla.pcos.ui.components.segmentSimgesi
 import java.time.LocalTime
 
 /** LH sonucu seçenekleri: "test yok" (null) ilk sırada. */
@@ -125,16 +118,15 @@ internal fun DogurganlikBolumu(
 
         Spacer(Modifier.height(4.dp))
         Text(stringResource(R.string.fertility_lh_title), style = MaterialTheme.typography.titleSmall)
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-            lhSecenekleri.forEachIndexed { index, (value, res) ->
+        // Çipler: dört seçenek büyük yazıda bölümlü düğmeye sığmaz ("Negat/if"); çipler satıra kayar.
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            lhSecenekleri.forEach { (value, res) ->
                 val selected = input.lh == value
-                SegmentedButton(
+                FilterChip(
                     selected = selected,
                     onClick = { onLh(value) },
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = lhSecenekleri.size),
-                    modifier = Modifier.fillMaxHeight(),
-                    icon = segmentSimgesi(selected),
-                    label = { SegmentEtiketi(stringResource(res), selected) },
+                    label = { CipEtiketi(stringResource(res)) },
+                    leadingIcon = if (selected) ({ Icon(Icons.Rounded.Check, contentDescription = null) }) else null,
                 )
             }
         }

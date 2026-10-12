@@ -51,6 +51,7 @@ import com.ayla.pcos.ui.components.EkranBasligi
 import com.ayla.pcos.ui.components.EvidenceLevel
 import com.ayla.pcos.ui.components.UyariBandi
 import com.ayla.pcos.ui.components.YaziOlcegiSiniri
+import com.ayla.pcos.ui.components.yaziOlcekli
 import com.ayla.pcos.ui.plan.BaslikVeKanit
 import com.ayla.pcos.ui.plan.BilgiKarti
 import com.ayla.pcos.ui.plan.BolumBasligi
@@ -304,7 +305,7 @@ private fun Lejant(showCoverline: Boolean, showLh: Boolean, showOvulation: Boole
 @Composable
 private fun LejantOgesi(label: String, glyph: DrawScope.() -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Canvas(modifier = Modifier.size(16.dp), onDraw = glyph)
+        Canvas(modifier = Modifier.size(yaziOlcekli(16.dp)), onDraw = glyph)
         Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
@@ -377,10 +378,14 @@ internal object DogurganlikIcerigi {
 private fun ColumnScope.BilgiKartlari() {
     val c = DogurganlikIcerigi
     IcerikKarti(c.intro)
-    IcerikKarti(c.bbtHow) {
-        c.bbtSteps.forEach { step ->
-            Text("• " + stringResource(step), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 4.dp))
+    // Adımlar madde listesi: ilk adım da madde olsun diye kart elle kurulur.
+    AylaCard {
+        BaslikVeKanit(stringResource(c.bbtHow.title), c.bbtHow.evidence)
+        (listOf(c.bbtHow.text) + c.bbtSteps).forEach { step ->
+            Text("• " + stringResource(step), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 6.dp))
         }
+        Spacer(Modifier.height(8.dp))
+        KaynakSatiri(c.bbtHow.source)
     }
     IcerikKarti(c.rule)
     IcerikKarti(c.bbtWhy)
