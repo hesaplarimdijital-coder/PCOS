@@ -1,5 +1,6 @@
 package com.ayla.pcos.ui.skin
 
+import android.content.ActivityNotFoundException
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -123,6 +124,7 @@ data class SkinActions(
     val onPickPhoto: (PhotoKind, String?) -> Unit = { _, _ -> },
     val onDeletePhoto: (String) -> Unit = {},
     val onExportPhoto: (PhotoRecord) -> Unit = {},
+    val onExportAll: () -> Unit = {},
     val onResetPhotos: () -> Unit = {},
 )
 
@@ -149,6 +151,9 @@ fun SkinScreen(onBack: () -> Unit, onOpenPrivacyPolicy: () -> Unit, viewModel: S
         if (uri != null && id != null) viewModel.exportPhoto(uri, id)
         exportId = null
     }
+    val folderPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
+        if (uri != null) viewModel.exportAll(uri)
+    }
 
     if (!state.loaded) return
     SkinContent(
@@ -165,7 +170,12 @@ fun SkinScreen(onBack: () -> Unit, onOpenPrivacyPolicy: () -> Unit, viewModel: S
                 pendingId = target.id
                 pendingKind = kind.name
                 pendingArea = area
-                camera.launch(target.uri)
+                try {
+                    camera.launch(target.uri)
+                } catch (e: ActivityNotFoundException) {
+                    pendingId = null
+                    viewModel.cameraUnavailable(target)
+                }
             },
             onPickPhoto = { kind, area ->
                 pendingKind = kind.name
@@ -177,6 +187,7 @@ fun SkinScreen(onBack: () -> Unit, onOpenPrivacyPolicy: () -> Unit, viewModel: S
                 exportId = record.id
                 exporter.launch(PhotoStore.suggestedFileName(record))
             },
+            onExportAll = { runCatching { folderPicker.launch(null) } },
             onResetPhotos = viewModel::resetPhotos,
         ),
         loadThumbnail = { record, px -> viewModel.thumbnail(record, px)?.asImageBitmap() },
@@ -599,11 +610,25 @@ private fun ColumnScope.FotografSekmesi(
         if (state.photo.busy) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 8.dp)) {
                 CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
-                Text("  " + stringResource(R.string.skin_photo_saving), style = MaterialTheme.typography.bodySmall)
+                Text(
+                    "  " + stringResource(if (state.photo.exporting) R.string.skin_photo_exporting else R.string.skin_photo_saving),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
         if (state.photo.error) {
             Text(stringResource(R.string.skin_photo_error), style = MaterialTheme.typography.bodySmall, color = scheme.error, modifier = Modifier.padding(top = 8.dp))
+        }
+        if (state.photo.cameraMissing) {
+            Text(stringResource(R.string.skin_photo_camera_missing), style = MaterialTheme.typography.bodySmall, color = scheme.error, modifier = Modifier.padding(top = 8.dp))
+        }
+        state.photo.exportResult?.let { result ->
+            val text = when {
+                result.failed == 0 -> stringResource(R.string.skin_photo_export_all_done, result.exported)
+                else -> stringResource(R.string.skin_photo_export_all_partial, result.exported, result.failed)
+            }
+            Text(text, style = MaterialTheme.typography.bodySmall, color = if (result.failed == 0) scheme.onSurfaceVariant else scheme.error, modifier = Modifier.padding(top = 8.dp))
         }
     }
 
@@ -663,7 +688,15 @@ private fun ColumnScope.FotografSekmesi(
     }
 
     Text(stringResource(R.string.skin_photo_not_diagnosis), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
-    TextButton(onClick = { confirmRevoke = true }, modifier = Modifier.heightIn(min = 48.dp)) {
+    if (state.photos.isNotEmpty()) {
+        // Fotoğraflar yedeğe girmez; telefon değiştirirken klasöre topluca kaydedilir.
+        OutlinedButton(onClick = actions.onExportAll, enabled = !state.photo.busy, modifier = Modifier.heightIn(min = 48.dp)) {
+            Icon(Icons.Rounded.FileDownload, contentDescription = null)
+            Text(" " + stringResource(R.string.skin_photo_export_all))
+        }
+        Text(stringResource(R.string.skin_photo_export_all_hint), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+    }
+    TextButton(onClick = { confirmRevoke = true }, enabled = !state.photo.busy, modifier = Modifier.heightIn(min = 48.dp)) {
         Text(stringResource(R.string.skin_photo_revoke), color = scheme.error)
     }
 

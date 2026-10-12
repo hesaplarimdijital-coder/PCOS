@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ayla.pcos.data.db.RoutineSlot
 import com.ayla.pcos.data.db.SkinProfileEntity
 import com.ayla.pcos.data.photos.PendingCapture
+import com.ayla.pcos.data.photos.PhotoExportResult
 import com.ayla.pcos.data.photos.PhotoKind
 import com.ayla.pcos.data.photos.PhotoRecord
 import com.ayla.pcos.data.photos.PhotoStore
@@ -22,6 +23,8 @@ import com.ayla.pcos.di.ApplicationScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -42,6 +45,12 @@ data class PhotoUi(
     val status: PhotoStatus = PhotoStatus.UNKNOWN,
     val busy: Boolean = false,
     val error: Boolean = false,
+    /** Cihazda fotoğraf çekecek uygulama yok (ör. iş profilinde kamera kapalı). */
+    val cameraMissing: Boolean = false,
+    /** "Tümünü klasöre kaydet" sürüyor ([busy] ile birlikte). */
+    val exporting: Boolean = false,
+    /** Son "tümünü klasöre kaydet" sonucu. */
+    val exportResult: PhotoExportResult? = null,
 )
 
 /** Cilt ve saç ekranının durumu (#25). Rutin, profil öz-beyanından ve tercihlerdeki gebelik planından türer. */
@@ -73,6 +82,9 @@ class SkinViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val photoUi = MutableStateFlow(PhotoUi())
+
+    /** Süren fotoğraf kaydı; rıza geri alınırken önce o bitirilir ki silmeden sonra dosya yazılmasın. */
+    private var saveJob: Job? = null
 
     private val routine = ticker.today.flatMapLatest { today ->
         skin.observeRoutineRange(today.with(DayOfWeek.MONDAY), today)
@@ -117,9 +129,7 @@ class SkinViewModel @Inject constructor(
 
     /** Profil alanı değişince hemen kaydedilir (form düğmesiz); yazma uygulama kapsamında (#27). */
     fun updateProfile(transform: (SkinProfileEntity) -> SkinProfileEntity) {
-        val base = state.value.profile ?: SkinProfileEntity()
-        val updated = transform(base)
-        appScope.launch { skin.saveProfile(updated) }
+        appScope.launch { skin.updateProfile(transform) }
     }
 
     fun toggleStep(slot: RoutineSlot, key: String) {
@@ -136,9 +146,14 @@ class SkinViewModel @Inject constructor(
         }
     }
 
-    /** Rıza geri alınır: tüm fotoğraflar ve anahtar silinir, sonra rıza kaydı kalkar. */
+    /**
+     * Rıza geri alınır: süren kayıt beklenir, tüm fotoğraflar ve anahtar silinir, sonra rıza kaydı kalkar.
+     * Silme başarısız olsa bile rıza kalkar; kalan dosyalar sonraki açılışta silinir (AylaApp).
+     */
     fun revokeConsent() {
+        val pending = saveJob
         appScope.launch {
+            pending?.cancelAndJoin()
             runCatching { photoStore.deleteAll() }
             prefs.update { it.copy(photoConsentAt = null) }
             photoUi.value = PhotoUi()
@@ -172,16 +187,39 @@ class SkinViewModel @Inject constructor(
     fun savePicked(uri: Uri, kind: PhotoKind, area: String?) = savePhoto { photoStore.save(uri, kind, area, state.value.today) }
 
     private fun savePhoto(block: suspend () -> Unit) {
-        photoUi.update { it.copy(busy = true, error = false) }
-        appScope.launch {
+        photoUi.update { it.copy(busy = true, error = false, cameraMissing = false, exportResult = null) }
+        saveJob = appScope.launch {
             try {
                 block()
+                // Kayıt sürerken rıza başka yerden (Ayarlar) geri alındıysa yazılan dosya da gider.
+                if (prefs.current().photoConsentAt == null) photoStore.deleteAll()
                 photoUi.update { it.copy(busy = false) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 photoUi.update { it.copy(busy = false, error = true) }
             }
+        }
+    }
+
+    /** Kamera uygulaması açılamadı: boş hedef silinir, kullanıcıya galeriden seçmesi söylenir. */
+    fun cameraUnavailable(capture: PendingCapture) {
+        photoUi.update { it.copy(cameraMissing = true) }
+        appScope.launch { runCatching { photoStore.discardCapture(capture) } }
+    }
+
+    /** Tüm fotoğrafları seçilen klasöre düz JPEG olarak yazar (telefon değiştirirken; yedeğe girmezler). */
+    fun exportAll(treeUri: Uri) {
+        photoUi.update { it.copy(busy = true, exporting = true, error = false, cameraMissing = false, exportResult = null) }
+        appScope.launch {
+            val result = try {
+                photoStore.exportAllTo(treeUri)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                PhotoExportResult(exported = 0, failed = state.value.photos.size.coerceAtLeast(1))
+            }
+            photoUi.update { it.copy(busy = false, exporting = false, exportResult = result) }
         }
     }
 

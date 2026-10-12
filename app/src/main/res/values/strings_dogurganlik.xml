@@ -106,7 +106,7 @@
     <string name="fertility_note_lh_without_rise_text">Pozitif testten sonra beş ölçümde yükselme yok. Bu döngüde ısıyla doğrulama yok. PCOS\'ta LH testi yumurtlama olmadan da pozitif çıkabilir. Sık olursa doktoruna söyle.</string>
     <string name="fertility_note_lh_without_rise_source" translatable="false">Ovülasyon testi üretici kullanım talimatı; McGovern ve ark. 2004, Fertil Steril; Su ve ark. 2017, Bioeng Transl Med</string>
     <string name="fertility_note_rise_without_lh_title">Isı yükseldi, LH pozitif yakalanmadı</string>
-    <string name="fertility_note_rise_without_lh_text">Yumurtlama ısıyla doğrulandı ama testlerin pozitif göstermedi. LH yükselişi kısa sürebilir; günde tek test onu kaçırabilir. Doğrulama geçerli.</string>
+    <string name="fertility_note_rise_without_lh_text">Isı yükselmesi kuralı sağlandı ama testlerin pozitif göstermedi. LH yükselişi kısa sürebilir; günde tek test onu kaçırabilir. Isı kuralı yine geçerli.</string>
     <string name="fertility_note_rise_without_lh_source" translatable="false">Direito ve ark. 2013, Fertil Steril; Ovülasyon testi üretici kullanım talimatı</string>
     <string name="fertility_note_long_luteal_title">Yumurtlama sonrası 18 günü geçti</string>
     <string name="fertility_note_long_luteal_text">Isın 18 günden uzun süredir yüksek ve adet gelmedi. Doğal aile planlaması kaynakları bu durumda gebelik testi önerir. Test negatifse ve adet gelmezse doktorunla konuş.</string>

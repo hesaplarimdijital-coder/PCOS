@@ -193,7 +193,7 @@
 
     <!-- Fotoğraf takibi -->
     <string name="skin_photo_title">Fotoğrafla takip</string>
-    <string name="skin_photo_intro">Fotoğraflar yalnızca bu cihazda şifreli saklanır, galeriye düşmez. Tanı aracı değildir; değişimi görmene ve doktoruna göstermene yarar.</string>
+    <string name="skin_photo_intro">Fotoğraflar yalnızca bu cihazda şifreli saklanır; Ayla onları galeriye yazmaz. Tanı aracı değildir; değişimi görmene ve doktoruna göstermene yarar.</string>
     <string name="skin_photo_tip_light">Aynı yerde, gün ışığında ya da aynı tavan lambasıyla çek; flaş ve tek yönlü lamba gölge yapar.</string>
     <string name="skin_photo_tip_distance">Telefonu cilde paralel tut ve en az 30–40 cm uzaktan çek; yakın plan için bir de karış mesafeden.</string>
     <string name="skin_photo_tip_consistency">Her seferinde aynı açı, aynı mesafe ve günün aynı saati; makyajsız ve ürün sürülmemiş ciltle. Filtre kullanma.</string>
@@ -237,7 +237,7 @@
     <string name="skin_tips_title">İpuçları</string>
 
     <string name="skin_photo_consent_title">Fotoğraf için ayrı onay</string>
-    <string name="skin_photo_consent_text">Cilt ve saç fotoğrafların sağlık verisidir ve yüzünü içerebilir. Yalnızca bu cihazda, şifreli saklanır; galeriye ve yedeğe düşmez, konum ve cihaz bilgisi silinir. Onayını istediğin an geri alabilirsin; o zaman tüm fotoğraflar silinir.</string>
+    <string name="skin_photo_consent_text">Cilt ve saç fotoğrafların sağlık verisidir ve yüzünü içerebilir. Yalnızca bu cihazda, şifreli saklanır; Ayla onları galeriye ve yedeğe yazmaz, konum ve cihaz bilgisini siler. Bazı kamera uygulamaları çekimin kendi kopyasını tutabilir; bunu kamera ayarlarından kapatabilirsin. Onayını istediğin an geri alabilirsin; o zaman tüm fotoğraflar silinir.</string>
     <string name="skin_photo_consent_accept">Onaylıyorum</string>
     <string name="skin_photo_consent_policy">Gizlilik politikasını oku</string>
     <string name="skin_photo_revoke">Fotoğraf onayını geri al</string>
@@ -261,6 +261,12 @@
     <string name="skin_photo_delete_confirm_text">Fotoğraf bu cihazdan kalıcı olarak silinir.</string>
     <string name="skin_photo_saving">Fotoğraf şifrelenip kaydediliyor…</string>
     <string name="skin_photo_error">Fotoğraf kaydedilemedi; yeniden dene.</string>
+    <string name="skin_photo_camera_missing">Bu cihazda fotoğraf çekecek bir uygulama açılamadı. Fotoğrafı galeriden seçebilirsin.</string>
+    <string name="skin_photo_exporting">Fotoğraflar klasöre kaydediliyor…</string>
+    <string name="skin_photo_export_all">Tümünü klasöre kaydet</string>
+    <string name="skin_photo_export_all_hint">Fotoğraflar yedek dosyasına girmez. Telefon değiştirirken seçtiğin klasöre şifresiz JPEG olarak kaydedilir; o klasörü güvendiğin bir yerde tut.</string>
+    <string name="skin_photo_export_all_done">%1$d fotoğraf klasöre kaydedildi.</string>
+    <string name="skin_photo_export_all_partial">%1$d fotoğraf kaydedildi, %2$d fotoğraf kaydedilemedi. Klasörde yer olduğundan emin olup yeniden dene.</string>
     <string name="skin_photo_unavailable_title">Fotoğraflar açılamıyor</string>
     <string name="skin_photo_unavailable_text">Şifre anahtarı bu cihazda artık yok (ör. ekran kilidi sıfırlandı). Eski fotoğraflar geri getirilemez; temiz başlayabilirsin.</string>
     <string name="skin_photo_unavailable_reset">Temiz başla</string>

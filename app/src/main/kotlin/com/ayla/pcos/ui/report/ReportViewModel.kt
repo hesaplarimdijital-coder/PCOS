@@ -96,6 +96,14 @@ class ReportViewModel @Inject constructor(
             val available = !fertility.isOnPill()
             _state.update { it.copy(loaded = true, fertilityAvailable = available) }
         }
+        // Ekran Activity boyunca yaşar; gece yarısından sonra hazır aralıklar ve özel aralığın üst sınırı bugüne kayar.
+        viewModelScope.launch {
+            ticker.today.collect { day ->
+                _state.update { s ->
+                    if (day == s.today) s else s.copy(today = day, customTo = if (s.customTo == s.today) day else s.customTo)
+                }
+            }
+        }
         viewModelScope.launch {
             questions.observeAll().collect { list -> _state.update { s -> s.copy(openQuestions = list.count { it.askedAt == null }) } }
         }

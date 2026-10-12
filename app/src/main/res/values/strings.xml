@@ -626,16 +626,16 @@
     <string name="report_fertility_cycle">%1$s başlangıçlı döngü</string>
     <string name="report_fertility_readings">Isı ölçümü</string>
     <string name="report_fertility_readings_value">%1$d geçerli, %2$d bozuk/aralık dışı</string>
-    <string name="report_fertility_ovulation">Isı yükselmesiyle doğrulanan yumurtlama</string>
-    <string name="report_fertility_ovulation_value">tahmini %1$s (doğrulama %2$s, örtü çizgisi %3$s °C)</string>
-    <string name="report_fertility_ovulation_none">doğrulanmadı</string>
+    <string name="report_fertility_ovulation">Isı yükselmesi kuralı</string>
+    <string name="report_fertility_ovulation_value">sağlandı; tahmini yumurtlama %1$s (kural %2$s tarihinde sağlandı, örtü çizgisi %3$s °C)</string>
+    <string name="report_fertility_ovulation_none">bu aralıkta sağlanmadı</string>
     <string name="report_fertility_lh_positive">LH pozitif günler</string>
     <string name="report_fertility_luteal">Yumurtlama sonrası gün (bugün)</string>
     <string name="report_fertility_notes">Notlar</string>
     <string name="report_fertility_chart_x">Döngü günü</string>
     <string name="report_fertility_chart_y">°C</string>
     <string name="report_fertility_chart_caption">Grafik: %1$s başlangıçlı döngü; içi boş noktalar hesaba girmeyen ölçümlerdir, kareler LH pozitif günler, kesikli çizgi örtü çizgisi.</string>
-    <string name="report_fertility_disclaimer">Yumurtlama yalnızca ısı yükselmesiyle (üç yüksek ölçüm kuralı) “doğrulanmış” sayılır; LH ve mukus kayıt amaçlıdır. Bu bölüm doğum kontrolü için kullanılmaz.</string>
+    <string name="report_fertility_disclaimer">Yumurtlama günü yalnızca ısı yükselmesi kuralı (üç yüksek ölçüm) sağlandığında, geriye dönük olarak tahmin edilir; LH ve mukus kayıt amaçlıdır. Bu bölüm doğum kontrolü için kullanılmaz.</string>
 
     <string name="report_section_skin">Cilt ve saç (öz-beyan)</string>
     <string name="report_skin_type">Cilt tipi</string>

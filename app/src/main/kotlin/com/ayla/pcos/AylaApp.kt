@@ -2,6 +2,7 @@ package com.ayla.pcos
 
 import android.app.Application
 import com.ayla.pcos.data.photos.PhotoStore
+import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.di.ApplicationScope
 import com.ayla.pcos.reminders.NotificationChannels
 import com.ayla.pcos.reminders.ReminderScheduler
@@ -26,6 +27,8 @@ class AylaApp : Application() {
     /** Kamera için açılmış geçici düz dosyalar (ADR-0010); anahtara dokunmadan temizlenir. */
     @Inject lateinit var photoStore: dagger.Lazy<PhotoStore>
 
+    @Inject lateinit var prefs: dagger.Lazy<UserPreferencesRepository>
+
     /** Önbellekteki eski rapor PDF'leri (ADR-0009). */
     @Inject lateinit var pdfReportWriter: dagger.Lazy<PdfReportWriter>
 
@@ -35,7 +38,16 @@ class AylaApp : Application() {
         // Uygulama her başladığında alarmlar tazelenir; ucuz ve yeniden başlatma sonrası güvenli.
         appScope.launch { runCatching { scheduler.get().rescheduleAll() } }
         appScope.launch { if (WidgetUpdater.hasWidgets(this@AylaApp)) widgetSync.get().start(refreshNow = true) }
-        appScope.launch { runCatching { photoStore.get().cleanupTemp() } }
+        appScope.launch {
+            runCatching {
+                // Fotoğraf onayı yokken diskte fotoğraf kalmaz (geri alma sırasında yarıda kalan silme ya da kayıt).
+                val store = photoStore.get()
+                when {
+                    prefs.get().current().photoConsentAt != null -> store.cleanupTemp()
+                    store.hasAnyFiles() -> store.deleteAll()
+                }
+            }
+        }
         appScope.launch { runCatching { pdfReportWriter.get().cleanup() } }
     }
 }

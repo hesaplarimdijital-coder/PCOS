@@ -226,6 +226,11 @@ class PhotoStore @Inject constructor(
         }
     }
 
+    /** Diskte fotoğraf dizini ya da geçici kamera dosyası var mı (anahtara dokunmaz). */
+    suspend fun hasAnyFiles(): Boolean = withContext(Dispatchers.IO) {
+        photosDir.exists() || cameraDir.listFiles()?.isNotEmpty() == true
+    }
+
     /** Fotoğrafı düz JPEG olarak kullanıcının seçtiği adrese (SAF) yazar. Kayıt yoksa false. */
     suspend fun exportTo(uri: Uri, id: String): Boolean = withContext(Dispatchers.IO) {
         val (key, record) = find(id)

@@ -34,6 +34,14 @@ class SkinRepository @Inject constructor(
     suspend fun saveProfile(profile: SkinProfileEntity) =
         profileDao.upsert(profile.copy(id = SkinProfileEntity.SINGLE_ID, updatedAt = Instant.now()))
 
+    /**
+     * Profili güncel satırdan oku-değiştir-yaz ile günceller: art arda iki hızlı değişiklik birbirini ezmez
+     * (ekrandaki durum henüz yenilenmemiş olabilir).
+     */
+    suspend fun updateProfile(transform: (SkinProfileEntity) -> SkinProfileEntity) = toggleLock.withLock {
+        saveProfile(transform(profileDao.get() ?: SkinProfileEntity()))
+    }
+
     suspend fun clearProfile() = profileDao.deleteAll()
 
     /** Günün sabah/akşam işaretleri (işaretsiz dilim listede yoktur); sıra sabah → akşam (enum sırası, metin sırası değil). */

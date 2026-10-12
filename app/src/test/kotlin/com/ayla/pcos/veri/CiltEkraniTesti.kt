@@ -95,4 +95,41 @@ class CiltEkraniTesti : VeriTestOrtami() {
         assertTrue(calistir { depo.list() }.isEmpty(), "fotoğraflar ve anahtar silindi")
         assertNull(calistir { prefs.current() }.photoConsentAt)
     }
+
+    @Test
+    fun `art arda iki profil degisikligi birbirini ezmez`() {
+        val vm = vm()
+        bekle(vm.state) { it.loaded }
+        vm.updateProfile { it.copy(skinType = SkinType.OILY) }
+        vm.updateProfile { it.copy(acne = AcneSelfReport.MILD) }
+        val son = bekle(vm.state) { it.profile?.acne == AcneSelfReport.MILD && it.profile?.skinType == SkinType.OILY }
+        assertEquals(SkinType.OILY, calistir { skin.profile() }?.skinType)
+        assertEquals(AcneSelfReport.MILD, son.profile?.acne)
+    }
+
+    @Test
+    fun `kayit surerken riza geri alinmissa yazilan fotograf da silinir`() {
+        val vm = vm()
+        bekle(vm.state) { it.loaded }
+        vm.giveConsent()
+        bekle(vm.state) { it.photoConsent && it.photo.status == PhotoStatus.AVAILABLE }
+        // Ayarlar'dan geri alma: bu ViewModel'in süren kaydından habersiz.
+        calistir { prefs.update { it.copy(photoConsentAt = null) } }
+        val hedef = vm.cameraTarget()
+        hedef.file.writeBytes(jpeg().readBytes())
+        vm.saveCapture(hedef, success = true, kind = PhotoKind.SKIN, area = null)
+        // Kamera hedefi diskte olduğu için dosya var; kayıt bitip rıza denetimi silince hiçbir şey kalmaz.
+        val sinir = System.currentTimeMillis() + 5_000
+        while (calistir { depo.hasAnyFiles() } && System.currentTimeMillis() < sinir) Thread.sleep(20)
+        assertFalse(calistir { depo.hasAnyFiles() }, "rıza yokken diskte fotoğraf kalmadı")
+    }
+
+    @Test
+    fun `kamera uygulamasi yoksa uyari gosterilir ve bos hedef silinir`() {
+        val vm = vm()
+        bekle(vm.state) { it.loaded }
+        val hedef = vm.cameraTarget()
+        vm.cameraUnavailable(hedef)
+        assertTrue(bekle(vm.state) { it.photo.cameraMissing }.photo.cameraMissing)
+    }
 }
