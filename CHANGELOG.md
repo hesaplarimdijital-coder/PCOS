@@ -3,6 +3,35 @@
 Biçim [Keep a Changelog](https://keepachangelog.com/tr-TR/1.1.0/) ilkelerine, sürümleme
 [Semantik Sürümleme](https://semver.org/lang/tr/)'ye uyar.
 
+## [0.3.0] — yayımlanmadı (MVP 3)
+
+### Eklendi
+- Doğurganlık kayıtları (#24): günlük kayıtta bazal vücut ısısı (saat ve "olağan dışı gece" işaretiyle), LH testi
+  ve servikal mukus; Ben > Doğurganlık'ta ısı grafiği, yükselme kuralı (üç yüksek ölçüm ve taban çizgisi) ve
+  kayıt notları. Yalnızca gebelik planı seçiliyken ve hap kullanılmıyorken görünür; "verimli gün" tahmini yapılmaz,
+  dil kayıt dilidir.
+- Cilt ve saç (#25): öz-beyan profil (cilt tipi, akne, koyu leke, koyulaşma, istenmeyen tüy, saç incelmesi),
+  profile göre sabah/akşam rutini ve haftalık sayaç; gebelik planında salisilik asit ve AHA çıkarılır,
+  kaçınılacaklar listelenir. "Ne zaman doktora" kartları aciliyet rozetiyle, saç ve tüy alma bilgisi, alerjen notu;
+  her kartta kanıt düzeyi ve kaynak.
+- Şifreli cilt/saç fotoğrafları (ADR-0010): ayrı ve geri alınabilir onay, Keystore anahtarıyla şifreli saklama,
+  konum ve cihaz bilgisinin silinmesi, galeriye ve yedeğe girmeme, yan yana karşılaştırma; onayı geri almak tüm
+  fotoğrafları siler.
+- Doktor raporu PDF'i (#26, ADR-0009): tarih aralığı ve bölüm seçimiyle cihazda üretilir; döngü, ilaç uyumu,
+  semptomlar, uyku, doğurganlık ve cilt özeti; düz metin olarak da paylaşılabilir. Doktora sorular listesi
+  (öneriler, "soruldu" işareti) rapora eklenir. Ben ekranındaki doktor notunun yerini alır.
+- Rıza kapsam sürümü (#20): politika 1.0 ile rıza vermiş kurulumlar, yeni veri türleri için rızalarını ilk
+  açılışta bir kez yeniler.
+
+### Değişti
+- Navigation 3'e geçildi (ADR-0003); geri yığını süreç ölümünden sonra onarılarak geri yüklenir.
+- Room şeması 2. sürüm (doğurganlık, cilt profili, rutin işaretleri, doktora sorular; göç testli);
+  yedek biçimi 3. sürüm (fotoğraflar yedeğe girmez).
+- Gizlilik politikası 1.1: yeni veri türleri, fotoğraf onayı, rapor paylaşımı.
+
+### Kaldırıldı
+- Ben ekranındaki "doktor notu" paylaşımı (doktor raporu kapsıyor).
+
 ## [0.2.0] — yayımlanmadı (MVP 2)
 
 ### Eklendi

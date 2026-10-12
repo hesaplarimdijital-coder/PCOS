@@ -3,12 +3,13 @@
 PCOS (yeni adıyla PMOS) ile yaşayan kadınlar için **tanı koymayan, verisi cihazda şifreli kalan** Android
 takip uygulaması. Düzensiz döngüler için aralıklı tahmin ve açık güven düzeyi, ilaç/takviye hatırlatması
 (günde iki doz Inofolic, doğum kontrol hapı paket takibi), 30 saniyelik günlük kayıt, su ve uyku; kanıt
-düzeyi görünür beslenme ve hareket içeriği, Health Connect'ten uyku ve ana ekran widget'ı.
+düzeyi görünür beslenme ve hareket içeriği, Health Connect'ten uyku, ana ekran widget'ı; doğurganlık kayıtları
+(bazal ısı, LH, mukus), cilt ve saç rutini ile şifreli fotoğraflar ve cihazda üretilen doktor raporu PDF'i.
 
 > Ayla tıbbi tavsiye vermez. Tanı ve tedavi için doktorunuza danışın.
 
 ## Durum
-MVP 1 ve MVP 2 kod olarak tamamlandı; ilk gerçek cihaz testi bekleniyor ([docs/ilk-cihaz-testi.md](docs/ilk-cihaz-testi.md)).
+MVP 1, MVP 2 ve MVP 3 kod olarak tamamlandı; ilk gerçek cihaz testi bekleniyor ([docs/ilk-cihaz-testi.md](docs/ilk-cihaz-testi.md)).
 Derleme ve testler GitHub Actions'ta (`.github/workflows/android.yml`); her `main` push'unda debug APK
 artefakt olarak üretilir.
 
@@ -29,6 +30,10 @@ ve [`ekran-goruntuleri`](https://github.com/hesaplarimdijital-coder/PCOS/tree/ek
 |---|---|---|---|---|
 | ![Beslenme](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/31-planim-beslenme.png) | ![Hareket](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/32-planim-hareket-adet.png) | ![Health Connect](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/36-hc-gerekce.png) | ![Widget](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/38-widget.png) | ![Pil](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/34-ilaclar-pil-bandi.png) |
 
+| Doğurganlık | Cilt rutini | Fotoğraflar | Doktor raporu | Doktora sorular |
+|---|---|---|---|---|
+| ![Doğurganlık](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/40-dogurganlik.png) | ![Cilt rutini](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/50-cilt-rutin.png) | ![Fotoğraflar](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/55-cilt-fotograflar.png) | ![Doktor raporu](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/60-rapor.png) | ![Sorular](https://raw.githubusercontent.com/hesaplarimdijital-coder/PCOS/ekran-goruntuleri/63-sorular.png) |
+
 ## Özellikler
 - **Bugün**: hale halkası (döngü günü, tahmin aralığı, güven rozeti), adet başladı/bitti, dozlar, su.
 - **Takvim**: kayıtlı adet, tahmini aralık, kayıt izi; adet başlangıcı/bitişi işaretleme, döngüyü hesap dışı bırakma, döngü geçmişi.
@@ -36,7 +41,10 @@ ve [`ekran-goruntuleri`](https://github.com/hesaplarimdijital-coder/PCOS/tree/ek
 - **Planım**: su (bardak hedefi, 7 gün), uyku (elle ya da Health Connect'ten), akşam rutini; **Beslenme** (tabak modeli, ilkeler, bitkisel destekler ve listeye alınmayanlar uyarısı) ve **Hareket** (haftalık ritim, dört kısa rutin). Her kartta kanıt düzeyi ve kaynak; kalori ve tartı dili yok.
 - **Health Connect**: yalnızca uyku okuma, açık rıza ekranı, yalnızca son 7 gün, çakışan gecelerin elenmesi; silinen gece geri gelmez; Ayarlar'dan bağlantıyı kesme ve alınanları silme.
 - **Ana ekran widget'ı**: döngü ya da hap günü, sıradaki doz ve tek dokunuşla "Aldım", su; gizlilik ayarı açıkken yalnızca "Ayla".
-- **Ben**: döngü düzeni (21–35 gün tipik aralık), takviye uyumu, su/kayıt haftası, 4 haftalık kayıt ızgarası, **doktor notu** (döngü, ilaç ve semptom özeti; paylaşım menüsüyle).
+- **Ben**: döngü düzeni (21–35 gün tipik aralık), takviye uyumu, su/kayıt haftası, 4 haftalık kayıt ızgarası.
+- **Doktor raporu**: tarih aralığı ve bölüm seçimiyle cihazda üretilen PDF (döngü, ilaç uyumu, semptomlar, uyku, doğurganlık, cilt) ya da düz metin; doktora sorular listesi rapora eklenir.
+- **Doğurganlık** (gebelik planında, hap yokken): günlük kayıtta bazal ısı, LH testi, mukus; ısı grafiği ve yükselme kuralı. "Verimli gün" tahmini yok.
+- **Cilt ve saç**: öz-beyan profile göre sabah/akşam rutini, gebelikte kaçınılacaklar, "ne zaman doktora" kartları, saç ve tüy alma bilgisi; ayrı onaylı, şifreli, galeriye düşmeyen fotoğraflar ve karşılaştırma.
 - **Hatırlatmalar**: tam saatinde doz alarmı (Aldım / 15 dk ertele), su, akşam rutini, Pazar akşamı nazik haftalık özet; sessiz saatlere uyar. Pil tasarrufu yönlendirmesi (üreticiye özel notlarla) ve gecikmeleri gösteren hatırlatma günlüğü.
 - **Gizlilik**: SQLCipher + Android Keystore, uygulama kilidi (biyometri/PIN), ekran görüntüsü engeli, gizli bildirim, ayrı açık rıza ve uygulama içi gizlilik politikası, JSON dışa aktarma ve **yedekten geri yükleme**, tek tek ve tam silme; anahtar kaybında veri ezilmez. İnternet izni yok (CI denetler).
 - **Erişilebilirlik**: sistem yazı boyutu %200'de kesilme yok (büyük yazıda dikey düzen; görüntüler `y01`–`y08`), iki temada WCAG AA kontrast (otomatik test), renk tek başına anlam taşımaz, animasyonları kaldır ayarına saygı, 48 dp dokunma alanları.
@@ -68,7 +76,8 @@ yaylı hareket, polar biçimler, renk tek başına anlam taşımaz, animasyonlar
 ## Yol haritası
 MVP 2 (kod tamam): yedekten geri yükleme, beslenme/hareket planı, bitkisel öneriler (alerjen/etkileşim notlu),
 Health Connect uyku, ana ekran widget'ı, pil yönlendirmesi ve hatırlatma günlüğü.
-MVP 3: cilt bakımı, LH/BBT, doktor raporu PDF. Topluluk/forum sürüm 2 (ön koşullar: ADR-0008).
+MVP 3 (kod tamam): cilt ve saç bakımı ile şifreli fotoğraflar, LH/BBT kayıtları, doktor raporu PDF'i ve doktora sorular.
+Topluluk/forum sürüm 2 (ön koşullar: ADR-0008).
 
 ## Lisans
 Henüz belirlenmedi. Fontlar SIL Open Font License 1.1.
