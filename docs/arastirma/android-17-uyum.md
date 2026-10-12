@@ -4,7 +4,7 @@ Android 17 kararlı sürümü 16 Haziran 2026'da yayımlandı. Ayla `compileSdk 
 
 ## Uygulamayı etkileyen değişiklikler
 - **Büyük ekranlarda yönlendirme/boyut kısıtları yok sayılır** → tüm ekranlar yeniden boyutlanabilir; sabit
-  genişlik varsayımı yok, `fillMaxWidth` + `weight` düzenleri; tablet liste-ayrıntı MVP 2.
+  genişlik varsayımı yok, `fillMaxWidth` + `weight` düzenleri; tablet liste-ayrıntı için ürün kararı bekleniyor; karar verilirse Nav3 geçişiyle birlikte yapılır (ADR-0003, Ekim 2026).
 - **Arka plan kısıtları** (ses, bellek) → kalıcı servis yok; AlarmManager + kısa `goAsync()` receiver'ları (ADR-0004).
 - **İçerik yakalama / FLAG_SECURE** → "Ekran görüntüsünü engelle" ayarı `MainActivity`'de pencere bayrağını yönetir.
 - **Keystore anahtar sayısı sınırları** → tek sarmal anahtar (`ayla.db.wrap.v1`), ilaç başına anahtar üretilmez.
