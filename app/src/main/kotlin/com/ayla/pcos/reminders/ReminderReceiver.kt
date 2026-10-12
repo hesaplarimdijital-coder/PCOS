@@ -13,6 +13,7 @@ import com.ayla.pcos.data.repo.CycleRepository
 import com.ayla.pcos.data.repo.DailyLogRepository
 import com.ayla.pcos.data.repo.HydrationRepository
 import com.ayla.pcos.data.repo.MedicationRepository
+import com.ayla.pcos.widget.WidgetUpdater
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +77,8 @@ class ReminderReceiver : BroadcastReceiver() {
                     ReminderKind.EVENING -> handleEvening()
                     ReminderKind.WEEKLY -> handleWeekly(context)
                 }
+                // Doz saati geldi ("bekliyor") ya da günlük kontrol çalıştı: widget tazelenir.
+                WidgetUpdater.requestUpdate(context)
             } catch (t: Throwable) {
                 Log.w(TAG, "Hatırlatma işlenemedi: $kind", t)
             } finally {

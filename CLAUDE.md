@@ -90,6 +90,6 @@ artefakt indirme ajan oturumunda engellidir; ihtiyaç duyulan her bilgi açıkla
 ## Yol haritası (kısa)
 - MVP 1 (bu depo): döngü + tahmin, ilaç/hap, günlük kayıt, su, uyku (elle), ayarlar, dışa aktarma, kilit.
 - MVP 2: yedekten geri yükleme, Health Connect uyku içe aktarma, beslenme/hareket planı, bitkisel öneriler,
-  Glance widget, pil optimizasyonu yönlendirmesi. Nav3 geçişi eşiklere bağlandı (ADR-0003, Ekim 2026 güncellemesi).
+  ana ekran widget'ı (RemoteViews, ADR-0007), pil optimizasyonu yönlendirmesi. Nav3 geçişi eşiklere bağlandı (ADR-0003, Ekim 2026 güncellemesi).
 - MVP 3: cilt bakımı, LH/BBT, doktor raporu PDF, forum (moderasyonlu).
 Ayrıntı: `docs/adr/`, `docs/arastirma/`, `.claude/agents/`.

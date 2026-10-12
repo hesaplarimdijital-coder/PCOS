@@ -95,6 +95,7 @@ import com.ayla.pcos.ui.components.SectionHeader
 import com.ayla.pcos.ui.components.SegmentEtiketi
 import com.ayla.pcos.ui.components.SimgeZemini
 import com.ayla.pcos.ui.components.segmentSimgesi
+import com.ayla.pcos.ui.components.yaziOlcekli
 import com.ayla.pcos.ui.health.HealthConnectAkisi
 import com.ayla.pcos.ui.health.HealthConnectUiState
 import com.ayla.pcos.ui.health.HealthConnectViewModel
@@ -490,7 +491,7 @@ private fun UykuKarti(
 private fun HealthConnectSatiri(healthConnect: HealthConnectUiState, onImport: () -> Unit) {
     val message = hcMessageText(healthConnect.message)
     TextButton(onClick = onImport, enabled = !healthConnect.importing, modifier = Modifier.heightIn(min = 48.dp)) {
-        Icon(Icons.Rounded.Sync, contentDescription = null, modifier = Modifier.size(18.dp))
+        Icon(Icons.Rounded.Sync, contentDescription = null, modifier = Modifier.size(yaziOlcekli(18.dp)))
         Spacer(Modifier.width(8.dp))
         Text(stringResource(if (healthConnect.importing) R.string.hc_importing else R.string.sleep_import_hc))
     }

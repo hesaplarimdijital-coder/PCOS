@@ -58,7 +58,7 @@ Ayla Tasarım Sistemi: nar/adaçayı/kayısı/lavanta paleti, Bricolage Grotesqu
 yaylı hareket, polar biçimler, renk tek başına anlam taşımaz, animasyonları kaldır ayarına saygı.
 
 ## Yol haritası
-MVP 2: Health Connect uyku, beslenme/hareket planı, bitkisel öneriler (alerjen/etkileşim notlu), Glance widget.
+MVP 2: Health Connect uyku, beslenme/hareket planı, bitkisel öneriler (alerjen/etkileşim notlu), ana ekran widget'ı.
 MVP 3: cilt bakımı, LH/BBT, doktor raporu PDF, moderasyonlu forum.
 
 ## Lisans

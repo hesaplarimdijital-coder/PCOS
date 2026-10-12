@@ -2,4 +2,11 @@
 <resources>
     <color name="zemin">#FAF7FB</color>
     <color name="nar">#B02E5A</color>
+    <!-- Ana ekran widget'ı (#14): tasarım tokenları; koyu karşılıkları values-night'ta -->
+    <color name="widget_zemin">#FFFFFF</color>
+    <color name="widget_cizgi">#E4DCE8</color>
+    <color name="widget_murekkep">#2B1830</color>
+    <color name="widget_murekkep_soluk">#6C5A72</color>
+    <color name="widget_nar">#B02E5A</color>
+    <color name="widget_nar_uzeri">#FFFFFF</color>
 </resources>

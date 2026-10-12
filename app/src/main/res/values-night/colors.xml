@@ -2,4 +2,10 @@
 <resources>
     <color name="zemin">#16101A</color>
     <color name="nar">#4B1B2F</color>
+    <color name="widget_zemin">#211827</color>
+    <color name="widget_cizgi">#3B2F43</color>
+    <color name="widget_murekkep">#F6EEF7</color>
+    <color name="widget_murekkep_soluk">#C2B2C9</color>
+    <color name="widget_nar">#FF8FB2</color>
+    <color name="widget_nar_uzeri">#3A0A1E</color>
 </resources>

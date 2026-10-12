@@ -32,7 +32,7 @@ class MainActivity : FragmentActivity() {
     @Inject lateinit var ticker: DateTicker
     @Inject lateinit var prefs: UserPreferencesRepository
 
-    /** Bildirimden gelen hedef: "today", "meds", "plan". */
+    /** Bildirimden ya da widget'tan gelen hedef ([OPEN_TODAY], [OPEN_MEDS], "plan"). */
     private var openTarget by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,5 +77,9 @@ class MainActivity : FragmentActivity() {
 
     companion object {
         const val EXTRA_OPEN = "com.ayla.pcos.extra.OPEN"
+
+        /** Bildirim ve widget'ın açabileceği hedefler; kök yalnızca bunları tanır (beyaz liste). */
+        const val OPEN_TODAY = "today"
+        const val OPEN_MEDS = "meds"
     }
 }

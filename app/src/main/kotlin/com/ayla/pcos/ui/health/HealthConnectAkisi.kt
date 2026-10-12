@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -53,6 +54,7 @@ import com.ayla.pcos.R
 import com.ayla.pcos.data.health.SLEEP_PERMISSIONS
 import com.ayla.pcos.data.health.openHealthConnectInPlayStore
 import com.ayla.pcos.data.health.openHealthConnectSettings
+import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
 import com.ayla.pcos.ui.components.SimgeZemini
 import com.ayla.pcos.ui.me.GizlilikPolitikasiDialog
 import com.ayla.pcos.ui.theme.LocalAylaColors
@@ -140,6 +142,8 @@ private fun HcGerekceDialog(onAccept: () -> Unit, onDecline: () -> Unit) {
 @Composable
 internal fun HcGerekceIcerik(onAccept: () -> Unit, onDecline: () -> Unit, onOpenPolicy: () -> Unit) {
     val colors = LocalAylaColors.current
+    // Büyük yazıda sabit alt çubuk ekranın yarısını kaplardı; rıza ve düğmeler metnin sonuna, kaydırılan alana iner.
+    val stacked = LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI
     Column(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp, start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onDecline) { Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.action_close)) }
@@ -163,17 +167,30 @@ internal fun HcGerekceIcerik(onAccept: () -> Unit, onDecline: () -> Unit, onOpen
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.hc_rationale_policy))
             }
-            Spacer(Modifier.height(8.dp))
+            if (stacked) {
+                HorizontalDivider()
+                RizaVeDugmeler(onAccept, onDecline, Modifier.padding(bottom = 16.dp))
+            } else {
+                Spacer(Modifier.height(8.dp))
+            }
         }
-        HorizontalDivider()
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(R.string.hc_rationale_consent), style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onAccept, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                Text(stringResource(R.string.hc_rationale_accept))
-            }
-            TextButton(onClick = onDecline, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                Text(stringResource(R.string.hc_rationale_decline))
-            }
+        if (!stacked) {
+            HorizontalDivider()
+            RizaVeDugmeler(onAccept, onDecline, Modifier.padding(horizontal = 20.dp, vertical = 12.dp))
+        }
+    }
+}
+
+/** Rıza cümlesi düğmenin hemen üstünde; önceden işaretli bir şey yok, onay düğmeye dokunmaktır. */
+@Composable
+private fun RizaVeDugmeler(onAccept: () -> Unit, onDecline: () -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.hc_rationale_consent), style = MaterialTheme.typography.bodyMedium)
+        Button(onClick = onAccept, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            Text(stringResource(R.string.hc_rationale_accept))
+        }
+        TextButton(onClick = onDecline, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            Text(stringResource(R.string.hc_rationale_decline))
         }
     }
 }

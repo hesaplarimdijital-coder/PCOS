@@ -67,6 +67,19 @@
             </intent-filter>
         </activity-alias>
 
+        <!-- Ana ekran widget'ı (#14, ADR-0007): RemoteViews, periyodik güncelleme yok -->
+        <receiver
+            android:name=".widget.AylaWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ayla_widget_info" />
+        </receiver>
+
         <!-- Alarm tetiklendiğinde bildirimi gösterir ve sıradaki alarmı kurar -->
         <receiver
             android:name=".reminders.ReminderReceiver"

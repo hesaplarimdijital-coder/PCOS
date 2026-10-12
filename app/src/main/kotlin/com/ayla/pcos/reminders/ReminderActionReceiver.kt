@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.ayla.pcos.data.repo.MedicationRepository
+import com.ayla.pcos.widget.WidgetUpdater
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +48,8 @@ class ReminderActionReceiver : BroadcastReceiver() {
                     }
                 }
                 if (notificationId >= 0) notifier.cancel(notificationId)
+                // Widget'tan ya da bildirimden işaretlendi: widget sıradaki doza geçsin.
+                WidgetUpdater.requestUpdate(context)
             } catch (t: Throwable) {
                 Log.w(TAG, "Bildirim eylemi işlenemedi: $action", t)
             } finally {

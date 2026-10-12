@@ -37,6 +37,9 @@ import com.ayla.pcos.ui.plan.DayCups
 import com.ayla.pcos.ui.plan.PlanUiState
 import com.ayla.pcos.ui.today.PillModeState
 import com.ayla.pcos.ui.today.TodayUiState
+import com.ayla.pcos.widget.NextDose
+import com.ayla.pcos.widget.WidgetHeadline
+import com.ayla.pcos.widget.WidgetState
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -203,6 +206,17 @@ internal object Ornek {
         availability = HealthConnectAvailability.AVAILABLE, consentGiven = true, permissionGranted = true, importedCount = 12,
     )
 
+    /** Widget örnekleri (#14): döngünün 23. günü, akşam dozu bekliyor; plasebo günü, dozlar tamam. */
+    val widgetHazir = WidgetState.Ready(
+        headline = WidgetHeadline.CycleDay(23),
+        nextDose = NextDose(1, "Inofolic Combi", bugun, LocalTime.of(21, 0), overdue = false),
+        hasDosesToday = true,
+        waterCups = 5,
+        waterGoal = 8,
+    )
+    val widgetBekleyen = widgetHazir.copy(nextDose = NextDose(1, "Inofolic Combi", bugun, LocalTime.of(9, 0), overdue = true))
+    val widgetTamam = widgetHazir.copy(headline = WidgetHeadline.PillDay(26, placebo = true), nextDose = null)
+
     val ben = MeUiState(
         loading = false, today = bugun, displayName = "Elif",
         cycleLengths = listOf(38, 33, 44, 36, 41, 35), trend = CycleTrend.Variable(33, 44),
@@ -227,6 +241,7 @@ internal object Ornek {
     val ayarlar = UserPreferences(
         onboardingDone = true, displayName = "Elif", goals = setOf(Goal.CYCLE, Goal.SYMPTOMS),
         trackingSince = baslangiclar.first(),
+        healthDataConsentAt = Instant.parse("2026-09-01T08:30:00Z"),
     )
 
     val ilacDuzenle = EditMedicationState.from(inofolic, bugun)

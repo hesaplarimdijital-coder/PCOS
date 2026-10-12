@@ -131,6 +131,8 @@ Verilerin yalnızca senin açıkça başlattığın şu işlemlerle cihazından 
 
 Hatırlatma bildirimlerinde ilacın adı ve dozu, su ve döngüyle ilgili kısa metinler ve haftalık özet görünebilir. Ben > Ayarlar > Koruma > Gizli bildirimler açıkken kilit ekranında yalnızca "Bir hatırlatman var" gibi genel bir metin görünür. Bildirimleri Android gösterir; bildirim erişimi verdiğin başka uygulamalar (örneğin akıllı saat uygulamaları) bildirim içeriğini görebilir. Bildirimleri Android ayarlarından tamamen kapatabilirsin.
 
+Ana ekran widget'ı isteğe bağlıdır; eklersen ana ekranında bugünün döngü ya da hap günü, sıradaki dozun saati ve adı ve su sayın görünür. Telefonunun kilidini açabilen herkes bunları görebilir. Uygulama kilidi ya da Gizli bildirimler açıkken widget yalnızca "Ayla" yazar. Widget kilit ekranına eklenemez; durumunu ayrı bir yerde saklamaz, her seferinde şifreli veritabanından okur.
+
 ## 9. Android izinleri
 
 - **Bildirim gösterme (POST_NOTIFICATIONS):** hatırlatmalar için. İlk kez gerektiğinde istenir; vermezsen Ayla bildirimsiz çalışır.

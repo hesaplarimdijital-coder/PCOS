@@ -359,11 +359,11 @@
     <string name="action_decrease">Azalt</string>
     <string name="settings_section_protection">Koruma</string>
     <string name="settings_app_lock">Uygulama kilidi</string>
-    <string name="settings_app_lock_text">Parmak izi ya da PIN ile aç</string>
+    <string name="settings_app_lock_text">Parmak izi ya da PIN ile aç; widget ayrıntı göstermez</string>
     <string name="settings_block_screenshots">Ekran görüntüsünü engelle</string>
     <string name="settings_block_screenshots_text">Son uygulamalarda içerik gizlenir</string>
     <string name="settings_hidden_notifications">Gizli bildirimler</string>
-    <string name="settings_hidden_notifications_text">Kilit ekranında yalnızca &#8220;Bir hatırlatman var&#8221;</string>
+    <string name="settings_hidden_notifications_text">Kilit ekranında yalnızca &#8220;Bir hatırlatman var&#8221;; ana ekran widget&#8217;ında ayrıntı yok</string>
     <string name="settings_section_consent">İzinlerin (KVKK)</string>
     <string name="settings_section_notifications">Bildirimler</string>
     <string name="settings_water_reminders">Su hatırlatmaları</string>
@@ -462,6 +462,29 @@
     <string name="hc_delete_imported_confirm_title">Alınan geceler silinsin mi?</string>
     <string name="hc_delete_imported_confirm">Health Connect&#8217;ten alınan %1$d gece Ayla&#8217;dan silinir. Health Connect&#8217;teki asıl kayıtlar değişmez.</string>
     <string name="hc_deleted">Health Connect&#8217;ten alınan %1$d gece silindi.</string>
+
+    <!-- Ana ekran widget'ı (#14, ADR-0007). Büyük harfli etiketler doğrudan Türkçe büyük harfle yazılır. -->
+    <string name="widget_name">Ayla: bugün</string>
+    <string name="widget_description">Döngü ya da hap günün, sıradaki doz ve tek dokunuşla &#8220;Aldım&#8221;.</string>
+    <string name="widget_overline_neutral">AYLA</string>
+    <string name="widget_headline_neutral">Bugün</string>
+    <string name="widget_neutral_text">Görmek için dokun</string>
+    <string name="widget_overline_cycle">DÖNGÜ</string>
+    <string name="widget_cycle_day">%1$d. gün</string>
+    <string name="widget_overline_pill">HAP</string>
+    <string name="widget_overline_pill_placebo">HAP · PLASEBO</string>
+    <string name="widget_pill_day">%1$d. hap</string>
+    <string name="widget_label_next">SIRADAKİ DOZ</string>
+    <string name="widget_label_overdue">BEKLEYEN DOZ</string>
+    <string name="widget_dose_next">%1$s · %2$s</string>
+    <string name="widget_dose_overdue">%1$s · %2$s bekliyor</string>
+    <string name="widget_taken">Aldım</string>
+    <string name="widget_taken_a11y">%1$s %2$s dozunu aldım olarak işaretle</string>
+    <string name="widget_doses_done">Bugünkü dozlar tamam</string>
+    <string name="widget_no_doses">Bugün planlı doz yok</string>
+    <string name="widget_water">Su %1$d/%2$d bardak</string>
+    <string name="widget_preview_headline">23. gün</string>
+    <string name="widget_preview_dose">21:00 · Inofolic Combi</string>
 
     <!-- Pil tasarrufu ve hatırlatma günlüğü (#17) -->
     <string name="battery_band_title">Hatırlatmaların gecikmesin</string>

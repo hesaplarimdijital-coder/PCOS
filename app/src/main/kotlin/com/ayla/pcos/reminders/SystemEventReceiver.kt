@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.ayla.pcos.widget.WidgetUpdater
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,8 @@ class SystemEventReceiver : BroadcastReceiver() {
         scope.launch {
             try {
                 scheduler.rescheduleAll()
+                // Saat/dilim değişimi ve yeniden başlatma: gün ve doz saatleri yeniden hesaplanır.
+                WidgetUpdater.requestUpdate(context)
             } catch (t: Throwable) {
                 Log.w(TAG, "Alarmlar yeniden kurulamadı: $action", t)
             } finally {

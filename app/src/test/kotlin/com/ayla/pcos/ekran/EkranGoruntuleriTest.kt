@@ -1,11 +1,14 @@
 package com.ayla.pcos.ekran
 
 import android.content.res.Configuration
+import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
@@ -21,6 +24,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.ayla.pcos.R
 import com.ayla.pcos.data.health.HealthConnectAvailability
 import com.ayla.pcos.ui.AppLockContent
@@ -52,6 +56,8 @@ import com.ayla.pcos.ui.plan.RutinKarti
 import com.ayla.pcos.ui.theme.AylaTheme
 import com.ayla.pcos.ui.today.TodayContent
 import com.ayla.pcos.ui.today.TodayUiState
+import com.ayla.pcos.widget.WidgetGorunumu
+import com.ayla.pcos.widget.WidgetState
 import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.github.takahirom.roborazzi.captureScreenRoboImage
@@ -166,6 +172,43 @@ class EkranGoruntuleriTest {
         state = durum, onAddCup = {}, onRemoveCup = {}, onAddSleep = { _, _, _ -> }, onDeleteSleep = {}, onEveningRoutine = {},
         initialTab = sekme, initialExpandedRoutine = acikRutin, healthConnect = healthConnect,
     )
+
+    /**
+     * Widget vitrini: RemoteViews gerçekten açılıp (başlatıcının yaptığı gibi) görünüm olarak çizilir. Koyu
+     * temada görünüm gece yapılandırmalı bir bağlamla açılır; renkler values-night'tan gelir.
+     */
+    @Composable
+    private fun WidgetVitrini(koyu: Boolean = false) {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Widget(Ornek.widgetHazir, wide = false, koyu = koyu)
+                Widget(WidgetState.Neutral, wide = false, koyu = koyu)
+            }
+            Widget(Ornek.widgetBekleyen, wide = true, koyu = koyu)
+            Widget(Ornek.widgetTamam, wide = true, koyu = koyu)
+        }
+    }
+
+    @Composable
+    private fun Widget(state: WidgetState, wide: Boolean, koyu: Boolean) {
+        AndroidView(
+            factory = { ctx ->
+                val c = if (koyu) {
+                    val cfg = Configuration(ctx.resources.configuration).apply {
+                        uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_YES
+                    }
+                    ctx.createConfigurationContext(cfg)
+                } else {
+                    ctx
+                }
+                FrameLayout(c).apply { addView(WidgetGorunumu.views(c, state, wide).apply(c, this)) }
+            },
+            modifier = if (wide) Modifier.size(width = 353.dp, height = 170.dp) else Modifier.size(width = 168.dp, height = 170.dp),
+        )
+    }
 
     // --- README: beş sekme, ilk ekran ---
 
@@ -300,6 +343,14 @@ class EkranGoruntuleriTest {
     @Test fun y15_yazi200_planim_uyku_hc() = ekran("y15-yazi200-planim-uyku-hc", sekme = Screen.Plan, sistemYaziOlcegi = 2f) {
         Plan(durum = Ornek.planHealthConnect, healthConnect = Ornek.hcBagli.copy(message = HcMessage.NothingNew))
     }
+
+    @Test fun t38_widget() = ekran("38-widget") { WidgetVitrini() }
+
+    @Test fun t39_widget_koyu() = ekran("39-widget-koyu", koyu = true) { WidgetVitrini(koyu = true) }
+
+    // RemoteViews kendi bağlamının yazı ölçeğini kullanır; %200 cihaz yapılandırmasıyla verilir.
+    @Config(qualifiers = UZUN, fontScale = 2f)
+    @Test fun y16_yazi200_widget() = ekran("y16-yazi200-widget") { WidgetVitrini() }
 
     @Config(qualifiers = UZUN, fontScale = 2f)
     @Test fun y13_yazi200_hatirlatma_gunlugu() = ekran("y13-yazi200-hatirlatma-gunlugu", tumEkran = true) {

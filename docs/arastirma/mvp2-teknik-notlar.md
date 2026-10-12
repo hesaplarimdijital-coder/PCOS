@@ -69,6 +69,11 @@ androidx-glance-appwidget-testing = { group = "androidx.glance", name = "glance-
 
 ## 2. Glance widget (#14)
 
+> **Karar (12 Ekim 2026, ADR-0007):** widget Glance yerine RemoteViews ile yapıldı. Glance'in getirdiği
+> WorkManager ek izinler ve şifresiz bir veritabanı ekliyordu; RemoteViews ise CI'da ekran görüntüsüyle
+> incelenebiliyor. Aşağıdaki gizlilik ve tetik önerileri (2.4–2.6) aynen uygulandı; Glance'e özgü kısımlar
+> kayıt için duruyor.
+
 ### 2.1 İskelet
 - `widget/AylaWidget.kt` (`GlanceAppWidget`), `widget/AylaWidgetReceiver.kt`
   (`GlanceAppWidgetReceiver`; `override val glanceAppWidget = AylaWidget()`), `widget/WidgetState.kt`
