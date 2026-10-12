@@ -68,7 +68,7 @@ yaylı hareket, polar biçimler, renk tek başına anlam taşımaz, animasyonlar
 ## Yol haritası
 MVP 2 (kod tamam): yedekten geri yükleme, beslenme/hareket planı, bitkisel öneriler (alerjen/etkileşim notlu),
 Health Connect uyku, ana ekran widget'ı, pil yönlendirmesi ve hatırlatma günlüğü.
-MVP 3: cilt bakımı, LH/BBT, doktor raporu PDF, moderasyonlu forum.
+MVP 3: cilt bakımı, LH/BBT, doktor raporu PDF. Topluluk/forum sürüm 2 (ön koşullar: ADR-0008).
 
 ## Lisans
 Henüz belirlenmedi. Fontlar SIL Open Font License 1.1.
