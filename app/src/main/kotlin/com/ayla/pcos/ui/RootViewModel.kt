@@ -2,6 +2,7 @@ package com.ayla.pcos.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.security.DatabaseKeyProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +22,10 @@ data class RootUiState(
     val locked: Boolean = false,
     /** Önceki veriler açılamadı ve yeni başlangıç yapıldı; kullanıcıya bir kez söylenir. */
     val dataResetNotice: Boolean = false,
-    /** Karşılama bitmiş ama sağlık verisine açık rıza kaydı yok (önceki sürümden kalan kurulum). */
+    /** Karşılama bitmiş ama sağlık verisine güncel kapsamda açık rıza kaydı yok (önceki sürümden kalan kurulum). */
     val needsHealthConsent: Boolean = false,
+    /** Rıza var ama eski kapsamda; pencere yeni veri türlerini anlatır (#20). */
+    val consentScopeUpdated: Boolean = false,
 )
 
 @HiltViewModel
@@ -46,7 +49,8 @@ class RootViewModel @Inject constructor(
             onboardingDone = p.onboardingDone,
             locked = p.appLockEnabled && !isUnlocked,
             dataResetNotice = resetNotice,
-            needsHealthConsent = p.onboardingDone && p.healthDataConsentAt == null,
+            needsHealthConsent = p.onboardingDone && (p.healthDataConsentAt == null || p.healthConsentOutdated),
+            consentScopeUpdated = p.healthConsentOutdated,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RootUiState())
 
@@ -57,7 +61,7 @@ class RootViewModel @Inject constructor(
     fun acknowledgeDataReset() = keyProvider.acknowledgeResetNotice()
 
     fun giveHealthDataConsent() = viewModelScope.launch {
-        prefs.update { it.copy(healthDataConsentAt = Instant.now()) }
+        prefs.update { it.copy(healthDataConsentAt = Instant.now(), healthConsentVersion = UserPreferences.HEALTH_CONSENT_VERSION) }
     }
 
     fun onBackgrounded(now: Long) {

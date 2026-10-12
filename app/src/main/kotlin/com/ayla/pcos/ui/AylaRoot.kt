@@ -105,19 +105,13 @@ fun AylaRoot(
         )
     }
 
-    // Rızası kaydedilmemiş kurulumlar (bu sürümden önce karşılamayı bitirenler) bir kez açık rıza verir.
+    // Rızası kaydedilmemiş ya da eski kapsamda kalmış kurulumlar bir kez (yeniden) açık rıza verir (#20).
     var showPolicy by rememberSaveable { mutableStateOf(false) }
     if (!state.loading && state.needsHealthConsent && !state.dataResetNotice) {
-        AlertDialog(
-            onDismissRequest = {},
-            title = { Text(stringResource(R.string.consent_dialog_title)) },
-            text = { Text(stringResource(R.string.consent_dialog_text)) },
-            confirmButton = {
-                TextButton(onClick = viewModel::giveHealthDataConsent) { Text(stringResource(R.string.consent_dialog_accept)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPolicy = true }) { Text(stringResource(R.string.privacy_policy_read)) }
-            },
+        AcikRizaPenceresi(
+            scopeUpdated = state.consentScopeUpdated,
+            onAccept = { viewModel.giveHealthDataConsent() },
+            onReadPolicy = { showPolicy = true },
         )
     }
     if (showPolicy) GizlilikPolitikasiDialog(onDismiss = { showPolicy = false })

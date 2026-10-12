@@ -19,6 +19,11 @@ data class UserPreferences(
     // zamanı saklanır. Kişiselleştirme isteğe bağlıdır ve varsayılan kapalıdır (önceden işaretli rıza yok).
     // Analitik ya da araştırma işlemesi olmadığı için onlara ait rıza anahtarı da yoktur.
     val healthDataConsentAt: Instant? = null,
+    /**
+     * Açık rızanın verildiği aydınlatma kapsamının sürümü (#20). 0 = sürüm kaydı yok: rıza varsa 1.0 kapsamıdır
+     * (adet, günlük kayıt, ilaç, su, uyku). Kapsam genişleyince [HEALTH_CONSENT_VERSION] artar ve rıza yeniden alınır.
+     */
+    val healthConsentVersion: Int = 0,
     val consentPersonalization: Boolean = false,
     /**
      * Health Connect'ten uyku okumaya verilen açık rıza (gerekçe ekranında "Onaylıyorum"); bağlantı kesilince
@@ -69,4 +74,20 @@ data class UserPreferences(
     val notificationsBandDismissed: Boolean = false,
     /** İlaçlar ekranındaki pil tasarrufu bandı kapatıldı; Ayarlar'daki satır her zaman görünür. */
     val batteryBandDismissed: Boolean = false,
-)
+) {
+    /** Kayıtlı rızanın kapsamı; sürüm kaydı olmayan eski rıza 1. sürüm sayılır. */
+    val effectiveHealthConsentVersion: Int
+        get() = if (healthDataConsentAt == null) 0 else healthConsentVersion.coerceAtLeast(1)
+
+    /** Sağlık verisi rızası var ama bugünkü kapsamdan eski. */
+    val healthConsentOutdated: Boolean
+        get() = healthDataConsentAt != null && effectiveHealthConsentVersion < HEALTH_CONSENT_VERSION
+
+    companion object {
+        /**
+         * Güncel açık rıza kapsamı: 1 = politika 1.0; 2 = politika 1.1 (doğurganlık kayıtları, cilt ve saç profili,
+         * doktora sorular eklendi). Kapsamı genişleten her politika değişikliğinde artırılır.
+         */
+        const val HEALTH_CONSENT_VERSION = 2
+    }
+}

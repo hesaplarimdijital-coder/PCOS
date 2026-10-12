@@ -3,6 +3,7 @@ package com.ayla.pcos.ui.onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayla.pcos.data.prefs.Goal
+import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.data.repo.CycleRepository
 import com.ayla.pcos.data.repo.DateTicker
@@ -76,6 +77,7 @@ class OnboardingViewModel @Inject constructor(
                     displayName = s.name.trim(),
                     goals = s.goals,
                     healthDataConsentAt = Instant.now(),
+                    healthConsentVersion = UserPreferences.HEALTH_CONSENT_VERSION,
                     consentPersonalization = s.consentPersonalization,
                     trackingSince = it.trackingSince ?: today,
                 )

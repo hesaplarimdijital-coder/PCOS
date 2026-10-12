@@ -139,6 +139,8 @@
     <string name="consent_dialog_title">Açık rızan gerekiyor</string>
     <string name="consent_dialog_text">Ayla kayıtlarını yalnızca bu cihazda ve şifreli işler. Devam etmek için sağlık verilerinin bu şekilde işlenmesine açık rıza vermen gerekiyor. Gizlilik politikasını ve aydınlatma metnini okuyabilirsin.</string>
     <string name="consent_dialog_accept">Okudum, onaylıyorum</string>
+    <string name="consent_update_title">Rıza kapsamı güncellendi</string>
+    <string name="consent_update_text">Ayla artık doğurganlık kayıtlarını (bazal ısı, LH testi, mukus), cilt ve saç profilini ve doktora sorularını da tutabiliyor. Bunlar da yalnızca bu cihazda, şifreli işlenir. Devam etmek için açık rızanı bu yeni kapsamla yenilemen gerekiyor; gizlilik politikasındaki değişiklikleri okuyabilirsin. Cilt fotoğrafları için ayrıca sorulur.</string>
     <string name="privacy_policy_title">Gizlilik politikası</string>
     <string name="privacy_policy_link">Gizlilik politikası ve aydınlatma metni</string>
     <string name="privacy_policy_read">Politikayı oku</string>

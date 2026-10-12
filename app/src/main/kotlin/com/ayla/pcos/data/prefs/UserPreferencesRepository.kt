@@ -41,6 +41,7 @@ class UserPreferencesRepository @Inject constructor(
             goals = this[Keys.GOALS]?.mapNotNull { runCatching { Goal.valueOf(it) }.getOrNull() }?.toSet() ?: defaults.goals,
             trackingSince = this[Keys.TRACKING_SINCE]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
             healthDataConsentAt = this[Keys.HEALTH_DATA_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
+            healthConsentVersion = this[Keys.HEALTH_CONSENT_VERSION] ?: defaults.healthConsentVersion,
             healthConnectConsentAt = this[Keys.HEALTH_CONNECT_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
             photoConsentAt = this[Keys.PHOTO_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
             healthConnectPermissionCancels = this[Keys.HEALTH_CONNECT_PERMISSION_CANCELS] ?: defaults.healthConnectPermissionCancels,
@@ -77,6 +78,7 @@ class UserPreferencesRepository @Inject constructor(
         this[Keys.GOALS] = p.goals.map { it.name }.toSet()
         p.trackingSince?.let { this[Keys.TRACKING_SINCE] = it.toString() } ?: remove(Keys.TRACKING_SINCE)
         p.healthDataConsentAt?.let { this[Keys.HEALTH_DATA_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.HEALTH_DATA_CONSENT_AT)
+        this[Keys.HEALTH_CONSENT_VERSION] = p.healthConsentVersion
         p.healthConnectConsentAt?.let { this[Keys.HEALTH_CONNECT_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.HEALTH_CONNECT_CONSENT_AT)
         p.photoConsentAt?.let { this[Keys.PHOTO_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.PHOTO_CONSENT_AT)
         this[Keys.HEALTH_CONNECT_PERMISSION_CANCELS] = p.healthConnectPermissionCancels
@@ -119,6 +121,7 @@ class UserPreferencesRepository @Inject constructor(
         val TRACKING_SINCE = stringPreferencesKey("tracking_since")
         val CONSENT_PERSONALIZATION = booleanPreferencesKey("consent_personalization")
         val HEALTH_DATA_CONSENT_AT = longPreferencesKey("health_data_consent_at")
+        val HEALTH_CONSENT_VERSION = intPreferencesKey("health_consent_version")
         val HEALTH_CONNECT_CONSENT_AT = longPreferencesKey("health_connect_consent_at")
         val PHOTO_CONSENT_AT = longPreferencesKey("photo_consent_at")
         val HEALTH_CONNECT_PERMISSION_CANCELS = intPreferencesKey("health_connect_permission_cancels")
