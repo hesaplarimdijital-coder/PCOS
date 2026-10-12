@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 4×2 widget (#14): solda gün ve su, sağda sıradaki doz ve "Aldım". -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,33 +16,38 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/widget_ust_etiket"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:letterSpacing="0.08"
-            android:maxLines="1"
-            android:text="@string/widget_overline_neutral"
-            android:textColor="@color/widget_murekkep_soluk"
-            android:textSize="11sp" />
-
-        <TextView
-            android:id="@+id/widget_baslik"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:maxLines="2"
-            android:text="@string/widget_headline_neutral"
-            android:textColor="@color/widget_murekkep"
-            android:textSize="20sp" />
-
-        <FrameLayout
-            android:id="@+id/widget_bosluk_1"
+        <!-- İç içe ağırlık bilinçli: yer daralınca bu blok kırpılır, alttaki öğe her zaman görünür. Düzen
+             yalnızca güncellemede bir kez ölçülür. -->
+        <LinearLayout
+            android:id="@+id/widget_ust_blok"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            tools:ignore="NestedWeights">
+
+            <TextView
+                android:id="@+id/widget_ust_etiket"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:letterSpacing="0.08"
+                android:maxLines="1"
+                android:text="@string/widget_overline_neutral"
+                android:textColor="@color/widget_murekkep_soluk"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/widget_baslik"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="2"
+                android:text="@string/widget_headline_neutral"
+                android:textColor="@color/widget_murekkep"
+                android:textSize="20sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/widget_su"
@@ -65,33 +71,38 @@
         android:layout_weight="1.2"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/widget_doz_etiket"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:letterSpacing="0.08"
-            android:maxLines="1"
-            android:text="@string/widget_label_next"
-            android:textColor="@color/widget_murekkep_soluk"
-            android:textSize="11sp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/widget_doz"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:text="@string/widget_neutral_text"
-            android:textColor="@color/widget_murekkep"
-            android:textSize="14sp" />
-
-        <FrameLayout
-            android:id="@+id/widget_bosluk_3"
+        <!-- İç içe ağırlık bilinçli: yer daralınca bu blok kırpılır, alttaki öğe her zaman görünür. Düzen
+             yalnızca güncellemede bir kez ölçülür. -->
+        <LinearLayout
+            android:id="@+id/widget_doz_blok"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            tools:ignore="NestedWeights">
+
+            <TextView
+                android:id="@+id/widget_doz_etiket"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:letterSpacing="0.08"
+                android:maxLines="1"
+                android:text="@string/widget_label_next"
+                android:textColor="@color/widget_murekkep_soluk"
+                android:textSize="11sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/widget_doz"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="@string/widget_neutral_text"
+                android:textColor="@color/widget_murekkep"
+                android:textSize="14sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/widget_aldim"

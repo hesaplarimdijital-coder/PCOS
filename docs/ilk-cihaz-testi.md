@@ -1,7 +1,7 @@
 # İlk cihaz testi (debug APK)
 
 CI her `main` push'unda debug APK üretir. Ajan oturumları uygulamayı çalıştıramaz; bu liste gerçek cihazda
-ilk kez açan kişi içindir. Bulguları GitHub Issues'a (etiket `mvp-1`) yaz.
+ilk kez açan kişi içindir. Bulguları GitHub Issues'a (etiket `mvp-1` ya da `mvp-2`) yaz.
 
 ## APK'yı alma
 1. GitHub → **Actions** → en üstteki yeşil "Android CI" çalıştırması → sayfanın altında **Artifacts** → `ayla-debug-apk` (zip).
@@ -36,7 +36,15 @@ ilk kez açan kişi içindir. Bulguları GitHub Issues'a (etiket `mvp-1`) yaz.
 | 22 | Planım → Beslenme: bir kanıt çipine dokun; "Yürüyüş rutinini aç" | Çip düzeyin ne anlama geldiğini açıklar; Hareket sekmesine geçilir, yürüyüş rutininin adımları açık |
 | 23 | İlaçlar (doz saati olan bir ilaç varken), pil ayarı "Optimize edilmiş" | "Hatırlatmaların gecikmesin" bandı; Xiaomi/Samsung vb. cihazda üreticiye özel ek not. "Pil ayarlarını aç" uygulama bilgilerini açar; "Kısıtlanmamış" seçip dönünce bant kaybolur, Ayarlar > Bildirimler'de "Pil tasarrufu kısıtlamıyor" yazar |
 | 24 | Uygulama bilgileri > Pil > "Kısıtlanmış" | İlaçlar'da kapatılamayan "Arka plan kullanımı kısıtlı" bandı |
-| 25 | Ayarlar: Tüm verilerimi sil → onayla | Karşılama ekranına dönülür, veriler, ilaçlar ve hatırlatma günlüğü silinmiştir |
+| 25 | Planım > Uyku > "Health Connect'ten al" (Android 14+ ya da Health Connect uygulaması kurulu) | Önce Ayla'nın rıza ekranı, sonra Health Connect izin penceresi; izin verilince son 30 günün geceleri "Health Connect'ten" etiketiyle eklenir, ikinci denemede "Eklenecek yeni gece yok" |
+| 26 | Health Connect izin ekranındaki "Gizlilik politikası" bağlantısı | Ayla'nın politika ekranı açılır (kilit ekranı ya da Bugün sekmesi değil); kapatınca Health Connect'e dönülür |
+| 27 | İzin penceresini iki kez "İptal" ile kapat, sonra yeniden dene | "İzin artık Health Connect ayarlarında" diyaloğu ve ayarlara giden düğme |
+| 28 | Ayarlar > Health Connect > Bağlantıyı kes | Durum "Bağlı değil"; alınan geceler kalır; "Health Connect'ten alınan geceleri sil" yalnızca onları siler |
+| 29 | Ana ekrana Ayla widget'ını ekle (2×2 ve 4×2) | Seçicide örnek veriyle önizleme; eklenince bugünün günü ve sıradaki doz; "Aldım" dozu işaretler, widget sıradaki doza geçer, bildirim kapanır |
+| 30 | Uygulama kilidini ya da Gizli bildirimleri aç | Widget yalnızca "AYLA · Bugün · Görmek için dokun" gösterir |
+| 31 | Android 16+ kilit ekranı widget'ları | Ayla widget'ı kilit ekranı seçicisinde görünmez |
+| 32 | Gece yarısını geçir (telefon uyurken) | Telefon uyanınca widget yeni günün dozlarını gösterir |
+| 33 | Ayarlar: Tüm verilerimi sil → onayla | Karşılama ekranına dönülür, veriler, ilaçlar ve hatırlatma günlüğü silinmiştir; widget nötr içeriğe döner, Health Connect izni bırakılır |
 
 ## 48 saatlik alarm güvenilirliği (#17)
 Üreticilerin pil tasarrufu kuralları emülatörde görülmez; bu test her yeni cihaz modelinde bir kez yapılır.
@@ -52,4 +60,6 @@ ilk kez açan kişi içindir. Bulguları GitHub Issues'a (etiket `mvp-1`) yaz.
    tam zamanlı alarm iznini ve pil durumunu kendisi ekler; ilaç adı içermez.
 
 ## Bilinen eksikler
-Health Connect uyku içe aktarma (#11) ve widget (#14) MVP 2'nin kalan işleridir.
+Erişilebilirlik ve boş/hata durumlarının cihazda denetimi (#5) ile bildirim izni reddi akışının son hâli (#7)
+gerçek cihaz gerektirir. Widget'ın `exported="false"` sağlayıcıyla güncellendiği ve kilit ekranı dışı
+bırakmanın OEM başlatıcılarında çalıştığı da cihazda doğrulanmalıdır (ADR-0007).

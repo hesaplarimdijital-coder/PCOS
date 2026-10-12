@@ -9,33 +9,36 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <TextView
-        android:id="@+id/widget_ust_etiket"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:letterSpacing="0.08"
-        android:maxLines="1"
-        android:text="@string/widget_overline_neutral"
-        android:textColor="@color/widget_murekkep_soluk"
-        android:textSize="11sp" />
-
-    <TextView
-        android:id="@+id/widget_baslik"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif-medium"
-        android:maxLines="1"
-        android:text="@string/widget_headline_neutral"
-        android:textColor="@color/widget_murekkep"
-        android:textSize="20sp" />
-
-    <FrameLayout
-        android:id="@+id/widget_bosluk_1"
+    <!-- Üst blok kalan alanı alır; yer daralırsa (büyük yazı, kısa hücre) önce o kırpılır, "Aldım" her zaman görünür. -->
+    <LinearLayout
+        android:id="@+id/widget_ust_blok"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/widget_ust_etiket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:letterSpacing="0.08"
+            android:maxLines="1"
+            android:text="@string/widget_overline_neutral"
+            android:textColor="@color/widget_murekkep_soluk"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/widget_baslik"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:text="@string/widget_headline_neutral"
+            android:textColor="@color/widget_murekkep"
+            android:textSize="20sp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/widget_doz_etiket"
