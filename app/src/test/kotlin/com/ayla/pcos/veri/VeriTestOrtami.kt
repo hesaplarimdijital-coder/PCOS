@@ -6,6 +6,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.viewModelScope
 import androidx.room.Room
 import com.ayla.cycle.CycleEngine
 import com.ayla.pcos.data.db.AylaDatabase
@@ -25,16 +26,19 @@ import com.ayla.pcos.report.DoctorNoteRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.job
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -103,8 +107,11 @@ abstract class VeriTestOrtami {
     private val viewModelStore = ViewModelStore()
 
     /** ViewModel'i test bitiminde temizlenmek üzere kaydeder. */
+    private val vmIsleri = mutableListOf<Job>()
+
     protected fun <T : ViewModel> kaydet(viewModel: T): T {
         viewModelStore.put(System.identityHashCode(viewModel).toString(), viewModel)
+        vmIsleri += viewModel.viewModelScope.coroutineContext.job
         return viewModel
     }
 
@@ -135,6 +142,9 @@ abstract class VeriTestOrtami {
     @After
     fun ortamiKapat() {
         viewModelStore.clear()
+        // İptal eşzamansızdır: Main'de (testte Default) süren bir iş bitmeden resetMain çağrılırsa sonraki
+        // setMain "used concurrently" ile düşer; işlerin gerçekten bitmesi beklenir.
+        runBlocking { withTimeoutOrNull(5_000) { vmIsleri.forEach { it.join() } } }
         db.close()
         dataStoreScope.cancel()
         Dispatchers.resetMain()
