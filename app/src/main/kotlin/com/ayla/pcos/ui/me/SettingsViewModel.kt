@@ -3,6 +3,7 @@ package com.ayla.pcos.ui.me
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ayla.pcos.data.health.HealthConnectRepository
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.data.repo.MedicationRepository
@@ -51,6 +52,7 @@ class SettingsViewModel @Inject constructor(
     private val notifier: ReminderNotifier,
     medications: MedicationRepository,
     private val alarmLog: AlarmLog,
+    private val healthConnect: HealthConnectRepository,
 ) : ViewModel() {
 
     /** Doz hatırlatması olan biri için pil tasarrufu yönlendirmesi gösterilir (#17). */
@@ -127,6 +129,8 @@ class SettingsViewModel @Inject constructor(
     fun wipeAll() = viewModelScope.launch {
         exporter.wipeAll()
         alarmLog.clear()
+        // Rıza tercihlerle birlikte silinir; Health Connect izni de bırakılır (Health Connect'teki kayıtlar değişmez).
+        healthConnect.revokePermissions()
         prefs.update { UserPreferences() }
         runCatching { scheduler.rescheduleAll() }
     }

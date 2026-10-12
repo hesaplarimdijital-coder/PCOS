@@ -41,6 +41,8 @@ class UserPreferencesRepository @Inject constructor(
             goals = this[Keys.GOALS]?.mapNotNull { runCatching { Goal.valueOf(it) }.getOrNull() }?.toSet() ?: defaults.goals,
             trackingSince = this[Keys.TRACKING_SINCE]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
             healthDataConsentAt = this[Keys.HEALTH_DATA_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
+            healthConnectConsentAt = this[Keys.HEALTH_CONNECT_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
+            healthConnectPermissionCancels = this[Keys.HEALTH_CONNECT_PERMISSION_CANCELS] ?: defaults.healthConnectPermissionCancels,
             consentPersonalization = this[Keys.CONSENT_PERSONALIZATION] ?: defaults.consentPersonalization,
             waterGoalCups = this[Keys.WATER_GOAL_CUPS] ?: defaults.waterGoalCups,
             cupMl = this[Keys.CUP_ML] ?: defaults.cupMl,
@@ -73,6 +75,8 @@ class UserPreferencesRepository @Inject constructor(
         this[Keys.GOALS] = p.goals.map { it.name }.toSet()
         p.trackingSince?.let { this[Keys.TRACKING_SINCE] = it.toString() } ?: remove(Keys.TRACKING_SINCE)
         p.healthDataConsentAt?.let { this[Keys.HEALTH_DATA_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.HEALTH_DATA_CONSENT_AT)
+        p.healthConnectConsentAt?.let { this[Keys.HEALTH_CONNECT_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.HEALTH_CONNECT_CONSENT_AT)
+        this[Keys.HEALTH_CONNECT_PERMISSION_CANCELS] = p.healthConnectPermissionCancels
         this[Keys.CONSENT_PERSONALIZATION] = p.consentPersonalization
         // Kaldırılan rıza anahtarları (analitik, araştırma) eski kurulumlarda kalmasın.
         remove(Keys.LEGACY_CONSENT_ANALYTICS)
@@ -111,6 +115,8 @@ class UserPreferencesRepository @Inject constructor(
         val TRACKING_SINCE = stringPreferencesKey("tracking_since")
         val CONSENT_PERSONALIZATION = booleanPreferencesKey("consent_personalization")
         val HEALTH_DATA_CONSENT_AT = longPreferencesKey("health_data_consent_at")
+        val HEALTH_CONNECT_CONSENT_AT = longPreferencesKey("health_connect_consent_at")
+        val HEALTH_CONNECT_PERMISSION_CANCELS = intPreferencesKey("health_connect_permission_cancels")
         val LEGACY_CONSENT_ANALYTICS = booleanPreferencesKey("consent_analytics")
         val LEGACY_CONSENT_RESEARCH = booleanPreferencesKey("consent_research")
         val WATER_GOAL_CUPS = intPreferencesKey("water_goal_cups")

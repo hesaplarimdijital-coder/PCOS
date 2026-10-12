@@ -51,6 +51,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +72,8 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.pcos.BuildConfig
 import com.ayla.pcos.R
+import com.ayla.pcos.data.health.openHealthConnectInPlayStore
+import com.ayla.pcos.data.health.openHealthConnectSettings
 import com.ayla.pcos.data.prefs.Goal
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.export.DataExporter
@@ -99,6 +102,9 @@ import com.ayla.pcos.ui.components.openNotificationSettings
 import com.ayla.pcos.ui.components.saatMetni
 import com.ayla.pcos.ui.components.segmentSimgesi
 import com.ayla.pcos.ui.components.shareText
+import com.ayla.pcos.ui.health.HealthConnectAkisi
+import com.ayla.pcos.ui.health.HealthConnectUiState
+import com.ayla.pcos.ui.health.HealthConnectViewModel
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import java.time.Instant
 import java.time.LocalTime
@@ -123,8 +129,10 @@ fun SettingsScreen(
     autoStartImport: Boolean = false,
     onOpenPrivacyPolicy: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
+    healthConnectViewModel: HealthConnectViewModel = hiltViewModel(),
 ) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
+    val healthConnect by healthConnectViewModel.uiState.collectAsStateWithLifecycle()
     val importState by viewModel.importState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -165,6 +173,9 @@ fun SettingsScreen(
             snackbar.showSnackbar(settingsEventMessage(resources, event))
         }
     }
+    // Health Connect sonucu bu ekranda gösterildi; başka ekrana taşınmasın.
+    DisposableEffect(Unit) { onDispose { healthConnectViewModel.clearMessage() } }
+    HealthConnectAkisi(healthConnectViewModel, healthConnect.step)
 
     val p = prefs ?: return
     SettingsContent(
@@ -199,6 +210,15 @@ fun SettingsScreen(
             val subject = resources.getString(R.string.alarm_log_share_subject)
             shareText(context, subject, AlarmLogText.shareText(resources, entries, deviceLines, Instant.now(), ZoneId.systemDefault()), subject)
         },
+        healthConnect = healthConnect,
+        healthConnectActions = HealthConnectActions(
+            onConnect = healthConnectViewModel::start,
+            onImport = healthConnectViewModel::importNow,
+            onOpenSettings = { openHealthConnectSettings(context) },
+            onOpenPlayStore = { openHealthConnectInPlayStore(context) },
+            onDisconnect = healthConnectViewModel::disconnect,
+            onDeleteImported = healthConnectViewModel::deleteImported,
+        ),
     )
 }
 
@@ -228,6 +248,8 @@ internal fun SettingsContent(
     onShareAlarmLog: (List<AlarmLogEntry>) -> Unit = {},
     onClearAlarmLog: () -> Unit = {},
     initialAlarmLog: List<AlarmLogEntry>? = null,
+    healthConnect: HealthConnectUiState? = null,
+    healthConnectActions: HealthConnectActions = HealthConnectActions(),
 ) {
     val p = prefs
     var alarmLog by remember { mutableStateOf(initialAlarmLog) }
@@ -408,6 +430,13 @@ internal fun SettingsContent(
                 AyarSatiri(R.string.consent_personalization_title, R.string.consent_personalization_text, p.consentPersonalization) { v -> onUpdate { it.copy(consentPersonalization = v) } }
                 HorizontalDivider()
                 EylemSatiri(Icons.Rounded.Policy, R.string.privacy_policy_link, null, onClick = onOpenPrivacyPolicy)
+            }
+
+            // Desteklenmeyen cihazda bölüm hiç görünmez (#11).
+            healthConnect?.takeIf { it.visible }?.let { hc ->
+                Grup(stringResource(R.string.hc_settings_title)) {
+                    HealthConnectAyarIcerigi(state = hc, actions = healthConnectActions)
+                }
             }
 
             Grup(stringResource(R.string.settings_section_display)) {
@@ -726,7 +755,7 @@ private fun AyarSatiri(titleRes: Int, textRes: Int?, checked: Boolean, onChange:
 }
 
 @Composable
-private fun EylemSatiri(icon: ImageVector, titleRes: Int, textRes: Int?, destructive: Boolean = false, onClick: () -> Unit) {
+internal fun EylemSatiri(icon: ImageVector, titleRes: Int, textRes: Int?, destructive: Boolean = false, onClick: () -> Unit) {
     val tint = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
     Row(
         modifier = Modifier.fillMaxWidth().clickable(role = Role.Button, onClick = onClick).padding(vertical = 12.dp),

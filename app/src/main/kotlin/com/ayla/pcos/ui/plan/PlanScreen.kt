@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,6 +36,7 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.Remove
+import androidx.compose.material.icons.rounded.Sync
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilledIconButton
@@ -55,6 +57,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,7 +74,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -80,6 +85,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.pcos.R
 import com.ayla.pcos.data.db.SleepEntity
+import com.ayla.pcos.data.db.SleepSource
 import com.ayla.pcos.data.repo.duration
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
@@ -89,6 +95,10 @@ import com.ayla.pcos.ui.components.SectionHeader
 import com.ayla.pcos.ui.components.SegmentEtiketi
 import com.ayla.pcos.ui.components.SimgeZemini
 import com.ayla.pcos.ui.components.segmentSimgesi
+import com.ayla.pcos.ui.health.HealthConnectAkisi
+import com.ayla.pcos.ui.health.HealthConnectUiState
+import com.ayla.pcos.ui.health.HealthConnectViewModel
+import com.ayla.pcos.ui.health.hcMessageText
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import com.ayla.pcos.ui.theme.LocalReducedMotion
@@ -107,8 +117,12 @@ private val hourMinute: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 /** Planım: su ve uyku (MVP 1); beslenme ve hareket sekmeleri MVP 2'de dolar. */
 @Composable
-fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
+fun PlanScreen(viewModel: PlanViewModel = hiltViewModel(), healthConnectViewModel: HealthConnectViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val healthConnect by healthConnectViewModel.uiState.collectAsStateWithLifecycle()
+    // Health Connect sonucu bu ekranda gösterildi; başka ekrana taşınmasın.
+    DisposableEffect(Unit) { onDispose { healthConnectViewModel.clearMessage() } }
+    HealthConnectAkisi(healthConnectViewModel, healthConnect.step)
     if (state.loading) {
         Box(Modifier.fillMaxSize())
         return
@@ -120,6 +134,8 @@ fun PlanScreen(viewModel: PlanViewModel = hiltViewModel()) {
         onAddSleep = { bed, wake, quality -> viewModel.addSleep(bed, wake, quality) },
         onDeleteSleep = { viewModel.deleteSleep(it) },
         onEveningRoutine = { viewModel.setEveningRoutine(it) },
+        healthConnect = healthConnect,
+        onImportHealthConnect = healthConnectViewModel::start,
     )
 }
 
@@ -134,6 +150,8 @@ internal fun PlanContent(
     onEveningRoutine: (Boolean) -> Unit,
     initialTab: Int = 0,
     initialExpandedRoutine: String? = null,
+    healthConnect: HealthConnectUiState = HealthConnectUiState(),
+    onImportHealthConnect: () -> Unit = {},
 ) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     var expandedRoutine by rememberSaveable { mutableStateOf(initialExpandedRoutine) }
@@ -190,7 +208,13 @@ internal fun PlanContent(
                 when (selectedTab) {
                     0 -> {
                         SuKarti(state = state, onAdd = onAddCup, onRemove = onRemoveCup)
-                        UykuKarti(state = state, onAdd = { showSleepDialog = true }, onDelete = onDeleteSleep)
+                        UykuKarti(
+                            state = state,
+                            onAdd = { showSleepDialog = true },
+                            onDelete = onDeleteSleep,
+                            healthConnect = healthConnect,
+                            onImportHealthConnect = onImportHealthConnect,
+                        )
                         AksamRutiniSatiri(
                             enabled = state.eveningRoutineEnabled,
                             time = state.eveningRoutineTime,
@@ -392,7 +416,13 @@ private fun HaftalikCubuklar(values: List<Int>, goal: Int, labels: List<String>)
 }
 
 @Composable
-private fun UykuKarti(state: PlanUiState, onAdd: () -> Unit, onDelete: (SleepEntity) -> Unit) {
+private fun UykuKarti(
+    state: PlanUiState,
+    onAdd: () -> Unit,
+    onDelete: (SleepEntity) -> Unit,
+    healthConnect: HealthConnectUiState,
+    onImportHealthConnect: () -> Unit,
+) {
     val scheme = MaterialTheme.colorScheme
     val colors = LocalAylaColors.current
     AylaCard {
@@ -429,6 +459,7 @@ private fun UykuKarti(state: PlanUiState, onAdd: () -> Unit, onDelete: (SleepEnt
                         style = MaterialTheme.typography.bodyMedium,
                         color = scheme.onSurfaceVariant,
                     )
+                    KaynakEtiketi(night)
                 }
                 IconButton(onClick = { onDelete(night) }) {
                     Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.action_delete), tint = scheme.onSurfaceVariant)
@@ -444,7 +475,40 @@ private fun UykuKarti(state: PlanUiState, onAdd: () -> Unit, onDelete: (SleepEnt
                 older.forEach { s -> UykuSatiri(s, onDelete = { onDelete(s) }) }
             }
         }
+        if (healthConnect.visible) {
+            Spacer(Modifier.height(4.dp))
+            HealthConnectSatiri(healthConnect, onImportHealthConnect)
+        }
     }
+}
+
+/**
+ * "Health Connect'ten al": eksik adım varsa (güncelleme, rıza, izin) akışı açar, yoksa son 30 günü alır.
+ * Sonuç düğmenin altında yazılır ve ekran okuyucuya duyurulur.
+ */
+@Composable
+private fun HealthConnectSatiri(healthConnect: HealthConnectUiState, onImport: () -> Unit) {
+    val message = hcMessageText(healthConnect.message)
+    TextButton(onClick = onImport, enabled = !healthConnect.importing, modifier = Modifier.heightIn(min = 48.dp)) {
+        Icon(Icons.Rounded.Sync, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(if (healthConnect.importing) R.string.hc_importing else R.string.sleep_import_hc))
+    }
+    if (message != null) {
+        Text(
+            message,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 12.dp).semantics { liveRegion = LiveRegionMode.Polite },
+        )
+    }
+}
+
+/** Health Connect'ten alınan gece için kaynak atfı. */
+@Composable
+private fun KaynakEtiketi(s: SleepEntity) {
+    if (s.source != SleepSource.HEALTH_CONNECT) return
+    Text(stringResource(R.string.sleep_source_hc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
 @Composable
@@ -460,6 +524,7 @@ private fun UykuSatiri(s: SleepEntity, onDelete: () -> Unit) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            KaynakEtiketi(s)
         }
         IconButton(onClick = onDelete) {
             Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.action_delete), tint = MaterialTheme.colorScheme.onSurfaceVariant)

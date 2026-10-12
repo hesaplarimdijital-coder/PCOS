@@ -22,10 +22,14 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.ayla.pcos.R
+import com.ayla.pcos.data.health.HealthConnectAvailability
 import com.ayla.pcos.ui.AppLockContent
 import com.ayla.pcos.ui.calendar.CalendarContent
 import com.ayla.pcos.ui.components.AltGezinme
 import com.ayla.pcos.ui.components.BatteryStatus
+import com.ayla.pcos.ui.health.HcGerekceIcerik
+import com.ayla.pcos.ui.health.HcMessage
+import com.ayla.pcos.ui.health.HealthConnectUiState
 import com.ayla.pcos.ui.log.DailyLogContent
 import com.ayla.pcos.ui.me.BackupImportState
 import com.ayla.pcos.ui.me.GizlilikPolitikasiIcerik
@@ -153,9 +157,14 @@ class EkranGoruntuleriTest {
     )
 
     @Composable
-    private fun Plan(sekme: Int = 0, durum: PlanUiState = Ornek.plan, acikRutin: String? = null) = PlanContent(
+    private fun Plan(
+        sekme: Int = 0,
+        durum: PlanUiState = Ornek.plan,
+        acikRutin: String? = null,
+        healthConnect: HealthConnectUiState = HealthConnectUiState(),
+    ) = PlanContent(
         state = durum, onAddCup = {}, onRemoveCup = {}, onAddSleep = { _, _, _ -> }, onDeleteSleep = {}, onEveningRoutine = {},
-        initialTab = sekme, initialExpandedRoutine = acikRutin,
+        initialTab = sekme, initialExpandedRoutine = acikRutin, healthConnect = healthConnect,
     )
 
     // --- README: beş sekme, ilk ekran ---
@@ -276,6 +285,22 @@ class EkranGoruntuleriTest {
 
     // Diyalog kendi penceresinde çizilir ve LocalDensity'yi pencereden yeniden okur; %200 yazı bu yüzden
     // cihaz yapılandırmasıyla (fontScale) verilir.
+    @Test fun t36_hc_gerekce() = ekran("36-hc-gerekce") { HcGerekceIcerik(onAccept = {}, onDecline = {}, onOpenPolicy = {}) }
+
+    @Test fun t37_planim_uyku_hc() = ekran("37-planim-uyku-hc", sekme = Screen.Plan) {
+        Plan(durum = Ornek.planHealthConnect, healthConnect = Ornek.hcBagli.copy(message = HcMessage.Added(3)))
+    }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y14_yazi200_hc_gerekce() = ekran("y14-yazi200-hc-gerekce", sistemYaziOlcegi = 2f) {
+        HcGerekceIcerik(onAccept = {}, onDecline = {}, onOpenPolicy = {})
+    }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y15_yazi200_planim_uyku_hc() = ekran("y15-yazi200-planim-uyku-hc", sekme = Screen.Plan, sistemYaziOlcegi = 2f) {
+        Plan(durum = Ornek.planHealthConnect, healthConnect = Ornek.hcBagli.copy(message = HcMessage.NothingNew))
+    }
+
     @Config(qualifiers = UZUN, fontScale = 2f)
     @Test fun y13_yazi200_hatirlatma_gunlugu() = ekran("y13-yazi200-hatirlatma-gunlugu", tumEkran = true) {
         HatirlatmaGunluguDialog(entries = Ornek.alarmGunlugu, onShare = {}, onClear = {}, onDismiss = {}, now = Ornek.alarmSimdi, zone = Ornek.zone)
@@ -340,6 +365,7 @@ class EkranGoruntuleriTest {
         SettingsContent(
             prefs = Ornek.ayarlar, exactAlarmsAllowed = true, snackbar = remember { SnackbarHostState() },
             onBack = {}, onUpdate = {}, onExport = {}, onWipe = {}, hasDoseReminders = true,
+            healthConnect = HealthConnectUiState(availability = HealthConnectAvailability.AVAILABLE),
         )
     }
 
@@ -382,6 +408,7 @@ class EkranGoruntuleriTest {
             prefs = Ornek.ayarlar, exactAlarmsAllowed = false, snackbar = remember { SnackbarHostState() },
             onBack = {}, onUpdate = {}, onExport = {}, onWipe = {},
             hasDoseReminders = true, batteryStatus = BatteryStatus.OPTIMIZED, oemBatteryNote = R.string.battery_oem_samsung,
+            healthConnect = Ornek.hcBagli,
         )
     }
 

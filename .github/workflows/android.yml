@@ -286,6 +286,12 @@ jobs:
             echo "::error title=İzin::INTERNET izni eklendi; gizlilik politikası ve Veri güvenliği formu buna göre güncellenmeden yayımlanamaz"
             exit 1
           fi
+          # Play'in Health Connect beyanı ve politika yalnızca uyku okumayı kapsar (#11).
+          extra=$(echo "$perms" | grep '^android.permission.health\.' | grep -vx 'android.permission.health.READ_SLEEP' || true)
+          if [ -n "$extra" ]; then
+            echo "::error title=İzin::READ_SLEEP dışında Health Connect izni var: $(echo "$extra" | tr '\n' ' ')"
+            exit 1
+          fi
 
       - name: Lint
         continue-on-error: true

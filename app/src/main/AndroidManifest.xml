@@ -11,8 +11,14 @@
     <!-- Uygulama kilidi -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
-    <!-- Health Connect (uyku okuma) MVP 2'de eklenir: READ_SLEEP izni, <queries> ve izin gerekçesi
-         etkinlikleri Play'in Health Connect beyan formunu gerektirir; kullanılmayan izin beyan edilmez. -->
+    <!-- Health Connect: yalnızca uyku okuma (#11). Başka android.permission.health.* izni eklenmez;
+         Play Console'da Health Connect beyanı: docs/play/health-connect-beyani.md -->
+    <uses-permission android:name="android.permission.health.READ_SLEEP" />
+
+    <!-- Android 11–13: Health Connect uygulaması getSdkStatus için görünür olsun -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
 
     <application
         android:name=".AylaApp"
@@ -38,6 +44,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Health Connect izin ekranındaki "Gizlilik politikası" bağlantısı (Android 13 ve altı) -->
+        <activity
+            android:name=".PermissionsRationaleActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Ayla">
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity>
+
+        <!-- Aynı ekran, Android 14 ve üstü. Takma ad hedef etkinlikten sonra tanımlanmalı. -->
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE"
+            android:targetActivity=".PermissionsRationaleActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
 
         <!-- Alarm tetiklendiğinde bildirimi gösterir ve sıradaki alarmı kurar -->
         <receiver

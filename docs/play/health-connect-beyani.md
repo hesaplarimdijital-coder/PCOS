@@ -79,11 +79,11 @@ Engelleyici (beyandan önce kapanmalı):
       [İLETİŞİM E-POSTASI], [POLİTİKA URL'Sİ].
 - [ ] **Politika yayında:** [POLİTİKA URL'Sİ] herkese açık HTML sayfa; giriş gerektirmez, PDF değil,
       yalnızca sahibince düzenlenebilir.
-- [ ] **Manifest:** sağlık izinlerinden yalnızca `READ_SLEEP`; birleştirilmiş manifestte `INTERNET` yok
-      (`apkanalyzer manifest permissions` ile doğrula).
-- [ ] **Politika ile uygulama aynı şeyi söylüyor:** Ayarlar'daki Health Connect bölümü ("bağlantıyı kes",
-      Health Connect ayarlarına bağlantı) ve kaynak uygulama adının gösterimi uygulandı; uygulanmadıysa
-      politikanın 6. bölümündeki ilgili ibareler çıkarıldı.
+- [x] **Manifest:** sağlık izinlerinden yalnızca `READ_SLEEP`; birleştirilmiş manifestte `INTERNET` yok.
+      CI'daki "İzin denetimi" adımı ikisini de her yayın derlemesinde denetler ve listeyi yayımlar.
+- [x] **Politika ile uygulama aynı şeyi söylüyor:** Ayarlar > Health Connect bölümü ("Bağlantıyı kes",
+      "Health Connect ayarlarını aç", "Health Connect'ten alınan geceleri sil") uygulandı; kaynak uygulama adı
+      saklanmıyor ve politika da saklanmadığını söylüyor (Ekim 2026, #11).
 
 Gönderimle birlikte:
 
@@ -133,42 +133,39 @@ Su ve uyku > "Health Connect'ten al").
 Why: so users do not have to type their bedtime and wake-up time by hand. Imported nights appear next to
 manually entered nights in the sleep card (last night and the last 7 nights with durations).
 
-How: data is read only while the app is in the foreground and only when the user taps the button. We read
-sleep sessions from the last 30 days and store only each session's start time, end time, Health Connect
-record ID (to avoid duplicates) and the source app name (to show where the data came from). Sleep stages,
-titles and notes are not stored.
+How: data is read only while the app is in the foreground: when the user taps the button and, after the
+user has connected Health Connect, when the user opens the app (to add new nights). Before the first read
+the app shows its own consent screen. We read sleep sessions from the last 30 days and store only each
+session's start time, end time and Health Connect record ID (to avoid duplicates). Sleep stages, titles,
+notes and the source app name are not stored.
 
 Storage and sharing: data stays on the device in an encrypted SQLCipher database whose key is protected by
 Android Keystore. The app has no INTERNET permission, no account, no server and no analytics or ads SDKs.
 Health Connect data is never transferred, sold or used for advertising, profiling, credit or insurance
-decisions, and no human can access it. Users can delete imported nights in the app and revoke access in
-Health Connect settings or in Ayla's settings. Ayla does not write to Health Connect and does not request
+decisions, and no human can access it. Users can delete imported nights in the app (one by one in the
+sleep card or all at once in Settings > Health Connect) and revoke access in Health Connect settings or in
+Ayla's settings (Settings > Health Connect > Disconnect). Ayla does not write to Health Connect and does not request
 background or historical (older than 30 days) read access.
 ```
 
-Ayla ön plana her gelişte de eşitleme yapacaksa (bkz. `docs/arastirma/mvp2-teknik-notlar.md` §3), "How:"
-paragrafının ilk cümlesi şöyle değişir:
-
-```text
-How: data is read only while the app is in the foreground: when the user taps the button and, after the
-user has connected Health Connect, when the user opens the app (to add new nights).
-```
+Uygulanan davranış (Ekim 2026): düğmeye dokununca ve bağlantı kurulduktan sonra uygulama her açıldığında
+(en sık saatte bir) ön planda okunur; kaynak uygulama adı saklanmaz. Davranış değişirse gerekçe de değişir.
 
 Kısa sürüm (alan karakter sınırı gösterirse):
 
 ```text
 Read-only Sleep access. In Plan > Water & sleep, the user taps "Import from Health Connect" to fill the
-sleep log (last night and last 7 nights) without typing times. Read only in the foreground on user action;
-only start/end time, record ID and source app name are stored, on-device, in an encrypted database. No
+sleep log (last night and last 7 nights) without typing times. Read only in the foreground (on tap and,
+once connected, on app open); only start/end time and record ID are stored, on-device, in an encrypted database. No
 internet permission, no server, no SDKs; data is never shared, sold or used for ads. No write, background
 or history access.
 ```
 
 Türkçe karşılığı (kayıt için): Ayla yalnızca uyku oturumlarını okur. Kullanıcı Planım > Su ve uyku'da
 "Health Connect'ten al"a dokunduğunda, yatış/kalkış saatini elle girmeden son 30 günün uyku oturumları içe
-aktarılır; dün gece ve son 7 gece uyku kartında gösterilir. Okuma yalnızca ön planda ve kullanıcı isteğiyle
-yapılır; yalnızca başlangıç/bitiş zamanı, kayıt kimliği ve kaynak uygulama adı cihazda şifreli veritabanında
-saklanır. İnternet izni, sunucu, SDK yok; veri paylaşılmaz, satılmaz, reklamda kullanılmaz. Yazma, arka plan
+aktarılır; dün gece ve son 7 gece uyku kartında gösterilir. Okuma yalnızca ön planda yapılır: dokununca ve
+bağlantı kurulduktan sonra uygulama açıldığında. Yalnızca başlangıç/bitiş zamanı ve kayıt kimliği cihazda
+şifreli veritabanında saklanır; kaynak uygulama adı saklanmaz. İnternet izni, sunucu, SDK yok; veri paylaşılmaz, satılmaz, reklamda kullanılmaz. Yazma, arka plan
 ve geçmiş veri izni istenmez.
 
 ### 3.3 Bilerek istenmeyen izinler
@@ -177,7 +174,7 @@ ve geçmiş veri izni istenmez.
 |---|---|
 | `WRITE_SLEEP` | Ayla Health Connect'e veri yazmaz; elle girilen uyku yalnızca Ayla'da kalır. |
 | `READ_HEALTH_DATA_HISTORY` | Uyku kartı son 7 geceyi gösterir; varsayılan 30 günlük pencere yeterli. Her ek izin ayrı gerekçe ister. |
-| `READ_HEALTH_DATA_IN_BACKGROUND` | Okuma yalnızca kullanıcı dokunduğunda, ön planda; Ayla WorkManager kullanmaz. |
+| `READ_HEALTH_DATA_IN_BACKGROUND` | Okuma yalnızca ön planda (dokununca ve bağlıyken uygulama açılınca); Ayla arka planda okumaz. |
 | Adet, ovülasyon testi, bazal ısı, semptom vb. | MVP 1–2 kapsamı dışında; üreme sağlığı türleri yüksek hassasiyetli incelemeye tabi. |
 
 ## 4. Veri güvenliği (Data safety) formu: önerilen yanıtlar

@@ -11,6 +11,8 @@ import com.ayla.pcos.data.db.MedicationForm
 import com.ayla.pcos.data.db.MedicationKind
 import com.ayla.pcos.data.db.PeriodEntity
 import com.ayla.pcos.data.db.SleepEntity
+import com.ayla.pcos.data.db.SleepSource
+import com.ayla.pcos.data.health.HealthConnectAvailability
 import com.ayla.pcos.data.prefs.Goal
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.repo.Adherence
@@ -24,6 +26,7 @@ import com.ayla.pcos.ui.calendar.CycleRow
 import com.ayla.pcos.ui.calendar.DayActions
 import com.ayla.pcos.ui.calendar.buildCalendarWeeks
 import com.ayla.pcos.ui.calendar.calendarDayRules
+import com.ayla.pcos.ui.health.HealthConnectUiState
 import com.ayla.pcos.ui.log.DailyLogUiState
 import com.ayla.pcos.ui.me.CycleTrend
 import com.ayla.pcos.ui.me.MeUiState
@@ -175,6 +178,29 @@ internal object Ornek {
             SleepEntity(id = 3, date = bugun.minusDays(2), startAt = instant(bugun.minusDays(3), LocalTime.of(23, 5)), endAt = instant(bugun.minusDays(2), LocalTime.of(6, 50)), quality = 3),
         ),
         eveningRoutineEnabled = true, eveningRoutineTime = LocalTime.of(22, 30),
+    )
+
+    /** Health Connect'ten alınmış geceler: dün gece ve iki gece önce saatten gelen kayıt. */
+    val planHealthConnect: PlanUiState = plan.copy(
+        lastNight = SleepEntity(
+            id = 11, date = bugun, startAt = instant(bugun.minusDays(1), LocalTime.of(23, 52)), endAt = instant(bugun, LocalTime.of(7, 4)),
+            source = SleepSource.HEALTH_CONNECT, externalId = "hc-11",
+        ),
+        sleepWeek = listOf(
+            SleepEntity(
+                id = 11, date = bugun, startAt = instant(bugun.minusDays(1), LocalTime.of(23, 52)), endAt = instant(bugun, LocalTime.of(7, 4)),
+                source = SleepSource.HEALTH_CONNECT, externalId = "hc-11",
+            ),
+            SleepEntity(id = 2, date = bugun.minusDays(1), startAt = instant(bugun.minusDays(1), LocalTime.of(0, 30)), endAt = instant(bugun.minusDays(1), LocalTime.of(7, 0)), quality = 2),
+            SleepEntity(
+                id = 12, date = bugun.minusDays(2), startAt = instant(bugun.minusDays(3), LocalTime.of(23, 18)), endAt = instant(bugun.minusDays(2), LocalTime.of(6, 41)),
+                source = SleepSource.HEALTH_CONNECT, externalId = "hc-12",
+            ),
+        ),
+    )
+
+    val hcBagli = HealthConnectUiState(
+        availability = HealthConnectAvailability.AVAILABLE, consentGiven = true, permissionGranted = true, importedCount = 12,
     )
 
     val ben = MeUiState(

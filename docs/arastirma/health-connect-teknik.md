@@ -230,13 +230,24 @@ Dışa aktarma bu geceleri `source` ve `externalId` ile içerir (kullanıcının
       bağlantısı Ayla'nın politika ekranını açar; iki kez iptal; Health Connect ayarlarından izni kaldırma;
       kaldır/yeniden kur; uygulama kilidi açıkken akış; R8 yayın derlemesi.
 
-## 9. Açık kararlar (ürün sahibi)
+## 9. Kararlar (uygulandı, Ekim 2026)
 
-1. Kaynak uygulama adını saklamak (Room v2) ya da politikadan çıkarmak.
-2. Şekerleme / birden çok oturum kuralı.
-3. "Health Connect'ten alınanları sil" ve Ayarlar'daki "Bağlantıyı kes" (politika 6. bölüm Ayarlar yolunu anar).
-4. Politika metninin tek kaynaktan üretilmesi (derleme görevi) ya da kopya + eşitlik testi.
-5. Eşitleme tetikleyicisi (yalnızca düğme / ön plana gelişte de) ve Health Connect'teki silmelerin yansıtılması.
+1. **Kaynak uygulama adı saklanmaz.** Room şeması değişmedi; politika ve Play gerekçesi "saklanmaz" der.
+   Arayüzdeki atıf "Health Connect'ten" etiketidir.
+2. **Birden çok oturum:** "dün gece" uyanılan günün **en uzun** oturumudur (öğle uykusu geceyi geçmez);
+   diğerleri "Son 7 gün" listesinde ayrı satırdır. Gelen bir oturum, var olan herhangi bir kayıtla (elle
+   girilen dahil) çakışırsa alınmaz: cihazdaki kayıt kazanır. Gelenler kendi aralarında çakışırsa (saat ve
+   telefon aynı geceyi ayrı kaydetmiş) uzun olan kalır. 24 saati aşan ya da bitişi başlangıcından önce olan
+   oturum alınmaz (`SleepImportRules.kt`, testli).
+3. **Ayarlar > Health Connect:** durum; "Health Connect'e bağlan" / "Şimdi al"; "Health Connect ayarlarını
+   aç"; "Bağlantıyı kes" (rıza silinir, `revokeAllPermissions`); "Health Connect'ten alınan geceleri sil".
+   Tam silme de izinleri bırakır.
+4. **Politika kopyası + eşitlik testi** (`GizlilikPolitikasiTest`), derleme görevi yok.
+5. **Eşitleme:** düğmeye dokununca ve bağlantı kurulduktan sonra her ön plana gelişte, en sık saatte bir;
+   arka planda okuma yok. Health Connect'teki silmeler yansıtılmaz (politika "ayrıca silmen gerekebilir" der).
+6. **Açık rıza:** gerekçe ekranındaki "Onaylıyorum, devam et" zamanı `healthConnectConsentAt` olarak saklanır;
+   rıza yoksa izin verilmiş olsa bile hiçbir şey okunmaz. Art arda iptal sayacı DataStore'da, izin verilince
+   sıfırlanır.
 
 ## 10. Kaynaklar
 

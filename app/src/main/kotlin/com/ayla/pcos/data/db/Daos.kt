@@ -159,8 +159,19 @@ interface SleepDao {
     @Query("SELECT * FROM sleep_sessions WHERE date BETWEEN :from AND :to ORDER BY date ASC")
     fun observeRange(from: LocalDate, to: LocalDate): Flow<List<SleepEntity>>
 
-    @Query("SELECT * FROM sleep_sessions WHERE date = :date ORDER BY start_at DESC LIMIT 1")
-    fun observeLatestFor(date: LocalDate): Flow<SleepEntity?>
+    /**
+     * "Dün gece": uyanılan günün en uzun oturumu. Health Connect'ten gelen öğle uykusu, gecenin yerine
+     * geçmesin diye en son başlayan değil en uzun olan seçilir; eşitlikte en son başlayan.
+     */
+    @Query("SELECT * FROM sleep_sessions WHERE date = :date ORDER BY (end_at - start_at) DESC, start_at DESC LIMIT 1")
+    fun observeLongestFor(date: LocalDate): Flow<SleepEntity?>
+
+    @Query("SELECT COUNT(*) FROM sleep_sessions WHERE source = :source")
+    fun observeCount(source: SleepSource): Flow<Int>
+
+    /** Health Connect'ten alınan kopyaları siler; Health Connect'teki asıl kayıtlar değişmez. */
+    @Query("DELETE FROM sleep_sessions WHERE source = :source")
+    suspend fun deleteBySource(source: SleepSource): Int
 
     @Query("SELECT * FROM sleep_sessions ORDER BY date ASC")
     suspend fun getAll(): List<SleepEntity>

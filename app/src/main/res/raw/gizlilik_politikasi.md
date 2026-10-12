@@ -70,7 +70,7 @@ Aşağıdaki kayıtların hepsi yalnızca bu cihazda tutulur ve sen silene ya da
 - **Ne:** elle girdiğin yatış ve kalkış saatleri ile isteğe bağlı kalite puanı; Health Connect'ten aldığın uyku oturumları (ayrıntılar 6. bölümde).
 - **Neden:** uyku düzenini görmen (dün gece ve son 7 gece).
 - **Nerede:** şifreli veritabanında.
-- **Nasıl silinir:** Planım > Su ve uyku bölümündeki uyku kartından (dün gece ve son 7 gün) tek tek ya da hepsini Tüm verilerimi sil ile.
+- **Nasıl silinir:** Planım > Su ve uyku bölümündeki uyku kartından (dün gece ve son 7 gün) tek tek; Health Connect'ten alınanların hepsini Ben > Ayarlar > Health Connect > Health Connect'ten alınan geceleri sil ile; tüm uyku kayıtlarını Tüm verilerimi sil ile.
 
 ### 3.6 Profil ve ayarlar
 

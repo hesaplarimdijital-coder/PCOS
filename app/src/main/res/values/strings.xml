@@ -296,9 +296,8 @@
     <string name="evidence_chip_a11y">Kanıt düzeyi: %1$s. Açıklama için dokun.</string>
     <string name="sleep_none_hint">Yatış ve kalkış saatini eklediğinde son 7 gece burada görünür.</string>
     <string name="sleep_add">Uyku ekle</string>
-    <!-- Health Connect uyku içe aktarma MVP 2 (#11) için hazır metinler. -->
-    <string name="sleep_import_hc" tools:ignore="UnusedResources">Health Connect&#8217;ten al</string>
-    <string name="sleep_hc_unavailable" tools:ignore="UnusedResources">Health Connect bu cihazda kullanılamıyor.</string>
+    <string name="sleep_import_hc">Health Connect&#8217;ten al</string>
+    <string name="sleep_source_hc">Health Connect&#8217;ten</string>
     <string name="sleep_bedtime">Yatış</string>
     <string name="sleep_wake">Kalkış</string>
     <string name="sleep_quality">Kalite</string>
@@ -416,6 +415,53 @@
     <string name="import_error_not_ayla">Bu dosya bir Ayla yedeği değil.</string>
     <string name="import_error_too_new">Bu yedek daha yeni bir Ayla sürümünden. Uygulamayı güncelleyip yeniden dene.</string>
     <string name="import_error_corrupt">Dosya okunamadı ya da bozuk.</string>
+
+    <!-- Health Connect: yalnızca uyku okuma (#11). Ayrıntı: docs/arastirma/health-connect-teknik.md -->
+    <string name="hc_rationale_title">Uyku verini Health Connect&#8217;ten al</string>
+    <string name="hc_rationale_what_title">Ne okunur?</string>
+    <string name="hc_rationale_what">Ayla, Health Connect&#8217;ten yalnızca uyku oturumlarını okur ve her gecenin başlangıç ile bitiş saatini alır. Başka hiçbir veri türüne erişmez, Health Connect&#8217;e veri yazmaz.</string>
+    <string name="hc_rationale_why_title">Neden?</string>
+    <string name="hc_rationale_why">Yatış ve kalkış saatini elle girmen gerekmez. Alınan geceler Planım&#8217;daki uyku kartında elle girdiklerinle birlikte görünür. Ayla, Health Connect&#8217;i yalnızca uygulama açıkken okur.</string>
+    <string name="hc_rationale_where_title">Nerede saklanır?</string>
+    <string name="hc_rationale_where">Geceler yalnızca bu telefonda, diğer kayıtlarınla birlikte şifreli veritabanında saklanır. Ayla&#8217;nın sunucusu yoktur; uygulamanın internet izni de yoktur.</string>
+    <string name="hc_rationale_sharing_title">Kimseyle paylaşılmaz</string>
+    <string name="hc_rationale_sharing">Uyku verin kimseye aktarılmaz, satılmaz, reklam için kullanılmaz; biz de göremeyiz. Yalnızca sen dışa aktarırsan oluşturduğun dosyada yer alır.</string>
+    <string name="hc_rationale_revoke_title">Nasıl geri alınır?</string>
+    <string name="hc_rationale_revoke">İzni istediğin an Health Connect ayarlarından ya da Ayla&#8217;nın Ayarlar ekranından kapatabilirsin. Daha önce alınan geceler sen silene kadar Ayla&#8217;da kalır.</string>
+    <string name="hc_rationale_consent">Uyku oturumlarımın Health Connect&#8217;ten okunup yalnızca bu cihazda saklanmasına açık rıza veriyorum.</string>
+    <string name="hc_rationale_accept">Onaylıyorum, devam et</string>
+    <string name="hc_rationale_decline">Şimdi değil</string>
+    <string name="hc_rationale_policy">Gizlilik politikasının tamamı</string>
+    <string name="hc_update_title">Health Connect gerekli</string>
+    <string name="hc_update_required">Health Connect&#8217;in yüklenmesi ya da güncellenmesi gerekiyor. Google Play&#8217;de bunu yaptıktan sonra yeniden dene.</string>
+    <string name="hc_update_action">Google Play&#8217;i aç</string>
+    <string name="hc_cancelled_twice_title">İzin artık Health Connect ayarlarında</string>
+    <string name="hc_cancelled_twice_text">İzin penceresini iki kez kapattığın için Health Connect onu yeniden göstermiyor. İstersen Health Connect ayarlarından Ayla&#8217;ya uyku izni verebilirsin.</string>
+    <string name="hc_open_settings">Health Connect ayarlarını aç</string>
+    <string name="hc_revoked_text">Health Connect izni kapalı; yeni gece alınmıyor. Daha önce alınan geceler sen silene kadar Ayla&#8217;da kalır.</string>
+    <string name="hc_permission_denied">İzin verilmedi; yeni gece alınmadı. İstediğin zaman yeniden deneyebilirsin.</string>
+    <string name="hc_importing">Health Connect&#8217;ten alınıyor…</string>
+    <string name="hc_import_done">%1$d gece eklendi.</string>
+    <string name="hc_import_nothing_new">Eklenecek yeni gece yok.</string>
+    <string name="hc_import_failed">Health Connect&#8217;e şu an ulaşılamadı. Biraz sonra yeniden dene.</string>
+    <string name="hc_settings_title">Health Connect</string>
+    <string name="hc_status_connected">Bağlı: uyku oturumları</string>
+    <string name="hc_status_connected_text">Ayla, uygulama açıkken Health Connect&#8217;teki yeni geceleri alır. Health Connect&#8217;e hiçbir şey yazmaz.</string>
+    <string name="hc_status_disconnected">Bağlı değil</string>
+    <string name="hc_status_disconnected_text">Bağlanırsan yatış ve kalkış saatini elle girmeden uyku kaydı alabilirsin.</string>
+    <string name="hc_status_revoked">İzin kapalı</string>
+    <string name="hc_status_update">Güncelleme gerekli</string>
+    <string name="hc_connect">Health Connect&#8217;e bağlan</string>
+    <string name="hc_import_now">Şimdi al</string>
+    <string name="hc_import_now_text">Son 30 günün uyku oturumları</string>
+    <string name="hc_disconnect">Bağlantıyı kes</string>
+    <string name="hc_disconnect_confirm_title">Health Connect bağlantısı kesilsin mi?</string>
+    <string name="hc_disconnect_text">Ayla artık yeni uyku verisi okumaz; alınmış geceler sen silene kadar kalır. Bu değişiklik Health Connect ayarlarında ancak Ayla yeniden açıldığında görünür.</string>
+    <string name="hc_disconnected">Bağlantı kesildi.</string>
+    <string name="hc_delete_imported">Health Connect&#8217;ten alınan geceleri sil</string>
+    <string name="hc_delete_imported_confirm_title">Alınan geceler silinsin mi?</string>
+    <string name="hc_delete_imported_confirm">Health Connect&#8217;ten alınan %1$d gece Ayla&#8217;dan silinir. Health Connect&#8217;teki asıl kayıtlar değişmez.</string>
+    <string name="hc_deleted">Health Connect&#8217;ten alınan %1$d gece silindi.</string>
 
     <!-- Pil tasarrufu ve hatırlatma günlüğü (#17) -->
     <string name="battery_band_title">Hatırlatmaların gecikmesin</string>

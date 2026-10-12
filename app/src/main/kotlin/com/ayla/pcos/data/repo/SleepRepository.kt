@@ -14,7 +14,8 @@ import javax.inject.Singleton
 @Singleton
 class SleepRepository @Inject constructor(private val dao: SleepDao) {
 
-    fun observeNight(date: LocalDate): Flow<SleepEntity?> = dao.observeLatestFor(date)
+    /** Uyanılan günün ana uykusu (en uzun oturum). */
+    fun observeNight(date: LocalDate): Flow<SleepEntity?> = dao.observeLongestFor(date)
 
     fun observeRange(from: LocalDate, to: LocalDate): Flow<List<SleepEntity>> = dao.observeRange(from, to)
 

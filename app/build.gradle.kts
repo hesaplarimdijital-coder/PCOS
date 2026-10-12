@@ -126,7 +126,8 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.fragment.ktx)
-    // Health Connect (libs.androidx.health.connect) MVP 2'de eklenir; bkz. docs/arastirma/android-17-uyum.md
+    // Health Connect: yalnızca uyku okuma (#11); bkz. docs/arastirma/health-connect-teknik.md
+    implementation(libs.androidx.health.connect)
 
     // Veri
     implementation(libs.androidx.room.runtime)

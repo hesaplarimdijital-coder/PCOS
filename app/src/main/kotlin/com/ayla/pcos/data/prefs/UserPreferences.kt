@@ -20,6 +20,13 @@ data class UserPreferences(
     // Analitik ya da araştırma işlemesi olmadığı için onlara ait rıza anahtarı da yoktur.
     val healthDataConsentAt: Instant? = null,
     val consentPersonalization: Boolean = false,
+    /**
+     * Health Connect'ten uyku okumaya verilen açık rıza (gerekçe ekranında "Onaylıyorum"); bağlantı kesilince
+     * silinir. Rıza olmadan, Health Connect izni verilmiş olsa bile hiçbir şey okunmaz (#11).
+     */
+    val healthConnectConsentAt: Instant? = null,
+    /** Health Connect izin penceresinin art arda kapatılma sayısı; 2'de pencere bir daha açılmaz. */
+    val healthConnectPermissionCancels: Int = 0,
 
     // Su
     val waterGoalCups: Int = 8,
