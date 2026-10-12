@@ -25,6 +25,7 @@ import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Medication
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.Icon
@@ -71,6 +72,7 @@ fun MeScreen(
     onOpenSettings: () -> Unit,
     onOpenFertility: () -> Unit = {},
     onOpenReport: () -> Unit = {},
+    onOpenSkin: () -> Unit = {},
     viewModel: MeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -83,6 +85,7 @@ fun MeScreen(
         onOpenSettings = onOpenSettings,
         onOpenReport = onOpenReport,
         onOpenFertility = onOpenFertility,
+        onOpenSkin = onOpenSkin,
     )
 }
 
@@ -93,6 +96,7 @@ internal fun MeContent(
     onOpenSettings: () -> Unit,
     onOpenReport: () -> Unit = {},
     onOpenFertility: () -> Unit = {},
+    onOpenSkin: () -> Unit = {},
 ) {
     val scheme = MaterialTheme.colorScheme
     val colors = LocalAylaColors.current
@@ -186,6 +190,15 @@ internal fun MeContent(
                 }
                 Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = scheme.onSurfaceVariant)
             }
+        }
+
+        SatirZemini(onClick = onOpenSkin) {
+            SimgeZemini(icon = Icons.Rounded.Spa, background = colors.basariAcik, tint = colors.basari)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.skin_title), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.skin_open_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+            }
+            Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = scheme.onSurfaceVariant)
         }
 
         SatirZemini(onClick = onOpenReport) {

@@ -64,6 +64,10 @@ sealed interface Screen : NavKey {
     @Serializable
     data object Fertility : Screen { override val route: String get() = "fertility" }
 
+    /** Cilt ve saç: rutin, profil, doktor kartları, fotoğraflar (#25). */
+    @Serializable
+    data object Skin : Screen { override val route: String get() = "skin" }
+
     /** Doktor raporu: aralık, bölümler, PDF/metin paylaşımı (#26). */
     @Serializable
     data object Report : Screen { override val route: String get() = "report" }
@@ -87,6 +91,7 @@ sealed interface Screen : NavKey {
             route == PrivacyPolicy.route -> PrivacyPolicy
             route == Fertility.route -> Fertility
             route == Report.route -> Report
+            route == Skin.route -> Skin
             route == Questions.route -> Questions
             route.startsWith("log/") -> runCatching { DailyLog(LocalDate.parse(route.removePrefix("log/"))) }.getOrNull()
             route.startsWith("meds/edit/") -> route.removePrefix("meds/edit/").toLongOrNull()?.let { EditMedication(it) }

@@ -129,6 +129,12 @@ class SettingsViewModel @Inject constructor(
         _importState.value = BackupImportState.Idle
     }
 
+    /** Cilt fotoğrafları rızasını geri alır: önce tüm fotoğraflar ve anahtar silinir (ADR-0010). */
+    fun revokePhotoConsent() = viewModelScope.launch {
+        runCatching { photoStore.deleteAll() }
+        prefs.update { it.copy(photoConsentAt = null) }
+    }
+
     /** Tüm verileri ve tercihleri siler; uygulama karşılamaya döner. */
     fun wipeAll() = viewModelScope.launch {
         // Önce Health Connect bağlantısı kesilir (rıza silinir, izinler bırakılır); sonra kayıtlar.

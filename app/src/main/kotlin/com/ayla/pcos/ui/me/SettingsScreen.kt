@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.Policy
 import androidx.compose.material.icons.rounded.SettingsBackupRestore
 import androidx.compose.material.icons.rounded.Shield
@@ -224,6 +225,7 @@ fun SettingsScreen(
             onDisconnect = healthConnectViewModel::disconnect,
             onDeleteImported = healthConnectViewModel::deleteImported,
         ),
+        onRevokePhotoConsent = viewModel::revokePhotoConsent,
     )
 }
 
@@ -255,8 +257,10 @@ internal fun SettingsContent(
     initialAlarmLog: List<AlarmLogEntry>? = null,
     healthConnect: HealthConnectUiState? = null,
     healthConnectActions: HealthConnectActions = HealthConnectActions(),
+    onRevokePhotoConsent: () -> Unit = {},
 ) {
     val p = prefs
+    var confirmPhotoRevoke by remember { mutableStateOf(false) }
     var alarmLog by remember { mutableStateOf(initialAlarmLog) }
     var confirmWipe by remember { mutableStateOf(false) }
     var confirmReplace by remember { mutableStateOf(false) }
@@ -433,6 +437,13 @@ internal fun SettingsContent(
                 }
                 HorizontalDivider()
                 AyarSatiri(R.string.consent_personalization_title, R.string.consent_personalization_text, p.consentPersonalization) { v -> onUpdate { it.copy(consentPersonalization = v) } }
+                // Cilt fotoğrafları ayrı rızadır (ADR-0010); geri almak fotoğrafları siler.
+                if (p.photoConsentAt != null) {
+                    HorizontalDivider()
+                    EylemSatiri(Icons.Rounded.PhotoCamera, R.string.skin_photo_settings_title, R.string.skin_photo_settings_on, destructive = true) {
+                        confirmPhotoRevoke = true
+                    }
+                }
                 HorizontalDivider()
                 EylemSatiri(Icons.Rounded.Policy, R.string.privacy_policy_link, null, onClick = onOpenPrivacyPolicy)
             }
@@ -543,6 +554,20 @@ internal fun SettingsContent(
         )
     }
 
+    if (confirmPhotoRevoke) {
+        AlertDialog(
+            onDismissRequest = { confirmPhotoRevoke = false },
+            title = { Text(stringResource(R.string.skin_photo_revoke_title)) },
+            text = { Text(stringResource(R.string.skin_photo_revoke_text)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    onRevokePhotoConsent()
+                    confirmPhotoRevoke = false
+                }) { Text(stringResource(R.string.skin_photo_revoke_confirm), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(onClick = { confirmPhotoRevoke = false }) { Text(stringResource(R.string.action_cancel)) } },
+        )
+    }
     if (confirmWipe) {
         AlertDialog(
             onDismissRequest = { confirmWipe = false },
