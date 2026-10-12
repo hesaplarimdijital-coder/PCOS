@@ -14,7 +14,8 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr-TR/1.1.0/) ilkelerine, s
   notuyla. Listeye alınmayanlar uyarısı (sarı kantaron × hormonal doğum kontrol, meyan kökü, berberin, hayıt,
   zerdeçal takviyeleri).
 - Health Connect'ten uyku (yalnızca okuma, yalnızca uyku): açık rıza ekranı, izin akışı (güncelleme gerekli,
-  iki kez iptal), son 30 gün, çakışan ve yinelenen gecelerin elenmesi, bağlıyken ön planda saatlik eşitleme;
+  iki kez iptal), yalnızca son 7 gün, çakışan ve yinelenen gecelerin elenmesi, silinen gecenin geri gelmemesi,
+  bağlıyken ön planda saatlik eşitleme;
   Ayarlar > Health Connect (bağlan, şimdi al, ayarlar, bağlantıyı kes, alınanları sil).
 - Ana ekran widget'ı (2×2 ve 4×2): döngü ya da hap günü, sıradaki doz ve "Aldım", su; gizlilik ayarı açıkken
   nötr içerik, kilit ekranına eklenemez.

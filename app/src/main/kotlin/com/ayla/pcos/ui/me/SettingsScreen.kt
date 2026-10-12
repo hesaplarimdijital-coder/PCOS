@@ -173,8 +173,13 @@ fun SettingsScreen(
             snackbar.showSnackbar(settingsEventMessage(resources, event))
         }
     }
-    // Health Connect sonucu bu ekranda gösterildi; başka ekrana taşınmasın.
-    DisposableEffect(Unit) { onDispose { healthConnectViewModel.clearMessage() } }
+    // Health Connect sonucu ve yarım kalan adım bu ekrana aittir; başka ekranda açılmasın.
+    DisposableEffect(Unit) {
+        onDispose {
+            healthConnectViewModel.clearMessage()
+            healthConnectViewModel.dismissStep()
+        }
+    }
     HealthConnectAkisi(healthConnectViewModel, healthConnect.step)
 
     val p = prefs ?: return
@@ -433,7 +438,7 @@ internal fun SettingsContent(
             }
 
             // Desteklenmeyen cihazda bölüm hiç görünmez (#11).
-            healthConnect?.takeIf { it.visible }?.let { hc ->
+            healthConnect?.takeIf { it.settingsVisible }?.let { hc ->
                 Grup(stringResource(R.string.hc_settings_title)) {
                     HealthConnectAyarIcerigi(state = hc, actions = healthConnectActions)
                 }

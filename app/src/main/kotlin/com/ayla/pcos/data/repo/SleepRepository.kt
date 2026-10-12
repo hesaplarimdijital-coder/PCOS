@@ -3,6 +3,7 @@ package com.ayla.pcos.data.repo
 import com.ayla.pcos.data.db.SleepDao
 import com.ayla.pcos.data.db.SleepEntity
 import com.ayla.pcos.data.db.SleepSource
+import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
 import java.time.Duration
 import java.time.Instant
@@ -12,7 +13,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SleepRepository @Inject constructor(private val dao: SleepDao) {
+class SleepRepository @Inject constructor(private val dao: SleepDao, private val prefs: UserPreferencesRepository) {
 
     /** Uyanılan günün ana uykusu (en uzun oturum). */
     fun observeNight(date: LocalDate): Flow<SleepEntity?> = dao.observeLongestFor(date)
@@ -32,7 +33,17 @@ class SleepRepository @Inject constructor(private val dao: SleepDao) {
         sessions.filter { it.externalId != null && it.externalId !in known }.forEach { dao.insert(it) }
     }
 
-    suspend fun delete(entity: SleepEntity) = dao.delete(entity)
+    /**
+     * Geceyi siler. Health Connect'ten gelen bir geceyse kimliği "gizlenenler"e eklenir; böylece sonraki
+     * almada yeniden eklenmez (Health Connect'teki asıl kayıt değişmez).
+     */
+    suspend fun delete(entity: SleepEntity) {
+        dao.delete(entity)
+        val id = entity.externalId
+        if (entity.source == SleepSource.HEALTH_CONNECT && id != null) {
+            prefs.update { it.copy(healthConnectHiddenIds = it.healthConnectHiddenIds + id) }
+        }
+    }
 }
 
 val SleepEntity.duration: Duration get() = Duration.between(startAt, endAt)

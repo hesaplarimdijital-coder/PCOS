@@ -419,7 +419,7 @@
     <!-- Health Connect: yalnızca uyku okuma (#11). Ayrıntı: docs/arastirma/health-connect-teknik.md -->
     <string name="hc_rationale_title">Uyku verini Health Connect&#8217;ten al</string>
     <string name="hc_rationale_what_title">Ne okunur?</string>
-    <string name="hc_rationale_what">Ayla, Health Connect&#8217;ten yalnızca uyku oturumlarını okur ve her gecenin başlangıç ile bitiş saatini alır. Başka hiçbir veri türüne erişmez, Health Connect&#8217;e veri yazmaz.</string>
+    <string name="hc_rationale_what">Ayla, Health Connect&#8217;ten yalnızca son 7 günün uyku oturumlarını okur ve her gecenin başlangıç ile bitiş saatini alır. Başka hiçbir veri türüne erişmez, Health Connect&#8217;e veri yazmaz.</string>
     <string name="hc_rationale_why_title">Neden?</string>
     <string name="hc_rationale_why">Yatış ve kalkış saatini elle girmen gerekmez. Alınan geceler Planım&#8217;daki uyku kartında elle girdiklerinle birlikte görünür. Ayla, Health Connect&#8217;i yalnızca uygulama açıkken okur.</string>
     <string name="hc_rationale_where_title">Nerede saklanır?</string>
@@ -451,16 +451,18 @@
     <string name="hc_status_disconnected_text">Bağlanırsan yatış ve kalkış saatini elle girmeden uyku kaydı alabilirsin.</string>
     <string name="hc_status_revoked">İzin kapalı</string>
     <string name="hc_status_update">Güncelleme gerekli</string>
+    <string name="hc_status_unavailable">Health Connect kullanılamıyor</string>
+    <string name="hc_status_unavailable_text">Bu cihazda Health Connect yok; uyku saatlerini elle girebilirsin. Daha önce alınan geceler sen silene kadar kalır.</string>
     <string name="hc_connect">Health Connect&#8217;e bağlan</string>
     <string name="hc_import_now">Şimdi al</string>
-    <string name="hc_import_now_text">Son 30 günün uyku oturumları</string>
+    <string name="hc_import_now_text">Son 7 günün uyku oturumları</string>
     <string name="hc_disconnect">Bağlantıyı kes</string>
     <string name="hc_disconnect_confirm_title">Health Connect bağlantısı kesilsin mi?</string>
     <string name="hc_disconnect_text">Ayla artık yeni uyku verisi okumaz; alınmış geceler sen silene kadar kalır. Bu değişiklik Health Connect ayarlarında ancak Ayla yeniden açıldığında görünür.</string>
     <string name="hc_disconnected">Bağlantı kesildi.</string>
     <string name="hc_delete_imported">Health Connect&#8217;ten alınan geceleri sil</string>
     <string name="hc_delete_imported_confirm_title">Alınan geceler silinsin mi?</string>
-    <string name="hc_delete_imported_confirm">Health Connect&#8217;ten alınan %1$d gece Ayla&#8217;dan silinir. Health Connect&#8217;teki asıl kayıtlar değişmez.</string>
+    <string name="hc_delete_imported_confirm">Health Connect&#8217;ten alınan %1$d gece Ayla&#8217;dan silinir ve yeniden alınmaz. Health Connect&#8217;teki asıl kayıtlar değişmez.</string>
     <string name="hc_deleted">Health Connect&#8217;ten alınan %1$d gece silindi.</string>
 
     <!-- Ana ekran widget'ı (#14, ADR-0007). Büyük harfli etiketler doğrudan Türkçe büyük harfle yazılır. -->

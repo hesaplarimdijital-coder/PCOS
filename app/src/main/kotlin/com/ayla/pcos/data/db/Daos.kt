@@ -182,6 +182,10 @@ interface SleepDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: SleepEntity): Long
 
+    /** Tek işlemde ekler; ekranlar her gece için ayrı ayrı değil bir kez tazelenir. */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(entities: List<SleepEntity>): List<Long>
+
     @Delete
     suspend fun delete(entity: SleepEntity)
 

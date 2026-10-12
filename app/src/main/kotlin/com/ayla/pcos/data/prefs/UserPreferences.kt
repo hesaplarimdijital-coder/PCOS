@@ -27,6 +27,11 @@ data class UserPreferences(
     val healthConnectConsentAt: Instant? = null,
     /** Health Connect izin penceresinin art arda kapatılma sayısı; 2'de pencere bir daha açılmaz. */
     val healthConnectPermissionCancels: Int = 0,
+    /**
+     * Ayla'dan silinen Health Connect gecelerinin kayıt kimlikleri (yalnızca kimlik, saat yok): sonraki almada
+     * yeniden eklenmesinler diye tutulur; kayıt alma penceresinden çıkınca listeden düşer.
+     */
+    val healthConnectHiddenIds: Set<String> = emptySet(),
 
     // Su
     val waterGoalCups: Int = 8,

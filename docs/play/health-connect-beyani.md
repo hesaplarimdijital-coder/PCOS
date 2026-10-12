@@ -10,7 +10,7 @@
 
 | Konu | Öneri |
 |---|---|
-| Health Connect izni | Yalnızca `android.permission.health.READ_SLEEP` (okuma). Yazma, geçmiş (30 günden eski) ve arka plan okuma izni yok. |
+| Health Connect izni | Yalnızca `android.permission.health.READ_SLEEP` (okuma). Yazma, geçmiş (30 günden eski) ve arka plan okuma izni yok; Ayla yalnızca son 7 günü okur. |
 | Onaylı kullanım durumu | "Fitness, wellness and coaching" altında uyku düzenini izleme ("analyzing sleep health and patterns"). |
 | Health apps formu, ekran 1 | Period tracking, Sleep management, Medication management, Diseases and conditions management (son ikisi aşağıda gerekçeli). Medical device apps **seçilmez**. |
 | Health apps formu, ekran 2 | Yalnızca Sleep management > Sleep, okuma; gerekçe metni §3.2'de (İngilizce, yapıştırmaya hazır). |
@@ -135,7 +135,7 @@ manually entered nights in the sleep card (last night and the last 7 nights with
 
 How: data is read only while the app is in the foreground: when the user taps the button and, after the
 user has connected Health Connect, when the user opens the app (to add new nights). Before the first read
-the app shows its own consent screen. We read sleep sessions from the last 30 days and store only each
+the app shows its own consent screen. We read sleep sessions from the last 7 days only and store only each
 session's start time, end time and Health Connect record ID (to avoid duplicates). Sleep stages, titles,
 notes and the source app name are not stored.
 
@@ -143,8 +143,8 @@ Storage and sharing: data stays on the device in an encrypted SQLCipher database
 Android Keystore. The app has no INTERNET permission, no account, no server and no analytics or ads SDKs.
 Health Connect data is never transferred, sold or used for advertising, profiling, credit or insurance
 decisions, and no human can access it. Users can delete imported nights in the app (one by one in the
-sleep card or all at once in Settings > Health Connect) and revoke access in Health Connect settings or in
-Ayla's settings (Settings > Health Connect > Disconnect). Ayla does not write to Health Connect and does not request
+sleep card or all at once in Settings > Health Connect); deleted nights are not imported again. Users can
+revoke access in Health Connect settings or in Ayla's settings (Settings > Health Connect > Disconnect). Ayla does not write to Health Connect and does not request
 background or historical (older than 30 days) read access.
 ```
 
@@ -162,7 +162,7 @@ or history access.
 ```
 
 Türkçe karşılığı (kayıt için): Ayla yalnızca uyku oturumlarını okur. Kullanıcı Planım > Su ve uyku'da
-"Health Connect'ten al"a dokunduğunda, yatış/kalkış saatini elle girmeden son 30 günün uyku oturumları içe
+"Health Connect'ten al"a dokunduğunda, yatış/kalkış saatini elle girmeden son 7 günün uyku oturumları içe
 aktarılır; dün gece ve son 7 gece uyku kartında gösterilir. Okuma yalnızca ön planda yapılır: dokununca ve
 bağlantı kurulduktan sonra uygulama açıldığında. Yalnızca başlangıç/bitiş zamanı ve kayıt kimliği cihazda
 şifreli veritabanında saklanır; kaynak uygulama adı saklanmaz. İnternet izni, sunucu, SDK yok; veri paylaşılmaz, satılmaz, reklamda kullanılmaz. Yazma, arka plan
@@ -173,7 +173,7 @@ ve geçmiş veri izni istenmez.
 | İzin | Neden istenmiyor |
 |---|---|
 | `WRITE_SLEEP` | Ayla Health Connect'e veri yazmaz; elle girilen uyku yalnızca Ayla'da kalır. |
-| `READ_HEALTH_DATA_HISTORY` | Uyku kartı son 7 geceyi gösterir; varsayılan 30 günlük pencere yeterli. Her ek izin ayrı gerekçe ister. |
+| `READ_HEALTH_DATA_HISTORY` | Uyku kartı son 7 geceyi gösterir ve Ayla yalnızca son 7 günü okur; varsayılan 30 günlük pencere fazlasıyla yeterli. |
 | `READ_HEALTH_DATA_IN_BACKGROUND` | Okuma yalnızca ön planda (dokununca ve bağlıyken uygulama açılınca); Ayla arka planda okumaz. |
 | Adet, ovülasyon testi, bazal ısı, semptom vb. | MVP 1–2 kapsamı dışında; üreme sağlığı türleri yüksek hassasiyetli incelemeye tabi. |
 

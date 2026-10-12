@@ -45,6 +45,12 @@ data class HealthConnectUiState(
     /** Desteklenmeyen cihazda giriş noktaları gizlenir; elle giriş her zaman açık. */
     val visible: Boolean get() = availability != HealthConnectAvailability.UNAVAILABLE
 
+    /**
+     * Ayarlar bölümü: Health Connect yoksa bile rıza verilmişse (geri almak için) ya da alınmış gece varsa
+     * (silmek için) görünür.
+     */
+    val settingsVisible: Boolean get() = visible || consentGiven || importedCount > 0
+
     val connected: Boolean get() = availability == HealthConnectAvailability.AVAILABLE && consentGiven && permissionGranted
 }
 
@@ -151,6 +157,8 @@ class HealthConnectViewModel @Inject constructor(
     }
 
     private suspend fun runImport() {
+        // Çift dokunuş: süren alma varken ikincisi başlamaz (depo da kısa aralıktaki ikinci okumayı birleştirir).
+        if (local.value.importing) return
         local.update { it.copy(importing = true, message = null) }
         val message = when (val result = repository.importNow()) {
             is SleepImportResult.Added -> if (result.count > 0) HcMessage.Added(result.count) else HcMessage.NothingNew

@@ -43,6 +43,7 @@ class UserPreferencesRepository @Inject constructor(
             healthDataConsentAt = this[Keys.HEALTH_DATA_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
             healthConnectConsentAt = this[Keys.HEALTH_CONNECT_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
             healthConnectPermissionCancels = this[Keys.HEALTH_CONNECT_PERMISSION_CANCELS] ?: defaults.healthConnectPermissionCancels,
+            healthConnectHiddenIds = this[Keys.HEALTH_CONNECT_HIDDEN_IDS] ?: defaults.healthConnectHiddenIds,
             consentPersonalization = this[Keys.CONSENT_PERSONALIZATION] ?: defaults.consentPersonalization,
             waterGoalCups = this[Keys.WATER_GOAL_CUPS] ?: defaults.waterGoalCups,
             cupMl = this[Keys.CUP_ML] ?: defaults.cupMl,
@@ -77,6 +78,7 @@ class UserPreferencesRepository @Inject constructor(
         p.healthDataConsentAt?.let { this[Keys.HEALTH_DATA_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.HEALTH_DATA_CONSENT_AT)
         p.healthConnectConsentAt?.let { this[Keys.HEALTH_CONNECT_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.HEALTH_CONNECT_CONSENT_AT)
         this[Keys.HEALTH_CONNECT_PERMISSION_CANCELS] = p.healthConnectPermissionCancels
+        this[Keys.HEALTH_CONNECT_HIDDEN_IDS] = p.healthConnectHiddenIds
         this[Keys.CONSENT_PERSONALIZATION] = p.consentPersonalization
         // Kaldırılan rıza anahtarları (analitik, araştırma) eski kurulumlarda kalmasın.
         remove(Keys.LEGACY_CONSENT_ANALYTICS)
@@ -117,6 +119,7 @@ class UserPreferencesRepository @Inject constructor(
         val HEALTH_DATA_CONSENT_AT = longPreferencesKey("health_data_consent_at")
         val HEALTH_CONNECT_CONSENT_AT = longPreferencesKey("health_connect_consent_at")
         val HEALTH_CONNECT_PERMISSION_CANCELS = intPreferencesKey("health_connect_permission_cancels")
+        val HEALTH_CONNECT_HIDDEN_IDS = stringSetPreferencesKey("health_connect_hidden_ids")
         val LEGACY_CONSENT_ANALYTICS = booleanPreferencesKey("consent_analytics")
         val LEGACY_CONSENT_RESEARCH = booleanPreferencesKey("consent_research")
         val WATER_GOAL_CUPS = intPreferencesKey("water_goal_cups")

@@ -243,8 +243,13 @@ Dışa aktarma bu geceleri `source` ve `externalId` ile içerir (kullanıcının
    aç"; "Bağlantıyı kes" (rıza silinir, `revokeAllPermissions`); "Health Connect'ten alınan geceleri sil".
    Tam silme de izinleri bırakır.
 4. **Politika kopyası + eşitlik testi** (`GizlilikPolitikasiTest`), derleme görevi yok.
-5. **Eşitleme:** düğmeye dokununca ve bağlantı kurulduktan sonra her ön plana gelişte, en sık saatte bir;
-   arka planda okuma yok. Health Connect'teki silmeler yansıtılmaz (politika "ayrıca silmen gerekebilir" der).
+5. **Eşitleme:** düğmeye dokununca ve bağlantı kurulduktan sonra her ön plana gelişte, en sık saatte bir
+   (başarısız denemeden sonra da); 10 saniye içindeki ikinci alma yeniden okumaz. Arka planda okuma yok.
+   Health Connect'teki silmeler yansıtılmaz (politika "ayrıca silmen gerekebilir" der).
+7. **Pencere 8 gün** (KVKK veri en aza indirme, Ekim 2026 incelemesi): kart son 7 geceyi gösterir; 30 günlük
+   okuma görünmeyen ve tek tek silinemeyen veri biriktiriyordu.
+8. **Silinen gece geri gelmez:** Ayla'dan silinen Health Connect gecesinin kimliği (yalnızca kimlik) tercihlerde
+   tutulur ve almada elenir; Health Connect bir sonraki okumada o kimliği döndürmezse listeden düşer.
 6. **Açık rıza:** gerekçe ekranındaki "Onaylıyorum, devam et" zamanı `healthConnectConsentAt` olarak saklanır;
    rıza yoksa izin verilmiş olsa bile hiçbir şey okunmaz. Art arda iptal sayacı DataStore'da, izin verilince
    sıfırlanır.

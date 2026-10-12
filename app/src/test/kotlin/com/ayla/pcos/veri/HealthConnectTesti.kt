@@ -17,6 +17,7 @@ import org.junit.Test
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -49,11 +50,24 @@ class SahteHealthConnect : HealthConnectSource {
     }
 }
 
+/** İleri sarılabilen saat: aynı andaki ikinci alma birleştirildiği için testler zamanı elle ilerletir. */
+class OynakSaat(var an: Instant, private val dilim: ZoneId) : Clock() {
+    override fun getZone(): ZoneId = dilim
+
+    override fun withZone(zone: ZoneId): Clock = OynakSaat(an, zone)
+
+    override fun instant(): Instant = an
+
+    fun ilerlet(dakika: Long) {
+        an = an.plusSeconds(dakika * 60)
+    }
+}
+
 /** Health Connect'ten uyku alma (#11): rıza ve izin kapıları, yineleme, hatalar ve akış adımları. */
 class HealthConnectTesti : VeriTestOrtami() {
 
     private val sahte = SahteHealthConnect()
-    private val saat: Clock get() = Clock.fixed(bugun.atTime(10, 0).atZone(zone).toInstant(), zone)
+    private val saat by lazy { OynakSaat(bugun.atTime(10, 0).atZone(zone).toInstant(), zone) }
     private val depo by lazy { HealthConnectRepository(sahte, db.sleepDao(), prefs, saat) }
 
     /** [gunOnce] gün önce [kalkis]'ta biten gece; yatış kalkıştan sonraysa önceki akşamdır. */
@@ -91,9 +105,10 @@ class HealthConnectTesti : VeriTestOrtami() {
         sahte.oturumlar = listOf(
             gece("a", 0, LocalTime.of(23, 30), LocalTime.of(7, 0)),
             gece("b", 1, LocalTime.of(0, 15), LocalTime.of(6, 45)),
-            gece("eski", 40, LocalTime.of(23, 0), LocalTime.of(7, 0)), // pencere dışı
+            gece("eski", 9, LocalTime.of(23, 0), LocalTime.of(7, 0)), // son 7 gecenin dışı
         )
         assertEquals(SleepImportResult.Added(2), calistir { depo.importNow() })
+        saat.ilerlet(1)
         assertEquals(SleepImportResult.Added(0), calistir { depo.importNow() })
         val kayitlar = calistir { db.sleepDao().getAll() }
         assertEquals(setOf("a", "b"), kayitlar.mapNotNull { it.externalId }.toSet())
@@ -106,9 +121,11 @@ class HealthConnectTesti : VeriTestOrtami() {
         rizaVer()
         sahte.izin = false
         assertEquals(SleepImportResult.NoPermission, calistir { depo.importNow() })
+        saat.ilerlet(1)
         sahte.izin = true
         sahte.hata = SecurityException("izin geri alındı")
         assertEquals(SleepImportResult.NoPermission, calistir { depo.importNow() })
+        assertEquals(1, sahte.okumaSayisi)
     }
 
     @Test
@@ -116,6 +133,9 @@ class HealthConnectTesti : VeriTestOrtami() {
         rizaVer()
         sahte.hata = IllegalStateException("kota")
         assertEquals(SleepImportResult.Failed, calistir { depo.importNow() })
+        // Başarısız denemeden sonra ön plan eşitlemesi saat dolmadan yeniden zorlamaz.
+        saat.ilerlet(5)
+        assertNull(calistir { depo.syncIfConnected() })
         sahte.hata = null
         sahte.durum = HealthConnectAvailability.UPDATE_REQUIRED
         assertEquals(SleepImportResult.Unavailable, calistir { depo.importNow() })
@@ -126,8 +146,44 @@ class HealthConnectTesti : VeriTestOrtami() {
         rizaVer()
         sahte.oturumlar = listOf(gece("a", 0, LocalTime.of(23, 30), LocalTime.of(7, 0)))
         assertEquals(SleepImportResult.Added(1), calistir { depo.syncIfConnected() })
+        saat.ilerlet(30)
+        assertNull(calistir { depo.syncIfConnected() })
+        saat.ilerlet(31)
+        assertEquals(SleepImportResult.Added(0), calistir { depo.syncIfConnected() })
+        assertEquals(2, sahte.okumaSayisi)
+    }
+
+    @Test
+    fun `ayni anda gelen ikinci alma yeniden okumaz, ilk sonucu dondurur`() {
+        rizaVer()
+        sahte.oturumlar = listOf(gece("a", 0, LocalTime.of(23, 30), LocalTime.of(7, 0)))
+        assertEquals(SleepImportResult.Added(1), calistir { depo.importNow() })
+        assertEquals(SleepImportResult.Added(1), calistir { depo.importNow() }, "izin dönüşü + ön plan eşitlemesi")
         assertNull(calistir { depo.syncIfConnected() })
         assertEquals(1, sahte.okumaSayisi)
+    }
+
+    @Test
+    fun `aylada silinen health connect gecesi yeniden alinmaz, pencereden cikinca kimligi duser`() {
+        rizaVer()
+        sahte.oturumlar = listOf(
+            gece("a", 0, LocalTime.of(23, 30), LocalTime.of(7, 0)),
+            gece("b", 1, LocalTime.of(23, 0), LocalTime.of(6, 30)),
+        )
+        calistir { depo.importNow() }
+        val a = calistir { db.sleepDao().getAll() }.single { it.externalId == "a" }
+        calistir { sleep.delete(a) }
+        assertEquals(setOf("a"), calistir { prefs.current().healthConnectHiddenIds })
+
+        saat.ilerlet(1)
+        assertEquals(SleepImportResult.Added(0), calistir { depo.importNow() })
+        assertEquals(listOf("b"), calistir { db.sleepDao().getAll() }.mapNotNull { it.externalId })
+
+        // "a" Health Connect penceresinden çıktı (ya da orada silindi): kimliği artık tutulmaz.
+        sahte.oturumlar = sahte.oturumlar.filter { it.id != "a" }
+        saat.ilerlet(1)
+        calistir { depo.importNow() }
+        assertTrue(calistir { prefs.current().healthConnectHiddenIds }.isEmpty())
     }
 
     @Test
@@ -144,6 +200,10 @@ class HealthConnectTesti : VeriTestOrtami() {
             )
         }
         assertEquals(1, calistir { depo.deleteImported() })
+        assertEquals(listOf(SleepSource.MANUAL), calistir { db.sleepDao().getAll() }.map { it.source })
+        // Bağlantı açık kalsa da silinenler geri gelmez.
+        saat.ilerlet(1)
+        assertEquals(SleepImportResult.Added(0), calistir { depo.importNow() })
         assertEquals(listOf(SleepSource.MANUAL), calistir { db.sleepDao().getAll() }.map { it.source })
 
         calistir { depo.disconnect() }

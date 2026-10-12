@@ -34,7 +34,7 @@ ve [`ekran-goruntuleri`](https://github.com/hesaplarimdijital-coder/PCOS/tree/ek
 - **Takvim**: kayıtlı adet, tahmini aralık, kayıt izi; adet başlangıcı/bitişi işaretleme, döngüyü hesap dışı bırakma, döngü geçmişi.
 - **İlaçlar**: hazır şablonlar (Inofolic Combi, hap 24/4 ve 21/7, metformin, D vitamini, nane çayı) ve tam düzenleme formu (saatler, yemekle/aç karna, stok ve uyarı eşiği, hap paket düzeni ve başlangıcı); haftalık uyum; inositol için kanıt notu.
 - **Planım**: su (bardak hedefi, 7 gün), uyku (elle ya da Health Connect'ten), akşam rutini; **Beslenme** (tabak modeli, ilkeler, bitkisel destekler ve listeye alınmayanlar uyarısı) ve **Hareket** (haftalık ritim, dört kısa rutin). Her kartta kanıt düzeyi ve kaynak; kalori ve tartı dili yok.
-- **Health Connect**: yalnızca uyku okuma, açık rıza ekranı, son 30 gün, çakışan gecelerin elenmesi; Ayarlar'dan bağlantıyı kesme ve alınanları silme.
+- **Health Connect**: yalnızca uyku okuma, açık rıza ekranı, yalnızca son 7 gün, çakışan gecelerin elenmesi; silinen gece geri gelmez; Ayarlar'dan bağlantıyı kesme ve alınanları silme.
 - **Ana ekran widget'ı**: döngü ya da hap günü, sıradaki doz ve tek dokunuşla "Aldım", su; gizlilik ayarı açıkken yalnızca "Ayla".
 - **Ben**: döngü düzeni (21–35 gün tipik aralık), takviye uyumu, su/kayıt haftası, 4 haftalık kayıt ızgarası, **doktor notu** (döngü, ilaç ve semptom özeti; paylaşım menüsüyle).
 - **Hatırlatmalar**: tam saatinde doz alarmı (Aldım / 15 dk ertele), su, akşam rutini, Pazar akşamı nazik haftalık özet; sessiz saatlere uyar. Pil tasarrufu yönlendirmesi (üreticiye özel notlarla) ve gecikmeleri gösteren hatırlatma günlüğü.

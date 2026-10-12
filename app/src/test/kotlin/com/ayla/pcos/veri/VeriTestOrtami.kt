@@ -104,7 +104,7 @@ abstract class VeriTestOrtami {
         meds = MedicationRepository(db.medicationDao(), db.doseEventDao(), scheduler)
         logs = DailyLogRepository(db.dailyLogDao())
         water = HydrationRepository(db.hydrationDao())
-        sleep = SleepRepository(db.sleepDao())
+        sleep = SleepRepository(db.sleepDao(), prefs)
         doctorNote = DoctorNoteRepository(context, cycles, logs, db.medicationDao(), db.doseEventDao(), ticker)
     }
 

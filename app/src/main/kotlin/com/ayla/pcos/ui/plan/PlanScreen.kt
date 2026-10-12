@@ -121,8 +121,13 @@ private val hourMinute: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 fun PlanScreen(viewModel: PlanViewModel = hiltViewModel(), healthConnectViewModel: HealthConnectViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val healthConnect by healthConnectViewModel.uiState.collectAsStateWithLifecycle()
-    // Health Connect sonucu bu ekranda gösterildi; başka ekrana taşınmasın.
-    DisposableEffect(Unit) { onDispose { healthConnectViewModel.clearMessage() } }
+    // Health Connect sonucu ve yarım kalan adım bu ekrana aittir; başka ekranda açılmasın.
+    DisposableEffect(Unit) {
+        onDispose {
+            healthConnectViewModel.clearMessage()
+            healthConnectViewModel.dismissStep()
+        }
+    }
     HealthConnectAkisi(healthConnectViewModel, healthConnect.step)
     if (state.loading) {
         Box(Modifier.fillMaxSize())

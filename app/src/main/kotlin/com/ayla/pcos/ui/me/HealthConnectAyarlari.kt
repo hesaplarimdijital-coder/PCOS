@@ -65,6 +65,8 @@ internal fun HealthConnectAyarIcerigi(state: HealthConnectUiState, actions: Heal
     var confirmDelete by remember { mutableStateOf(false) }
     val colors = LocalAylaColors.current
     val status = when {
+        state.availability == HealthConnectAvailability.UNAVAILABLE ->
+            HcDurum(Icons.Rounded.WarningAmber, colors.uyari, R.string.hc_status_unavailable, R.string.hc_status_unavailable_text)
         state.availability == HealthConnectAvailability.UPDATE_REQUIRED ->
             HcDurum(Icons.Rounded.SystemUpdate, colors.uyari, R.string.hc_status_update, R.string.hc_update_required)
         state.connected -> HcDurum(Icons.Rounded.CheckCircle, colors.basari, R.string.hc_status_connected, R.string.hc_status_connected_text)
@@ -78,24 +80,29 @@ internal fun HealthConnectAyarIcerigi(state: HealthConnectUiState, actions: Heal
             Text(stringResource(status.text), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
-    HorizontalDivider()
+    // Eylemler: kullanılabilirliğe göre bağlan / şimdi al / ayarlar; rıza verilmişse her durumda "Bağlantıyı kes"
+    // (rıza, Health Connect kaldırılmış olsa da geri alınabilmeli).
     when {
-        state.availability == HealthConnectAvailability.UPDATE_REQUIRED ->
+        state.availability == HealthConnectAvailability.UPDATE_REQUIRED -> {
+            HorizontalDivider()
             EylemSatiri(Icons.Rounded.SystemUpdate, R.string.hc_update_action, null, onClick = actions.onOpenPlayStore)
+        }
         state.connected -> {
+            HorizontalDivider()
             EylemSatiri(Icons.Rounded.Sync, R.string.hc_import_now, R.string.hc_import_now_text, onClick = actions.onImport)
-            HorizontalDivider()
-            EylemSatiri(Icons.Rounded.Settings, R.string.hc_open_settings, null, onClick = actions.onOpenSettings)
-            HorizontalDivider()
-            EylemSatiri(Icons.Rounded.LinkOff, R.string.hc_disconnect, null) { confirmDisconnect = true }
         }
-        else -> {
+        state.visible -> {
+            HorizontalDivider()
             EylemSatiri(Icons.Rounded.Link, R.string.hc_connect, null, onClick = actions.onConnect)
-            if (state.consentGiven) {
-                HorizontalDivider()
-                EylemSatiri(Icons.Rounded.Settings, R.string.hc_open_settings, null, onClick = actions.onOpenSettings)
-            }
         }
+    }
+    if (state.availability == HealthConnectAvailability.AVAILABLE && state.consentGiven) {
+        HorizontalDivider()
+        EylemSatiri(Icons.Rounded.Settings, R.string.hc_open_settings, null, onClick = actions.onOpenSettings)
+    }
+    if (state.consentGiven) {
+        HorizontalDivider()
+        EylemSatiri(Icons.Rounded.LinkOff, R.string.hc_disconnect, null) { confirmDisconnect = true }
     }
     if (state.importedCount > 0) {
         HorizontalDivider()

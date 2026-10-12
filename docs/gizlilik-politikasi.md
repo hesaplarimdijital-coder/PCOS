@@ -108,8 +108,8 @@ Health Connect, Android'de sağlık ve fitness verilerini cihazda bir arada tuta
 
 - **Okunan veri:** yalnızca uyku oturumları (Health Connect'teki "Uyku" veri türü, READ_SLEEP izni). Ayla başka hiçbir veri türüne erişim istemez.
 - **Ne zaman:** yalnızca Ayla açıkken. Sen "Health Connect'ten al" dediğinde okur; bağlantı açık kaldıkça Ayla'yı açtığında yeni geceleri eklemek için de okuyabilir. Ayla Health Connect'i arka planda okumaz.
-- **Ne kadar geriye:** Health Connect, uygulamalara varsayılan olarak ilk izin verildiği tarihten en fazla 30 gün öncesine kadarki kayıtları açar. Ayla daha eski kayıtlar için ek izin istemez.
-- **Saklanan alanlar:** her oturumun başlangıç ve bitiş zamanı ile aynı geceyi iki kez eklememek için Health Connect kayıt kimliği. Kaydı oluşturan uygulamanın adı, uyku evreleri, oturum başlığı ve notları saklanmaz.
+- **Ne kadar geriye:** Ayla yalnızca son 7 günün uyku oturumlarını okur; uyku kartı da son 7 geceyi gösterir. Daha eski kayıtlar için izin istemez.
+- **Saklanan alanlar:** her oturumun başlangıç ve bitiş zamanı ile aynı geceyi iki kez eklememek için Health Connect kayıt kimliği. Kaydı oluşturan uygulamanın adı, uyku evreleri, oturum başlığı ve notları saklanmaz. Ayla'dan sildiğin bir Health Connect gecesi bir sonraki almada geri gelmesin diye yalnızca o kaydın kimliği (saat ya da süre olmadan), kayıt 7 günlük pencereden çıkana kadar 3.6. bölümdeki ayar dosyasında tutulur.
 - **Kullanım amacı:** uyku kaydını elle saat girmeden tamamlamak. Alınan geceler, Planım'daki uyku kartında elle girdiğin gecelerle birlikte gösterilir. Başka hiçbir amaçla kullanılmaz.
 - **Saklama yeri:** yalnızca cihazında, diğer kayıtlarınla aynı şifreli veritabanında.
 - **Paylaşım:** Health Connect'ten alınan veriler cihazından çıkmaz; kimseye aktarılmaz veya satılmaz; reklam, profil çıkarma, kredi ya da sigorta değerlendirmesi gibi amaçlarla kullanılmaz; biz dahil hiç kimse tarafından okunmaz. Yalnızca sen dışa aktarırsan oluşturduğun dosyada yer alır.
