@@ -15,8 +15,8 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr-TR/1.1.0/) ilkelerine, s
   kaçınılacaklar listelenir. "Ne zaman doktora" kartları aciliyet rozetiyle, saç ve tüy alma bilgisi, alerjen notu;
   her kartta kanıt düzeyi ve kaynak.
 - Şifreli cilt/saç fotoğrafları (ADR-0010): ayrı ve geri alınabilir onay, Keystore anahtarıyla şifreli saklama,
-  konum ve cihaz bilgisinin silinmesi, galeriye ve yedeğe girmeme, yan yana karşılaştırma; onayı geri almak tüm
-  fotoğrafları siler.
+  konum ve cihaz bilgisinin silinmesi, Ayla tarafından galeriye ve yedeğe yazılmama, yan yana karşılaştırma,
+  tek tek ya da topluca klasöre kaydetme; onayı geri almak tüm fotoğrafları siler.
 - Doktor raporu PDF'i (#26, ADR-0009): tarih aralığı ve bölüm seçimiyle cihazda üretilir; döngü, ilaç uyumu,
   semptomlar, uyku, doğurganlık ve cilt özeti; düz metin olarak da paylaşılabilir. Doktora sorular listesi
   (öneriler, "soruldu" işareti) rapora eklenir. Ben ekranındaki doktor notunun yerini alır.
