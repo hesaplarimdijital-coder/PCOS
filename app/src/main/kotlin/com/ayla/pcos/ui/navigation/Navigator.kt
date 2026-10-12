@@ -32,6 +32,9 @@ sealed interface Screen {
     data class EditMedication(val id: Long) : Screen { override val route = "meds/edit/$id" }
     data object Settings : Screen { override val route = "settings" }
 
+    /** Ayarlar, yedek dosyası seçici açık başlar (anahtar kaybı diyaloğundan gelinir). */
+    data object RestoreBackup : Screen { override val route = "settings/restore" }
+
     companion object {
         val tabs: List<Tab> = listOf(Today, Calendar, Meds, Plan, Me)
 
@@ -43,6 +46,7 @@ sealed interface Screen {
             route == Me.route -> Me
             route == AddMedication.route -> AddMedication
             route == Settings.route -> Settings
+            route == RestoreBackup.route -> RestoreBackup
             route.startsWith("log/") -> runCatching { DailyLog(LocalDate.parse(route.removePrefix("log/"))) }.getOrNull()
             route.startsWith("meds/edit/") -> route.removePrefix("meds/edit/").toLongOrNull()?.let { EditMedication(it) }
             else -> null

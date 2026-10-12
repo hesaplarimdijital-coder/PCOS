@@ -16,6 +16,7 @@ import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.repo.Adherence
 import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.data.repo.SymptomCatalog
+import com.ayla.pcos.export.ImportSummary
 import com.ayla.pcos.ui.calendar.CalendarUiState
 import com.ayla.pcos.ui.calendar.CycleRow
 import com.ayla.pcos.ui.calendar.DayActions
@@ -181,6 +182,11 @@ internal object Ornek {
         waterDaysThisWeek = 3, logDaysThisWeek = 5,
         // Bugün Pazartesi: son satırın ilk hücresi bugün, sonrası gelecek.
         logGrid = List(28) { i -> if (i > 21) null else (i % 3 != 1) },
+    )
+
+    val yedekOzeti = ImportSummary(
+        exportedAt = Instant.parse("2026-10-01T17:42:00Z"),
+        periods = 7, dailyLogs = 118, medications = 3, doses = 236, hydrationDays = 64, sleepNights = 41,
     )
 
     val gunlukKayit = DailyLogUiState(

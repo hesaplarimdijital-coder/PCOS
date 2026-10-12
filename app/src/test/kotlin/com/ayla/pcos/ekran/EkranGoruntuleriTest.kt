@@ -22,6 +22,7 @@ import com.ayla.pcos.ui.AppLockContent
 import com.ayla.pcos.ui.calendar.CalendarContent
 import com.ayla.pcos.ui.components.AltGezinme
 import com.ayla.pcos.ui.log.DailyLogContent
+import com.ayla.pcos.ui.me.BackupImportState
 import com.ayla.pcos.ui.me.MeContent
 import com.ayla.pcos.ui.me.SettingsContent
 import com.ayla.pcos.ui.meds.AddMedicationContent
@@ -35,6 +36,7 @@ import com.ayla.pcos.ui.theme.AylaTheme
 import com.ayla.pcos.ui.today.TodayContent
 import com.ayla.pcos.ui.today.TodayUiState
 import com.github.takahirom.roborazzi.captureRoboImage
+import com.github.takahirom.roborazzi.captureScreenRoboImage
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -72,6 +74,7 @@ class EkranGoruntuleriTest {
         koyu: Boolean = false,
         yaziOlcegi: Float = 1f,
         sistemYaziOlcegi: Float? = null,
+        tumEkran: Boolean = false,
         content: @Composable () -> Unit,
     ) {
         compose.setContent {
@@ -106,7 +109,8 @@ class EkranGoruntuleriTest {
             }
         }
         compose.waitForIdle()
-        compose.onRoot().captureRoboImage("build/ekran/$ad.png")
+        // Diyaloglar ayrı pencerede çizilir; tumEkran tüm pencereleri tek görüntüde birleştirir.
+        if (tumEkran) captureScreenRoboImage("build/ekran/$ad.png") else compose.onRoot().captureRoboImage("build/ekran/$ad.png")
     }
 
     @Composable
@@ -224,6 +228,14 @@ class EkranGoruntuleriTest {
 
     @Config(qualifiers = KUCUK)
     @Test fun t27_kucuk_ekran_takvim() = ekran("27-kucuk-takvim", sekme = Screen.Calendar) { Takvim() }
+
+    @Test fun t29_yedek_onizleme() = ekran("29-yedek-onizleme", tumEkran = true) {
+        SettingsContent(
+            prefs = Ornek.ayarlar, exactAlarmsAllowed = true, snackbar = remember { SnackbarHostState() },
+            onBack = {}, onUpdate = {}, onExport = {}, onWipe = {},
+            importState = BackupImportState.Preview(Ornek.yedekOzeti),
+        )
+    }
 
     @Test fun t28_planim_uyku_bos() = ekran("28-planim-uyku-bos", sekme = Screen.Plan) {
         PlanContent(

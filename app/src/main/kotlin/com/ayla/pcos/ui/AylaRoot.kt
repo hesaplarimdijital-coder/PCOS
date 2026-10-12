@@ -20,6 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -57,6 +60,8 @@ fun AylaRoot(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
+    // Anahtar kaybı diyaloğunda "Yedekten geri yükle" seçildi; ana kabuk açılınca Ayarlar'a gidilir.
+    var restoreRequested by rememberSaveable { mutableStateOf(false) }
 
     // Arka plana gidip gelince kilidi yeniden değerlendir.
     DisposableEffect(lifecycleOwner) {
@@ -75,7 +80,13 @@ fun AylaRoot(
         state.loading -> Box(Modifier.fillMaxSize())
         !state.onboardingDone -> OnboardingScreen()
         state.locked -> AppLockScreen(onUnlocked = viewModel::onUnlocked)
-        else -> MainShell(openTarget = openTarget, onOpenTargetConsumed = onOpenTargetConsumed)
+        else -> MainShell(
+            openTarget = openTarget ?: RESTORE_TARGET.takeIf { restoreRequested },
+            onOpenTargetConsumed = {
+                restoreRequested = false
+                onOpenTargetConsumed()
+            },
+        )
     }
 
     if (!state.loading && state.dataResetNotice) {
@@ -85,6 +96,12 @@ fun AylaRoot(
             text = { Text(stringResource(R.string.data_reset_text)) },
             confirmButton = {
                 TextButton(onClick = viewModel::acknowledgeDataReset) { Text(stringResource(R.string.action_understood)) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    viewModel.acknowledgeDataReset()
+                    restoreRequested = true
+                }) { Text(stringResource(R.string.data_reset_restore)) }
             },
         )
     }
@@ -101,6 +118,7 @@ private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit) {
             "plan" -> navigator.selectTab(Screen.Plan)
             "calendar" -> navigator.selectTab(Screen.Calendar)
             "me" -> navigator.selectTab(Screen.Me)
+            RESTORE_TARGET -> navigator.push(Screen.RestoreBackup)
         }
         if (openTarget != null) onOpenTargetConsumed()
     }
@@ -164,5 +182,9 @@ private fun ScreenHost(screen: Screen, navigator: AylaNavigator) {
         )
         is Screen.EditMedication -> EditMedicationScreen(id = screen.id, onDone = { navigator.pop() })
         Screen.Settings -> SettingsScreen(onBack = { navigator.pop() })
+        Screen.RestoreBackup -> SettingsScreen(onBack = { navigator.pop() }, autoStartImport = true)
     }
 }
+
+/** Ana kabuğa "yedek geri yükleme ekranını aç" isteği (bildirim hedefleriyle aynı kanal). */
+private const val RESTORE_TARGET = "restore"

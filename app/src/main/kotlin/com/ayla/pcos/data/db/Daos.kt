@@ -37,6 +37,10 @@ interface PeriodDao {
 
     @Query("UPDATE periods SET end_date = :end WHERE id = :id")
     suspend fun setEnd(id: Long, end: LocalDate?)
+
+    /** Yedekten "üzerine yaz" için; işlem (transaction) içinde çağrılır. */
+    @Query("DELETE FROM periods")
+    suspend fun deleteAll()
 }
 
 @Dao
@@ -58,6 +62,9 @@ interface DailyLogDao {
 
     @Query("DELETE FROM daily_logs WHERE date = :date")
     suspend fun delete(date: LocalDate)
+
+    @Query("DELETE FROM daily_logs")
+    suspend fun deleteAll()
 }
 
 @Dao
@@ -85,6 +92,9 @@ interface MedicationDao {
 
     @Query("UPDATE medications SET stock_count = :count WHERE id = :id")
     suspend fun setStock(id: Long, count: Int?)
+
+    @Query("DELETE FROM medications")
+    suspend fun deleteAll()
 }
 
 @Dao
@@ -118,6 +128,9 @@ interface DoseEventDao {
 
     @Query("SELECT * FROM dose_events ORDER BY date ASC, time ASC")
     suspend fun getAll(): List<DoseEventEntity>
+
+    @Query("DELETE FROM dose_events")
+    suspend fun deleteAll()
 }
 
 @Dao
@@ -136,6 +149,9 @@ interface HydrationDao {
 
     @Upsert
     suspend fun upsert(entity: HydrationEntity)
+
+    @Query("DELETE FROM hydration")
+    suspend fun deleteAll()
 }
 
 @Dao
@@ -157,4 +173,7 @@ interface SleepDao {
 
     @Delete
     suspend fun delete(entity: SleepEntity)
+
+    @Query("DELETE FROM sleep_sessions")
+    suspend fun deleteAll()
 }

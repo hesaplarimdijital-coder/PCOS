@@ -1,7 +1,9 @@
 package com.ayla.pcos.ui.me
 
+import android.content.res.Resources
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -23,12 +26,14 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.SettingsBackupRestore
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
@@ -36,6 +41,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -51,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -62,6 +69,9 @@ import com.ayla.pcos.R
 import com.ayla.pcos.data.prefs.Goal
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.export.DataExporter
+import com.ayla.pcos.export.ImportMode
+import com.ayla.pcos.export.ImportSummary
+import com.ayla.pcos.export.InvalidBackupException
 import com.ayla.pcos.ui.components.AdimSayaci
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
@@ -77,6 +87,7 @@ import com.ayla.pcos.ui.components.openNotificationSettings
 import com.ayla.pcos.ui.components.saatMetni
 import com.ayla.pcos.ui.components.segmentSimgesi
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 /** Ayar sınırları; arayüz ve testler aynı değerleri kullanır. */
 object AyarSinirlari {
@@ -91,12 +102,12 @@ enum class SaatAlani { ACTIVE_START, ACTIVE_END, QUIET_START, QUIET_END, DAILY_C
 
 /** Ayarlar: profil, su, bildirimler, koruma, KVKK rızaları, görünüm, veri. */
 @Composable
-fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(onBack: () -> Unit, autoStartImport: Boolean = false, viewModel: SettingsViewModel = hiltViewModel()) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
+    val importState by viewModel.importState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val context = LocalContext.current
-    val exportDone = stringResource(R.string.export_done)
-    val exportFailed = stringResource(R.string.export_failed)
+    val resources = LocalResources.current
     var exactAllowed by remember { mutableStateOf(viewModel.exactAlarmsAllowed()) }
     var notificationsEnabled by remember { mutableStateOf(viewModel.notificationsEnabled()) }
 
@@ -110,10 +121,24 @@ fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewMo
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
         if (uri != null) viewModel.exportTo(uri)
     }
+    // Bazı dosya yöneticileri .json'u "octet-stream" ya da düz metin olarak etiketler.
+    val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) viewModel.readBackup(uri)
+    }
+    val launchImport = { importLauncher.launch(arrayOf("application/json", "application/octet-stream", "text/plain")) }
+
+    // Anahtar kaybı diyaloğundan "Yedekten geri yükle" ile gelindiyse dosya seçici bir kez açılır.
+    var autoImportDone by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(autoStartImport) {
+        if (autoStartImport && !autoImportDone) {
+            autoImportDone = true
+            launchImport()
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
-            snackbar.showSnackbar(if (event is SettingsEvent.ExportDone) exportDone else exportFailed)
+            snackbar.showSnackbar(settingsEventMessage(resources, event))
         }
     }
 
@@ -127,6 +152,10 @@ fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewMo
         onUpdate = { transform -> viewModel.update(transform) },
         onExport = { exportLauncher.launch(DataExporter.suggestedFileName()) },
         onWipe = { viewModel.wipeAll() },
+        importState = importState,
+        onImport = launchImport,
+        onImportConfirm = viewModel::applyBackup,
+        onImportCancel = viewModel::cancelImport,
         onOpenNotificationSettings = { openNotificationSettings(context) },
         onOpenExactAlarmSettings = { openExactAlarmSettings(context) },
     )
@@ -145,9 +174,14 @@ internal fun SettingsContent(
     notificationsEnabled: Boolean = true,
     onOpenNotificationSettings: () -> Unit = {},
     onOpenExactAlarmSettings: () -> Unit = {},
+    importState: BackupImportState = BackupImportState.Idle,
+    onImport: () -> Unit = {},
+    onImportConfirm: (ImportMode) -> Unit = {},
+    onImportCancel: () -> Unit = {},
 ) {
     val p = prefs
     var confirmWipe by remember { mutableStateOf(false) }
+    var confirmReplace by remember { mutableStateOf(false) }
     var editingName by rememberSaveable { mutableStateOf(false) }
     var editingTime by rememberSaveable { mutableStateOf<SaatAlani?>(null) }
 
@@ -303,6 +337,8 @@ internal fun SettingsContent(
             Grup(stringResource(R.string.settings_section_data)) {
                 EylemSatiri(Icons.Rounded.Download, R.string.settings_export, R.string.settings_export_text, onClick = onExport)
                 HorizontalDivider()
+                EylemSatiri(Icons.Rounded.SettingsBackupRestore, R.string.settings_import, R.string.settings_import_text, onClick = onImport)
+                HorizontalDivider()
                 EylemSatiri(Icons.Rounded.Delete, R.string.settings_delete_all, null, destructive = true) { confirmWipe = true }
             }
 
@@ -348,6 +384,37 @@ internal fun SettingsContent(
         )
     }
 
+    when (importState) {
+        is BackupImportState.Preview -> YedekOnizlemeDialog(
+            summary = importState.summary,
+            onMerge = { onImportConfirm(ImportMode.MERGE) },
+            onReplace = { confirmReplace = true },
+            onDismiss = onImportCancel,
+        )
+        BackupImportState.Applying -> AlertDialog(
+            onDismissRequest = {},
+            title = { Text(stringResource(R.string.import_working)) },
+            text = { LinearProgressIndicator(modifier = Modifier.fillMaxWidth()) },
+            confirmButton = {},
+        )
+        BackupImportState.Idle -> Unit
+    }
+
+    if (confirmReplace) {
+        AlertDialog(
+            onDismissRequest = { confirmReplace = false },
+            title = { Text(stringResource(R.string.import_replace_confirm_title)) },
+            text = { Text(stringResource(R.string.import_replace_confirm_text)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmReplace = false
+                    onImportConfirm(ImportMode.REPLACE)
+                }) { Text(stringResource(R.string.import_replace_confirm), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(onClick = { confirmReplace = false }) { Text(stringResource(R.string.action_cancel)) } },
+        )
+    }
+
     if (confirmWipe) {
         AlertDialog(
             onDismissRequest = { confirmWipe = false },
@@ -361,6 +428,83 @@ internal fun SettingsContent(
             },
             dismissButton = { TextButton(onClick = { confirmWipe = false }) { Text(stringResource(R.string.action_cancel)) } },
         )
+    }
+}
+
+/** Ayarlar olayının kullanıcıya gösterilecek metni. */
+internal fun settingsEventMessage(resources: Resources, event: SettingsEvent): String = when (event) {
+    SettingsEvent.ExportDone -> resources.getString(R.string.export_done)
+    SettingsEvent.ExportFailed -> resources.getString(R.string.export_failed)
+    is SettingsEvent.ImportDone ->
+        if (event.skipped > 0) {
+            resources.getString(R.string.import_done_skipped, event.added, event.skipped)
+        } else {
+            resources.getString(R.string.import_done, event.added)
+        }
+    is SettingsEvent.ImportFailed -> resources.getString(
+        when (event.reason) {
+            InvalidBackupException.Reason.NOT_AYLA -> R.string.import_error_not_ayla
+            InvalidBackupException.Reason.TOO_NEW -> R.string.import_error_too_new
+            InvalidBackupException.Reason.CORRUPT -> R.string.import_error_corrupt
+        },
+    )
+}
+
+/**
+ * Yedek önizlemesi: dosyanın tarihi ve içeriği, iki açık seçenek. "Üzerine yaz" ayrıca onay ister;
+ * yedek boşsa yalnızca "Vazgeç" kalır.
+ */
+@Composable
+private fun YedekOnizlemeDialog(summary: ImportSummary, onMerge: () -> Unit, onReplace: () -> Unit, onDismiss: () -> Unit) {
+    val tr = remember { java.util.Locale.forLanguageTag("tr") }
+    val dateText = summary.exportedAt?.let {
+        DateTimeFormatter.ofPattern("d MMMM yyyy HH:mm", tr).format(it.atZone(java.time.ZoneId.systemDefault()))
+    }
+    val parts = listOfNotNull(
+        summary.periods.takeIf { it > 0 }?.let { stringResource(R.string.import_part_periods, it) },
+        summary.dailyLogs.takeIf { it > 0 }?.let { stringResource(R.string.import_part_logs, it) },
+        summary.medications.takeIf { it > 0 }?.let { stringResource(R.string.import_part_meds, it) },
+        summary.doses.takeIf { it > 0 }?.let { stringResource(R.string.import_part_doses, it) },
+        summary.hydrationDays.takeIf { it > 0 }?.let { stringResource(R.string.import_part_water, it) },
+        summary.sleepNights.takeIf { it > 0 }?.let { stringResource(R.string.import_part_sleep, it) },
+    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Rounded.SettingsBackupRestore, contentDescription = null) },
+        title = { Text(stringResource(R.string.import_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.verticalScroll(rememberScrollState())) {
+                if (dateText != null) Text(stringResource(R.string.import_date, dateText), style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    if (summary.isEmpty) stringResource(R.string.import_empty) else stringResource(R.string.import_contents, parts.joinToString(", ")),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (!summary.isEmpty) {
+                    YedekSecenegi(R.string.import_merge, R.string.import_merge_text, destructive = false, onClick = onMerge)
+                    YedekSecenegi(R.string.import_replace, R.string.import_replace_text, destructive = true, onClick = onReplace)
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+    )
+}
+
+/** Diyalogdaki seçenek: başlık + ne olacağını anlatan cümle; tamamı tek dokunma hedefi (≥ 48 dp). */
+@Composable
+private fun YedekSecenegi(titleRes: Int, textRes: Int, destructive: Boolean, onClick: () -> Unit) {
+    val scheme = MaterialTheme.colorScheme
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.medium,
+        border = BorderStroke(1.dp, if (destructive) scheme.error.copy(alpha = 0.5f) else scheme.outlineVariant),
+        color = scheme.surface,
+        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+            Text(stringResource(titleRes), style = MaterialTheme.typography.titleSmall, color = if (destructive) scheme.error else scheme.primary)
+            Text(stringResource(textRes), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+        }
     }
 }
 
