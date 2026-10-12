@@ -1,14 +1,15 @@
 package com.ayla.pcos.data.photos
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
 import android.provider.DocumentsContract
 import androidx.core.content.FileProvider
+import androidx.exifinterface.media.ExifInterface
+import com.ayla.pcos.data.InstantIso
+import com.ayla.pcos.data.LocalDateIso
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -17,15 +18,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -396,7 +391,6 @@ class PhotoStore @Inject constructor(
      * bellek sınırlı tutulur, sonra kalan ölçek ve EXIF yönü tek bir dönüşümle uygulanır. Yön dışındaki hiçbir
      * EXIF alanı okunmaz; yeniden kodlanan JPEG'e meta veri yazılmaz.
      */
-    @SuppressLint("ExifInterface") // Yeni bağımlılık eklenmez; yalnızca yön etiketi okunur.
     private fun decodeScaled(file: File, maxEdge: Int): Bitmap {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(file.path, bounds)
@@ -502,22 +496,4 @@ class PhotoStore @Inject constructor(
         private val ID_PATTERN = Regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
         private val ORDER = compareByDescending<PhotoRecord> { it.date }.thenByDescending { it.createdAt }
     }
-}
-
-/** ISO-8601 gün (`2026-10-12`). */
-internal object LocalDateIso : KSerializer<LocalDate> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: LocalDate) = encoder.encodeString(value.toString())
-
-    override fun deserialize(decoder: Decoder): LocalDate = LocalDate.parse(decoder.decodeString())
-}
-
-/** ISO-8601 an (`2026-10-12T07:00:00Z`). */
-internal object InstantIso : KSerializer<Instant> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: Instant) = encoder.encodeString(value.toString())
-
-    override fun deserialize(decoder: Decoder): Instant = Instant.parse(decoder.decodeString())
 }

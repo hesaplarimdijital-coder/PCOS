@@ -9,7 +9,7 @@ Cilt ve saç bakımı (MVP 3) kullanıcının akne, leke/koyulaşma, tüylenme v
 görmesini ister; bunun en dürüst aracı fotoğraftır. Fotoğraf, PCOS bağlamında sağlık verisidir (KVKK özel nitelikli)
 ve çoğu zaman yüzü içerir: galeriye düşerse bulut yedeğine, "Anılar" bildirimlerine ve başka uygulamalara sızar.
 "Cihazda kalır, şifreli kalır, kullanıcı siler" ilkesi burada da geçerlidir. Teknik kısıtlar: Room şeması bu işte
-değişmez (migration yok), yeni bağımlılık eklenmez (`androidx.security:security-crypto` eskimiştir), Robolectric'te
+değişmez (migration yok), `androidx.security:security-crypto` eklenmez (eskimiştir), Robolectric'te
 Android Keystore yoktur, Android 17 Keystore anahtar sayısını sınırlar.
 
 ## Karar
@@ -40,7 +40,7 @@ Android Keystore yoktur, Android 17 Keystore anahtar sayısını sınırlar.
 5. **Küçültme ve meta veri temizliği.** Kaynak `BitmapFactory` sınır okuması + `inSampleSize` ile bellek sınırlı
    çözülür, en uzun kenar 1600 px'e ölçeklenir ve JPEG kalite 85 ile **yeniden kodlanır**. Yeniden kodlama kaynaktaki
    EXIF'i (GPS, cihaz, zaman, küçük resim) tamamen atar; yalnızca yön etiketi okunup piksellere uygulanır
-   (`android.media.ExifInterface`, yeni bağımlılık yok). Kaynak dosya hiçbir zaman olduğu gibi saklanmaz.
+   (`androidx.exifinterface` 1.4.2, tek yeni bağımlılık; platform `android.media.ExifInterface` lint tarafından önerilmez ve Robolectric'te güvenilir değil). Kaynak dosya hiçbir zaman olduğu gibi saklanmaz.
 6. **Alma yolları ve izinler.** Kamera: `ACTION_IMAGE_CAPTURE` + `EXTRA_OUTPUT` olarak uygulamanın kendi
    `FileProvider`'ından (`<applicationId>.photos`, `exported=false`, `grantUriPermissions=true`, yalnızca
    `cacheDir/camera/`) alınan geçici adres; sistem yazma iznini niyetle birlikte verir. Çekim bitince geçici düz dosya

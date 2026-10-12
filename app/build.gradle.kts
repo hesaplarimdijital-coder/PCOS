@@ -128,6 +128,8 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     // Health Connect: yalnızca uyku okuma (#11); bkz. docs/arastirma/health-connect-teknik.md
     implementation(libs.androidx.health.connect)
+    // Fotoğraf yön etiketi (ADR-0010): platform ExifInterface yerine önerilen AndroidX sürümü (Robolectric'te de çalışır).
+    implementation(libs.androidx.exifinterface)
 
     // Veri
     implementation(libs.androidx.room.runtime)

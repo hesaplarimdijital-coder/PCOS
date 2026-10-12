@@ -7,8 +7,8 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
-import android.media.ExifInterface
 import android.net.Uri
+import androidx.exifinterface.media.ExifInterface
 import com.ayla.pcos.data.photos.PhotoCipher
 import com.ayla.pcos.data.photos.PhotoKeyProvider
 import com.ayla.pcos.data.photos.PhotoKind
