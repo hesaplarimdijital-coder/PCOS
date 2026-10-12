@@ -326,7 +326,7 @@ class FotografTesti {
             saveAttributes()
         }
         val kaynakExif = ExifInterface(kaynak.path)
-        assertTrue(kaynakExif.getLatLong(FloatArray(2)), "kaynakta konum olmalı ki test anlamlı olsun")
+        assertNotNull(kaynakExif.latLong, "kaynakta konum olmalı ki test anlamlı olsun")
         assertEquals("TestMarka", kaynakExif.getAttribute(ExifInterface.TAG_MAKE))
 
         val record = kaydet(kaynak)
@@ -334,7 +334,7 @@ class FotografTesti {
 
         assertTrue(jpegImzasi(cikti), "dışa aktarılan dosya düz JPEG")
         val ciktiExif = ExifInterface(ByteArrayInputStream(cikti))
-        assertFalse(ciktiExif.getLatLong(FloatArray(2)), "konum silinmiş olmalı")
+        assertNull(ciktiExif.latLong, "konum silinmiş olmalı")
         assertNull(ciktiExif.getAttribute(ExifInterface.TAG_GPS_LATITUDE))
         assertNull(ciktiExif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL))
         assertNull(ciktiExif.getAttribute(ExifInterface.TAG_MAKE))
@@ -355,11 +355,11 @@ class FotografTesti {
         val bitmap = assertNotNull(calistir { depo.load(record.id) })
         assertEquals(200, bitmap.width)
         assertEquals(400, bitmap.height)
+        // Yeniden kodlanan JPEG'de yön etiketi ya yoktur ya da "tanımsız/normal"dır (Robolectric'in kodlayıcısı
+        // boş bir EXIF bloğu yazabiliyor); döndürülmüş değer taşımaz.
         val ciktiExif = ExifInterface(ByteArrayInputStream(dizaAktar(record.id)))
-        assertEquals(
-            ExifInterface.ORIENTATION_NORMAL,
-            ciktiExif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL),
-        )
+        val yon = ciktiExif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        assertTrue(yon == ExifInterface.ORIENTATION_NORMAL || yon == ExifInterface.ORIENTATION_UNDEFINED, "yön: $yon")
     }
 
     @Test

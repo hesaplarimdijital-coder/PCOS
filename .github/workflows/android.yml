@@ -79,19 +79,15 @@ jobs:
         shell: bash
         run: |
           set +e +o pipefail
+          # GitHub adım başına en fazla 10 "error" açıklaması tutar: önce derleme hataları, sonra başarısız testler
+          # (XML raporlarından, her biri ilk hata satırıyla), Gradle satırları yalnızca ikisi de yoksa.
           esc() { printf '%s' "$1" | sed 's/%/%25/g; s/\r/%0D/g'; }
           n=0
           while IFS= read -r line; do
             n=$((n + 1)); [ "$n" -gt 10 ] && break
             echo "::error title=Kotlin::$(esc "$line")"
           done < <(cat build-core.log build-app.log 2>/dev/null | grep -E '^e: ' | sed 's#file:///home/runner/work/[^/]*/[^/]*/##')
-          if [ "$n" -eq 0 ]; then
-            cat build-core.log build-app.log 2>/dev/null | grep -A 8 'What went wrong' | head -40 | while IFS= read -r line; do
-              echo "::error title=Gradle::$(esc "$line")"
-            done
-          fi
-          # Başarısız testlerin tamamı ve ilk hata satırı XML raporlarından (günlük sınırı 10 satırla kesilmesin).
-          python3 - <<'PY'
+          t=$(python3 - <<'PY'
           import glob, xml.etree.ElementTree as ET
           n = 0
           for f in sorted(glob.glob('app/build/test-results/testDebugUnitTest/*.xml') + glob.glob('core/cycle/build/test-results/test/*.xml')):
@@ -103,14 +99,24 @@ jobs:
                   for fail in list(tc.findall('failure')) + list(tc.findall('error')):
                       msg = ((fail.get('message') or fail.text or '').strip().splitlines() or [''])[0][:400]
                       msg = msg.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-                      print('::error title=Test::%s > %s :: %s' % (tc.get('classname'), tc.get('name'), msg))
+                      if n < 9:
+                          print('::error title=Test::%s > %s :: %s' % (tc.get('classname'), tc.get('name'), msg))
                       n += 1
-          if n == 0:
-              import subprocess
-              out = subprocess.run("cat build-core.log build-app.log 2>/dev/null | grep -E 'FAILED$|Test.*FAILED|AssertionError|Exception' | grep -v 'BUILD FAILED' | head -10", shell=True, capture_output=True, text=True).stdout
-              for line in out.splitlines():
-                  print('::error title=Test::%s' % line.replace('%', '%25'))
+          if n > 9:
+              print('::error title=Test::… ve %d başarısız test daha (test-raporlari artefaktı)' % (n - 9))
+          print('TESTFAIL=%d' % n)
           PY
+          )
+          printf '%s\n' "$t" | grep '^::error'
+          failed=$(printf '%s\n' "$t" | grep -o 'TESTFAIL=[0-9]*' | cut -d= -f2)
+          if [ "$n" -eq 0 ] && [ "${failed:-0}" -eq 0 ]; then
+            cat build-core.log build-app.log 2>/dev/null | grep -A 8 'What went wrong' | head -20 | while IFS= read -r line; do
+              echo "::error title=Gradle::$(esc "$line")"
+            done
+            cat build-core.log build-app.log 2>/dev/null | grep -E 'FAILED$|Test.*FAILED|AssertionError|Exception' | grep -v 'BUILD FAILED' | head -5 | while IFS= read -r line; do
+              echo "::error title=Test::$(esc "$line")"
+            done
+          fi
 
       - name: Test ve uyarı özeti
         if: always()
