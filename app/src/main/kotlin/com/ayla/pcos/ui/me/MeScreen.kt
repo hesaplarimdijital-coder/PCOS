@@ -26,6 +26,7 @@ import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.IosShare
 import androidx.compose.material.icons.rounded.Medication
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -69,7 +70,11 @@ import java.time.format.TextStyle
 
 /** Ben: döngü düzeni, takviye uyumu, su ve kayıt alışkanlığı; ayarlara giriş. Sayılar yargılamaz, gösterir. */
 @Composable
-fun MeScreen(onOpenSettings: () -> Unit, viewModel: MeViewModel = hiltViewModel()) {
+fun MeScreen(
+    onOpenSettings: () -> Unit,
+    onOpenFertility: () -> Unit = {},
+    viewModel: MeViewModel = hiltViewModel(),
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     if (state.loading) {
         Box(Modifier.fillMaxSize())
@@ -81,12 +86,18 @@ fun MeScreen(onOpenSettings: () -> Unit, viewModel: MeViewModel = hiltViewModel(
         state = state,
         onOpenSettings = onOpenSettings,
         onShareDoctorNote = { viewModel.prepareDoctorNote { title, text -> shareText(context, title, text, shareTitle) } },
+        onOpenFertility = onOpenFertility,
     )
 }
 
 /** Durumsuz Ben içeriği; ekran görüntüsü testleri doğrudan bunu çizer. */
 @Composable
-internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit, onShareDoctorNote: () -> Unit = {}) {
+internal fun MeContent(
+    state: MeUiState,
+    onOpenSettings: () -> Unit,
+    onShareDoctorNote: () -> Unit = {},
+    onOpenFertility: () -> Unit = {},
+) {
     val scheme = MaterialTheme.colorScheme
     val colors = LocalAylaColors.current
 
@@ -168,6 +179,17 @@ internal fun MeContent(state: MeUiState, onOpenSettings: () -> Unit, onShareDoct
                 style = MaterialTheme.typography.bodySmall,
                 color = scheme.onSurfaceVariant,
             )
+        }
+
+        if (state.showFertility) {
+            SatirZemini(onClick = onOpenFertility) {
+                SimgeZemini(icon = Icons.Rounded.Thermostat, background = colors.lavantaAcik, tint = colors.lavanta)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.fertility_open_title), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.fertility_open_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+                }
+                Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = scheme.onSurfaceVariant)
+            }
         }
 
         SatirZemini(onClick = onShareDoctorNote) {

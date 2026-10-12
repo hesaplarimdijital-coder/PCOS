@@ -3,11 +3,13 @@ package com.ayla.pcos.ui.me
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayla.cycle.CycleOverview
+import com.ayla.pcos.data.prefs.Goal
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.data.repo.Adherence
 import com.ayla.pcos.data.repo.CycleRepository
 import com.ayla.pcos.data.repo.DailyLogRepository
 import com.ayla.pcos.data.repo.DateTicker
+import com.ayla.pcos.data.repo.FertilityRepository
 import com.ayla.pcos.data.repo.HydrationRepository
 import com.ayla.pcos.data.repo.MedicationRepository
 import com.ayla.pcos.report.DoctorNoteRepository
@@ -49,6 +51,8 @@ data class MeUiState(
      * Bu haftanın henüz gelmemiş günleri null.
      */
     val logGrid: List<Boolean?> = emptyList(),
+    /** "Hamile kalmayı planlıyorum" açık ve hap modunda değil: Doğurganlık girişi görünür (#24). */
+    val showFertility: Boolean = false,
 )
 
 @HiltViewModel
@@ -60,7 +64,11 @@ class MeViewModel @Inject constructor(
     prefs: UserPreferencesRepository,
     ticker: DateTicker,
     private val doctorNote: DoctorNoteRepository,
+    fertilityRepository: FertilityRepository,
 ) : ViewModel() {
+
+    private val preferencesAndPill = combine(prefs.preferences, fertilityRepository.onPill) { p, pill -> p to pill }
+
 
     val uiState: StateFlow<MeUiState> = ticker.today
         .flatMapLatest { today ->
@@ -71,8 +79,8 @@ class MeViewModel @Inject constructor(
                 medicationRepository.observeAdherence(today.minusDays(6), today),
                 hydrationRepository.observeRange(weekStart, today),
                 dailyLogRepository.observeRange(gridStart, today),
-                prefs.preferences,
-            ) { overview, adherence, water, logs, p ->
+                preferencesAndPill,
+            ) { overview, adherence, water, logs, (p, onPill) ->
                 val logDates = logs.map { it.date }.toSet()
                 MeUiState(
                     loading = false,
@@ -88,6 +96,7 @@ class MeViewModel @Inject constructor(
                         val d = gridStart.plusDays(i.toLong())
                         if (d.isAfter(today)) null else d in logDates
                     },
+                    showFertility = Goal.TTC in p.goals && !onPill,
                 )
             }
         }

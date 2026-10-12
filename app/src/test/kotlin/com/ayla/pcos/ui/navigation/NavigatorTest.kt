@@ -20,7 +20,7 @@ class NavigatorTest {
         val screens = listOf(
             Screen.Today, Screen.Calendar, Screen.Meds, Screen.Plan, Screen.Me,
             Screen.DailyLog(LocalDate.of(2026, 10, 12)), Screen.AddMedication, Screen.EditMedication(42), Screen.EditMedication(0),
-            Screen.Settings, Screen.RestoreBackup, Screen.PrivacyPolicy,
+            Screen.Settings, Screen.RestoreBackup, Screen.PrivacyPolicy, Screen.Fertility,
         )
         screens.forEach { assertEquals(it, Screen.fromRoute(it.route), it.route) }
         assertNull(Screen.fromRoute("meds/edit/abc"))

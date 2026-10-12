@@ -60,6 +60,10 @@ sealed interface Screen : NavKey {
     @Serializable
     data object PrivacyPolicy : Screen { override val route: String get() = "privacy" }
 
+    /** Doğurganlık: ısı grafiği ve notlar (#24). */
+    @Serializable
+    data object Fertility : Screen { override val route: String get() = "fertility" }
+
     companion object {
         val tabs: List<Tab> = listOf(Today, Calendar, Meds, Plan, Me)
 
@@ -73,6 +77,7 @@ sealed interface Screen : NavKey {
             route == Settings.route -> Settings
             route == RestoreBackup.route -> RestoreBackup
             route == PrivacyPolicy.route -> PrivacyPolicy
+            route == Fertility.route -> Fertility
             route.startsWith("log/") -> runCatching { DailyLog(LocalDate.parse(route.removePrefix("log/"))) }.getOrNull()
             route.startsWith("meds/edit/") -> route.removePrefix("meds/edit/").toLongOrNull()?.let { EditMedication(it) }
             else -> null

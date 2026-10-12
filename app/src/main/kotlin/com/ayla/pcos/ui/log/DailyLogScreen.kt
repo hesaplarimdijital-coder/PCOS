@@ -53,6 +53,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ayla.cycle.CervicalMucus
+import com.ayla.cycle.LhResult
 import com.ayla.pcos.R
 import com.ayla.pcos.data.repo.SymptomCatalog
 import com.ayla.pcos.ui.components.CipEtiketi
@@ -60,6 +62,7 @@ import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SegmentEtiketi
 import com.ayla.pcos.ui.components.segmentSimgesi
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -81,6 +84,11 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
         onNote = { viewModel.setNote(it) },
         onSave = { viewModel.save(onClose) },
         onDelete = { viewModel.delete(onClose) },
+        onBbt = viewModel::setBbt,
+        onBbtTime = viewModel::setBbtTime,
+        onDisturbed = viewModel::setBbtDisturbed,
+        onLh = viewModel::setLh,
+        onMucus = viewModel::setMucus,
     )
 }
 
@@ -99,6 +107,11 @@ internal fun DailyLogContent(
     onNote: (String) -> Unit,
     onSave: () -> Unit,
     onDelete: () -> Unit = {},
+    onBbt: (String) -> Unit = {},
+    onBbtTime: (LocalTime?) -> Unit = {},
+    onDisturbed: (Boolean) -> Unit = {},
+    onLh: (LhResult?) -> Unit = {},
+    onMucus: (CervicalMucus?) -> Unit = {},
 ) {
     val date = state.date
     var confirmDelete by remember { mutableStateOf(false) }
@@ -207,6 +220,12 @@ internal fun DailyLogContent(
                             shape = MaterialTheme.shapes.small,
                         )
                     }
+                }
+            }
+
+            state.fertility?.let { input ->
+                Bolum(stringResource(R.string.fertility_title)) {
+                    DogurganlikBolumu(input, onBbt, onBbtTime, onDisturbed, onLh, onMucus)
                 }
             }
 

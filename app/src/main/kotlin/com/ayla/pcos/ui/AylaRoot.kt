@@ -44,6 +44,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.ayla.pcos.R
 import com.ayla.pcos.ui.calendar.CalendarScreen
 import com.ayla.pcos.ui.components.AltGezinme
+import com.ayla.pcos.ui.fertility.FertilityScreen
 import com.ayla.pcos.ui.log.DailyLogScreen
 import com.ayla.pcos.ui.me.GizlilikPolitikasiDialog
 import com.ayla.pcos.ui.me.GizlilikPolitikasiEkrani
@@ -224,6 +225,9 @@ private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit, res
                         )
                     }
                     entry<Screen.PrivacyPolicy> { GizlilikPolitikasiEkrani(onBack = { navigator.pop() }) }
+                    entry<Screen.Fertility> {
+                        FertilityScreen(onBack = { navigator.pop() }, onOpenLog = { date -> navigator.push(Screen.DailyLog(date)) })
+                    }
                 },
             )
         }
@@ -263,7 +267,10 @@ private fun SekmeKoku(navigator: AylaNavigator) {
                     onEdit = { id -> navigator.push(Screen.EditMedication(id)) },
                 )
                 Screen.Plan -> PlanScreen()
-                Screen.Me -> MeScreen(onOpenSettings = { navigator.push(Screen.Settings) })
+                Screen.Me -> MeScreen(
+                    onOpenSettings = { navigator.push(Screen.Settings) },
+                    onOpenFertility = { navigator.push(Screen.Fertility) },
+                )
             }
         }
     }

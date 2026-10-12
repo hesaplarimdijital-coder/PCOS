@@ -75,7 +75,7 @@
     <string name="fertility_mucus_creamy">Kremsi</string>
     <string name="fertility_mucus_watery">Sulu</string>
     <string name="fertility_mucus_egg_white">Yumurta akı</string>
-    <string name="fertility_mucus_text">Yalnızca kayıt için; doğrulamaya girmez. Yumurta akı kıvamındaki şeffaf, uzayan mukus en verimli günlere denk gelir; düzenli gözlem gebelik şansının yükselmesiyle ilişkili bulundu.</string>
+    <string name="fertility_mucus_text">Yalnızca kayıt için; doğrulamaya girmez. Kıvamdaki değişimi düzenli gözlemek döngünü tanımana yardım eder; mukus tek başına yumurtlamayı göstermez.</string>
     <string name="fertility_mucus_source" translatable="false">Evans-Hoeker ve ark. 2013, Fertil Steril; Bigelow ve ark. 2004, Hum Reprod</string>
     <string name="fertility_mucus_pcos_note">PCOS\'ta yumurtlama gecikince verimli tip mukus günlerce sürebilir ya da yinelenebilir; mukus tek başına yumurtlama demek değildir.</string>
 
@@ -88,12 +88,12 @@
     <string name="fertility_chart_a11y">Bu döngünün ısı grafiği: %1$d ölçüm, %2$d tanesi hesaba girmedi. %3$s</string>
     <string name="fertility_chart_coverline_a11y">Örtü çizgisi %1$s derece.</string>
     <string name="fertility_ovulation_estimate">Tahmini yumurtlama: %1$s (yaklaşık)</string>
-    <string name="fertility_confirmed_on">%1$s tarihinde doğrulandı</string>
+    <string name="fertility_confirmed_on">Kural %1$s tarihinde sağlandı</string>
     <string name="fertility_luteal_day">Yumurtlama sonrası %1$d. gün</string>
     <string name="fertility_cycle_day">Döngünün %1$d. günü</string>
 
     <!-- FertilityNote metinleri (motor sırası) -->
-    <string name="fertility_note_confirmed_title">Yumurtlama doğrulandı</string>
+    <string name="fertility_note_confirmed_title">Isı yükselmesi kuralı sağlandı</string>
     <string name="fertility_note_confirmed_text">Isın üç gün üst üste örtü çizgisinin üstünde kaldı; bu döngüde yumurtlama olmuş görünüyor. Tahmini gün yaklaşıktır, yükselme yumurtlamadan birkaç gün sonra görünebilir.</string>
     <string name="fertility_note_confirmed_source" translatable="false">Sensiplan (Frank-Herrmann ve ark. 2007, Hum Reprod); Ecochard ve ark. 2001, BJOG</string>
     <string name="fertility_note_too_few_title">Henüz yeterli ölçüm yok</string>
@@ -128,4 +128,28 @@
     <string name="fertility_pregnancy_test_title">Gebelik testi ne zaman?</string>
     <string name="fertility_pregnancy_test_text">Adetin geciktiği ilk günden test yapabilirsin; döngün düzensizse son korunmasız ilişkiden en az 21 gün sonra. Pozitif sonuç neredeyse kesindir; negatifse birkaç gün sonra tekrarla.</string>
     <string name="fertility_pregnancy_test_source" translatable="false">NHS, Doing a pregnancy test</string>
+
+    <!-- Doğurganlık ekranı ve günlük kayıt bölümü (arayüz). -->
+    <string name="fertility_open_title">Doğurganlık kaydı</string>
+    <string name="fertility_open_text">Bazal ısı, LH testi ve mukus kayıtların; ısı grafiği ve notlar</string>
+    <string name="fertility_add_today">Bugünün ölçümünü ekle</string>
+    <string name="fertility_cycle_label">%1$s başlangıçlı döngü</string>
+    <string name="fertility_cycle_current">Şu anki döngü</string>
+    <string name="fertility_cycle_previous">Önceki döngü</string>
+    <string name="fertility_cycle_next">Sonraki döngü</string>
+    <string name="fertility_cycle_position">%1$d / %2$d</string>
+    <string name="fertility_no_period_title">Önce adet başlangıcı</string>
+    <string name="fertility_no_period_text">Kayıtlar adet başlangıçlarına göre döngülere bölünür. Takvimden ya da Bugün ekranından adetini işaretleyince grafik oluşur.</string>
+    <string name="fertility_legend_valid">Geçerli ölçüm</string>
+    <string name="fertility_legend_ovulation">Tahmini yumurtlama günü</string>
+    <string name="fertility_notes_title">Bu döngünün notları</string>
+    <string name="fertility_info_title">Bilmekte yarar var</string>
+    <string name="fertility_lh_none">Test yok</string>
+    <string name="fertility_bbt_clear">Isıyı temizle</string>
+    <string name="fertility_bbt_time_unset">Saat ekle</string>
+    <string name="fertility_bbt_invalid">Sayı olarak yaz, ör. 36,55</string>
+    <string name="fertility_section_hint">İsteğe bağlı; boş bırakılan alanlar kaydedilmez.</string>
+    <string name="fertility_mucus_clear">Seçimi kaldır</string>
+    <string name="fertility_chart_a11y_coverline_none">Örtü çizgisi yok.</string>
+    <string name="fertility_chart_point_a11y">%1$s: %2$s derece</string>
 </resources>
