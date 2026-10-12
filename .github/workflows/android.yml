@@ -59,20 +59,35 @@ jobs:
       - name: Compose BOM uyumu (dependencyInsight)
         shell: bash
         run: |
-          set -o pipefail
+          set +e
           fail=0
           for dep in androidx.compose.runtime:runtime androidx.compose.ui:ui androidx.compose.animation:animation; do
-            out=$(./gradlew -q :app:dependencyInsight --configuration debugRuntimeClasspath --dependency "$dep" --no-daemon 2>&1)
-            sel=$(printf '%s\n' "$out" | grep -m1 -oE "^${dep}:[0-9][^ ]*" | sed "s#^${dep}:##")
-            bomline=$(printf '%s\n' "$out" | grep -B1 -E '^[\\+]--- androidx.compose:compose-bom' | grep -E "^${dep}:" | head -1)
-            echo "::notice title=Compose::${dep} seçilen=${sel:-?} · BOM satırı: ${bomline:-bulunamadı}"
-            case "$bomline" in
-              *" -> "*)
-                echo "::error title=Compose BOM::${dep} BOM sürümünün üstüne çekiliyor (ADR-0003 engelleyici koşul): ${bomline}"
-                echo "::notice title=dependencyInsight::$(printf '%s\n' "$out" | head -30 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')"
-                fail=1
-                ;;
-            esac
+            ./gradlew -q :app:dependencyInsight --configuration debugRuntimeClasspath --dependency "$dep" --no-daemon > insight.txt 2>&1
+            python3 - "$dep" insight.txt <<'PY' || fail=1
+          import re, sys
+          dep, path = sys.argv[1], sys.argv[2]
+          lines = open(path, encoding='utf-8', errors='replace').read().splitlines()
+          def esc(t):
+              return t.replace('%', '%25').replace('\r', '').replace('\n', '%0A')
+          sel = next((l.split()[0][len(dep) + 1:] for l in lines if l.startswith(dep + ':')), '?')
+          bom = None
+          for i, l in enumerate(lines):
+              if 'androidx.compose:compose-bom' in l and i > 0:
+                  m = re.search(re.escape(dep) + r':(\S+)(?: -> (\S+))?', lines[i - 1])
+                  if m:
+                      bom = m
+                      break
+          if bom is None:
+              print('::notice title=Compose BOM::%s seçilen=%s; BOM kısıtı satırı bulunamadı, çıktı aşağıda' % (dep, sel))
+              print('::notice title=dependencyInsight::%s' % esc('\n'.join(lines[:40])))
+              sys.exit(0)
+          req, over = bom.group(1), bom.group(2)
+          if over and over != req:
+              print('::error title=Compose BOM::%s için BOM %s istiyor, %s seçildi (ADR-0003 engelleyici koşul)' % (dep, req, over))
+              print('::notice title=dependencyInsight::%s' % esc('\n'.join(lines[:40])))
+              sys.exit(1)
+          print('::notice title=Compose BOM::%s seçilen=%s, BOM=%s' % (dep, sel, req))
+          PY
           done
           exit $fail
 
