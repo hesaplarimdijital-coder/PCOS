@@ -162,7 +162,7 @@
 
     <!-- Ne zaman dermatoloğa ya da doktora? -->
     <string name="skin_doctor_title">Ne zaman doktora?</string>
-    <string name="skin_doctor_text">Erken görünmek iz kalmasını ve geç kalmayı önler. Aşağıdakilerden biri varsa randevu almak iyi bir fikir; seçtiklerini doktor notuna ekleyebilirsin.</string>
+    <string name="skin_doctor_text">Erken görünmek iz kalmasını ve geç kalmayı önler. Aşağıdakilerden biri varsa randevu almak iyi bir fikir; sormak istediklerini Ben &gt; Doktor raporu ekranındaki soru listesine yazabilirsin.</string>
     <string name="skin_doctor_urgency_now">Gecikmeden</string>
     <string name="skin_doctor_urgency_same_day">Aynı gün</string>
     <string name="skin_doctor_urgency_soon">Yakın zamanda</string>
@@ -216,10 +216,10 @@
 
     <!-- Cilt ve saç ekranı (arayüz). -->
     <string name="skin_open_text">Rutinin, profilin, doktora ne zaman gidileceği ve fotoğraflar</string>
-    <string name="skin_tab_routine">Rutinim</string>
+    <string name="skin_tab_routine">Rutin</string>
     <string name="skin_tab_profile">Profil</string>
     <string name="skin_tab_doctor">Doktora</string>
-    <string name="skin_tab_photos">Fotoğraflar</string>
+    <string name="skin_tab_photos">Fotoğraf</string>
     <string name="skin_profile_start_title">Önce profilini doldur</string>
     <string name="skin_profile_start_text">Cilt tipini ve dikkat ettiğin şeyleri seçince sabah ve akşam rutinin buna göre oluşur.</string>
     <string name="skin_profile_start_action">Profile git</string>
