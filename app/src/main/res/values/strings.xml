@@ -222,7 +222,6 @@
     <string name="meds_adherence_text">%2$d/%1$d doz alındı</string>
     <string name="meds_inositol_evidence_title">Inositol hakkında</string>
     <string name="meds_inositol_evidence_text">2023 uluslararası kılavuz inositolü deneysel kabul ediyor. Kullandığını doktoruna söyle; dozu kendin değiştirme.</string>
-    <string name="meds_evidence_limited">Sınırlı kanıt</string>
     <string name="meds_remove">Listeden kaldır</string>
     <string name="meds_remove_confirm">%1$s listeden kaldırılsın mı? Geçmiş kayıtlar silinmez.</string>
     <string name="meds_new_title">Yeni ilaç ya da takviye</string>
@@ -279,10 +278,7 @@
     <string name="plan_tab_water_sleep">Su ve uyku</string>
     <string name="plan_tab_nutrition">Beslenme</string>
     <string name="plan_tab_movement">Hareket</string>
-    <string name="plan_coming_soon">Bu bölüm MVP 2 ile geliyor.</string>
     <string name="plan_last_7_days">Son 7 gün</string>
-    <string name="plan_nutrition_preview">Düşük glisemik yüklü, lif ve protein ağırlıklı öğün önerileri; yemek sonrası kan şekerini yumuşatan 10–15 dakikalık yürüyüş hatırlatması. Beslenme kaydı yok, kalori sayma yok.</string>
-    <string name="plan_movement_preview">2023 uluslararası PCOS kılavuzu: haftada 150 dakika orta tempolu hareket ve 2 gün kuvvet çalışması. Döngü gününe göre kısa, evde yapılabilir rutinler.</string>
     <string name="water_remove_cup">Bir bardak çıkar</string>
     <string name="water_title">Su</string>
     <string name="water_of_goal">/ %1$d bardak</string>
@@ -291,6 +287,13 @@
     <string name="sleep_duration">%1$d sa %2$d dk</string>
     <string name="sleep_last_night">Dün gece · %1$s–%2$s</string>
     <string name="sleep_none">Henüz uyku kaydı yok.</string>
+    <string name="plan_section_principles">İlkeler</string>
+    <string name="plan_section_weekly">Haftalık ritim</string>
+    <string name="plan_section_routines">Kısa rutinler</string>
+    <string name="nutrition_walk_tip_action">Yürüyüş rutinini aç</string>
+    <string name="routine_steps_show">Adımları göster</string>
+    <string name="routine_steps_hide">Adımları gizle</string>
+    <string name="evidence_chip_a11y">Kanıt düzeyi: %1$s. Açıklama için dokun.</string>
     <string name="sleep_none_hint">Yatış ve kalkış saatini eklediğinde son 7 gece burada görünür.</string>
     <string name="sleep_add">Uyku ekle</string>
     <!-- Health Connect uyku içe aktarma MVP 2 (#11) için hazır metinler. -->

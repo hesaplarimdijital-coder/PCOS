@@ -2,17 +2,26 @@ package com.ayla.pcos.ui.plan
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ayla.pcos.data.db.MedicationKind
+import com.ayla.pcos.data.db.PeriodEntity
 import com.ayla.pcos.data.db.SleepEntity
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
+import com.ayla.pcos.data.repo.CycleRepository
+import com.ayla.pcos.data.repo.DailyLogRepository
 import com.ayla.pcos.data.repo.DateTicker
 import com.ayla.pcos.data.repo.HydrationRepository
+import com.ayla.pcos.data.repo.MedicationRepository
 import com.ayla.pcos.data.repo.SleepRepository
 import com.ayla.pcos.reminders.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -35,7 +44,31 @@ data class PlanUiState(
     val sleepWeek: List<SleepEntity> = emptyList(),
     val eveningRoutineEnabled: Boolean = false,
     val eveningRoutineTime: LocalTime = LocalTime.of(22, 30),
+    /** Hareket sekmesinin döngü kartı; kişiselleştirme rızası kapalıysa ya da hap modundaysa genel. */
+    val movementCycleCard: MovementCycleCard = MovementCycleCard.GENERAL,
 )
+
+/** Açık (bitişi girilmemiş) adetin kaç gün sayılacağı; takvimdeki kuralla aynı. */
+private const val OPEN_PERIOD_DAYS = 5L
+
+/**
+ * Bugün kaydedilmiş bir adetin içinde mi ya da bugünkü kanama kaydı "hafif" ve üstü mü (B4).
+ * Tahmini aralık kullanılmaz; yalnızca kullanıcının kendi kaydı.
+ */
+fun isRecordedPeriodDay(today: LocalDate, periods: List<PeriodEntity>, todayFlow: Int?): Boolean {
+    if ((todayFlow ?: 0) >= 2) return true
+    return periods.any { p ->
+        val end = p.endDate ?: minOf(p.startDate.plusDays(OPEN_PERIOD_DAYS - 1), today)
+        !today.isBefore(p.startDate) && !today.isAfter(end)
+    }
+}
+
+/** Rıza kapalı ya da hap modu açık: herkese aynı genel kart; aksi hâlde adet günü / diğer gün. */
+fun movementCycleCard(consentPersonalization: Boolean, pillMode: Boolean, periodDay: Boolean): MovementCycleCard = when {
+    !consentPersonalization || pillMode -> MovementCycleCard.GENERAL
+    periodDay -> MovementCycleCard.PERIOD
+    else -> MovementCycleCard.OTHER
+}
 
 @HiltViewModel
 class PlanViewModel @Inject constructor(
@@ -44,7 +77,28 @@ class PlanViewModel @Inject constructor(
     private val prefs: UserPreferencesRepository,
     private val scheduler: ReminderScheduler,
     private val ticker: DateTicker,
+    private val cycles: CycleRepository,
+    private val logs: DailyLogRepository,
+    private val medications: MedicationRepository,
 ) : ViewModel() {
+
+    /**
+     * Kişiselleştirme rızası kapalıyken kanama kaydı ve ilaçlar hiç okunmaz; kart genel kalır.
+     */
+    private fun movementCard(today: LocalDate): Flow<MovementCycleCard> =
+        prefs.preferences.map { it.consentPersonalization }.distinctUntilChanged().flatMapLatest { consent ->
+            if (!consent) {
+                flowOf(MovementCycleCard.GENERAL)
+            } else {
+                combine(medications.activeMedications, cycles.periods, logs.observe(today)) { active, periods, log ->
+                    movementCycleCard(
+                        consentPersonalization = true,
+                        pillMode = active.any { it.kind == MedicationKind.CONTRACEPTIVE },
+                        periodDay = isRecordedPeriodDay(today, periods, log?.flow),
+                    )
+                }
+            }
+        }
 
     val uiState: StateFlow<PlanUiState> = ticker.today
         .flatMapLatest { today ->
@@ -54,7 +108,8 @@ class PlanViewModel @Inject constructor(
                 sleep.observeNight(today),
                 sleep.observeRange(from, today),
                 prefs.preferences,
-            ) { cups, lastNight, nights, p ->
+                movementCard(today),
+            ) { cups, lastNight, nights, p, movement ->
                 val byDate = cups.associate { it.date to it.cups }
                 PlanUiState(
                     loading = false,
@@ -67,6 +122,7 @@ class PlanViewModel @Inject constructor(
                     sleepWeek = nights.sortedByDescending { it.endAt },
                     eveningRoutineEnabled = p.eveningRoutineEnabled,
                     eveningRoutineTime = p.eveningRoutineTime,
+                    movementCycleCard = movement,
                 )
             }
         }

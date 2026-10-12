@@ -133,8 +133,10 @@ internal fun PlanContent(
     onDeleteSleep: (SleepEntity) -> Unit,
     onEveningRoutine: (Boolean) -> Unit,
     initialTab: Int = 0,
+    initialExpandedRoutine: String? = null,
 ) {
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
+    var expandedRoutine by rememberSaveable { mutableStateOf(initialExpandedRoutine) }
     var showSleepDialog by remember { mutableStateOf(false) }
     val reduced = LocalReducedMotion.current
     val buyukYazi = LocalDensity.current.fontScale >= BUYUK_YAZI_ESIGI
@@ -195,8 +197,17 @@ internal fun PlanContent(
                             onChange = onEveningRoutine,
                         )
                     }
-                    1 -> YakindaKarti(stringResource(R.string.plan_nutrition_preview))
-                    else -> YakindaKarti(stringResource(R.string.plan_movement_preview))
+                    1 -> BeslenmeSekmesi(
+                        onOpenWalkRoutine = {
+                            expandedRoutine = PlanIcerigi.ROUTINE_WALK
+                            tab = 2
+                        },
+                    )
+                    else -> HareketSekmesi(
+                        cycleCard = state.movementCycleCard,
+                        expandedRoutine = expandedRoutine,
+                        onToggleRoutine = { key -> expandedRoutine = if (expandedRoutine == key) null else key },
+                    )
                 }
             }
         }
@@ -468,15 +479,6 @@ private fun AksamRutiniSatiri(enabled: Boolean, time: LocalTime, onChange: (Bool
             )
         }
         Switch(checked = enabled, onCheckedChange = onChange)
-    }
-}
-
-@Composable
-private fun YakindaKarti(preview: String) {
-    AylaCard {
-        Text(stringResource(R.string.plan_coming_soon), style = MaterialTheme.typography.titleMedium)
-        Spacer(Modifier.height(6.dp))
-        Text(preview, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

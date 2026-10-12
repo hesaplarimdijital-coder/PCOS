@@ -201,13 +201,17 @@ object MedicationTemplates {
         withFood = true,
     )
 
+    /**
+     * Çalışmalarda kullanılan bitki yeşil nanedir (Mentha spicata). Şablon tek saatle gelir: çalışma
+     * protokolünü (günde iki fincan) andırıp kür önerisi gibi okunmasın; saatleri kullanıcı seçer (#13).
+     */
     val SPEARMINT_TEA = Template(
         key = "spearmint_tea",
-        name = "Nane çayı",
+        name = "Yeşil nane çayı",
         doseText = "1 fincan",
         kind = MedicationKind.HERBAL,
         form = MedicationForm.TEA,
-        times = listOf(LocalTime.of(10, 0), LocalTime.of(16, 0)),
+        times = listOf(LocalTime.of(16, 0)),
         withFood = null,
     )
 

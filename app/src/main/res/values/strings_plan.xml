@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Üretildi: docs/arastirma/plan-icerigi.md (klinik içerik ajanı). Elle değiştirme; önce belgeyi güncelle. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation" tools:locale="tr">
+    <string name="plan_content_disclaimer">Bu bilgiler geneldir; tanı ya da tedavi yerine geçmez. Sana uygun olanı doktorunla konuşabilirsin.</string>
+    <string name="plan_source_format">Kaynak: %1$s</string>
+    <string name="movement_duration_short">%1$d dk</string>
+    <string name="movement_duration_a11y">%1$d dakika</string>
+    <string name="nutrition_intro_title">Beslenmede ritim</string>
+    <string name="nutrition_intro_text">PCOS (yeni adıyla PMOS) için hazırlanan bu ilkeler 2023 uluslararası kılavuzuna dayanır. Hepsini birden uygulaman gerekmez; sana uyanla başla.</string>
+    <string name="nutrition_intro_source" translatable="false">Teede ve ark. 2023, Fertil Steril / Hum Reprod</string>
+    <string name="nutrition_flexible_title">Sana uyan bir düzen</string>
+    <string name="nutrition_flexible_text">Kılavuza göre PCOS&#8217;ta tek bir doğru beslenme biçimi yok. Kısıtlayıcı listeler yerine sevdiğin yiyeceklerle sürdürebileceğin bir düzen öneriliyor.</string>
+    <string name="nutrition_flexible_source" translatable="false">Teede ve ark. 2023, Fertil Steril / Hum Reprod</string>
+    <string name="nutrition_rhythm_title">Düzenli öğün ritmi</string>
+    <string name="nutrition_rhythm_text">Öğünlerini güne benzer aralıklarla yaymak, açlığın birden bastırmasını önlemeye yardımcı olabilir. Bir öğün kaçarsa sorun değil; bir sonrakiyle devam.</string>
+    <string name="nutrition_rhythm_source" translatable="false">St-Onge ve ark. 2017, Circulation (AHA)</string>
+    <string name="nutrition_fiber_protein_title">Lif ve protein bir arada</string>
+    <string name="nutrition_fiber_protein_text">Sebze, baklagil ve tam tahıldaki lif ile yoğurt, yumurta, balık gibi proteinler öğünü daha doyurucu yapabilir ve kan şekerinin dengeli seyretmesine yardımcı olabilir.</string>
+    <string name="nutrition_fiber_protein_source" translatable="false">Reynolds ve ark. 2019, Lancet; Reynolds ve ark. 2020, PLoS Med; Dhillon ve ark. 2016, J Acad Nutr Diet</string>
+    <string name="nutrition_slow_carbs_title">Kan şekerine nazik seçimler</string>
+    <string name="nutrition_slow_carbs_text">Bulgur, mercimek, nohut ve kuru fasulye kan şekerini daha yavaş yükseltir; PCOS&#8217;ta yararı küçük çalışmalarda görüldü. Bir öğünde tek bir değişiklikle başlayabilirsin.</string>
+    <string name="nutrition_slow_carbs_source" translatable="false">Kazemi ve ark. 2021, Adv Nutr; Atkinson ve ark. 2021, Am J Clin Nutr</string>
+    <string name="nutrition_water_title">Susadığında önce su</string>
+    <string name="nutrition_water_text">Şekerli içecekler kan şekerini hızla yükseltebilir. Günlük içeceğin çoğunlukla su, şekersiz çay ya da maden suyu olabilir; ara sıra keyif içeceği de olur.</string>
+    <string name="nutrition_water_source" translatable="false">DSÖ 2015, şeker kılavuzu; Imamura ve ark. 2015, BMJ</string>
+    <string name="nutrition_whole_foods_title">Çoğunlukla az işlenmiş</string>
+    <string name="nutrition_whole_foods_text">Sofranın çoğunu ev yemekleri, sebze, meyve, baklagil ve yoğurt gibi az işlenmiş yiyecekler oluşturabilir. Paketli ürünler de hayatın parçası; her yiyeceğe yer var.</string>
+    <string name="nutrition_whole_foods_source" translatable="false">Lane ve ark. 2024, BMJ; TÜBER 2022, T.C. Sağlık Bakanlığı</string>
+    <string name="nutrition_plate_title">Tabak modeli</string>
+    <string name="nutrition_plate_text">Tabağın yarısı sebze, çeyreği protein, çeyreği tam tahıl ya da baklagil olabilir; yanında su. Tartmak ya da saymak gerekmez, göz kararı yeter.</string>
+    <string name="nutrition_plate_source" translatable="false">Harvard T.H. Chan, Healthy Eating Plate 2011; ADA, Diabetes Plate Method</string>
+    <string name="nutrition_plate_slice_vegetables">Sebze</string>
+    <string name="nutrition_plate_slice_protein">Protein</string>
+    <string name="nutrition_plate_slice_grains">Tam tahıl</string>
+    <string name="nutrition_plate_slice_water">Su</string>
+    <string name="nutrition_plate_vegetables_examples">Salata, zeytinyağlı sebze yemekleri, ızgara sebze, çorba</string>
+    <string name="nutrition_plate_protein_examples">Yumurta, yoğurt, peynir, balık, tavuk, köfte</string>
+    <string name="nutrition_plate_grains_examples">Bulgur, tam buğday ekmeği, mercimek, nohut, kuru fasulye</string>
+    <string name="nutrition_plate_legume_note">Baklagiller hem protein hem lif kaynağıdır; tabağın protein ya da tahıl çeyreğine koyabilirsin.</string>
+    <string name="nutrition_plate_a11y">Tabak çizimi: yarısı sebze, çeyreği protein, çeyreği tam tahıl ya da baklagil. Yanında bir bardak su.</string>
+    <string name="nutrition_walk_tip_title">Yemekten sonra kısa yürüyüş</string>
+    <string name="nutrition_walk_tip_text">Yemekten sonra 10–15 dakika yürümek, tokluk kan şekerinin daha yumuşak yükselmesine yardımcı olabilir. Hareket sekmesinde hazır bir rutin var.</string>
+    <string name="nutrition_walk_tip_source" translatable="false">Buffey ve ark. 2022, Sports Med; Reynolds ve ark. 2016, Diabetologia</string>
+    <string name="nutrition_support_title">Yemekle ilişkin zorlayıcıysa</string>
+    <string name="nutrition_support_text">Yemek düşünceleri gününü zorluyorsa, suçluluk ya da kontrol kaybı hissediyorsan yalnız değilsin; PCOS&#8217;ta bu daha sık görülür. Hekim, diyetisyen ya da psikologla konuşabilirsin.</string>
+    <string name="nutrition_support_source" translatable="false">Teede ve ark. 2023, Fertil Steril / Hum Reprod; J Clin Endocrinol Metab 2024, meta-analiz</string>
+    <string name="movement_intro_title">Kendi temponda</string>
+    <string name="movement_intro_text">Burada amaç performans değil, sürdürülebilir bir ritim. 2023 uluslararası kılavuzu düzenli hareketi PCOS (yeni adıyla PMOS) yönetiminin temel parçası sayar.</string>
+    <string name="movement_intro_source" translatable="false">Teede ve ark. 2023, Fertil Steril / Hum Reprod</string>
+    <string name="movement_weekly_title">Haftalık hareket ritmi</string>
+    <string name="movement_weekly_text">Kılavuz haftada en az 150 dk orta ya da 75 dk yoğun tempolu hareket ve 2 gün kas güçlendirme öneriyor. Daha azı da değerli: her dakika sayılır.</string>
+    <string name="movement_weekly_source" translatable="false">Teede ve ark. 2023, Hum Reprod; Bull ve ark. 2020, Br J Sports Med (DSÖ)</string>
+    <string name="movement_every_minute_title">Her dakika sayılır</string>
+    <string name="movement_every_minute_text">Merdiven çıkmak, ev işi, yürüyerek bir yere gitmek de harekettir. Kısa parçalar gün içinde birikir; biraz hareket hiç yoktan iyidir.</string>
+    <string name="movement_every_minute_source" translatable="false">Bull ve ark. 2020, Br J Sports Med (DSÖ); Teede ve ark. 2023, Hum Reprod</string>
+    <string name="movement_intensity_title">Tempo nasıl anlaşılır?</string>
+    <string name="movement_intensity_text">Orta tempoda konuşabilirsin ama şarkı söyleyemezsin. Yoğun tempoda birkaç kelimeden fazlasını söylemek zorlaşır.</string>
+    <string name="movement_intensity_source" translatable="false">CDC, Measuring Physical Activity Intensity</string>
+    <string name="movement_routine_walk_title">Yemek sonrası yürüyüş</string>
+    <string name="movement_routine_walk_text">Yemekten sonra kısa bir yürüyüş, tokluk kan şekerinin daha yumuşak yükselmesine yardımcı olabilir. Hız değil süreklilik önemli.</string>
+    <string name="movement_routine_walk_source" translatable="false">Buffey ve ark. 2022, Sports Med; Reynolds ve ark. 2016, Diabetologia; DiPietro ve ark. 2013, Diabetes Care</string>
+    <string name="movement_routine_walk_step_1">Yemeği bitirince çok beklemeden kalk; rahat bir ayakkabı yeter.</string>
+    <string name="movement_routine_walk_step_2">İlk 2 dakika yavaş yürü, nefesin sakinleşsin.</string>
+    <string name="movement_routine_walk_step_3">Rahatça konuşabileceğin bir tempoyla 6 dakika devam et.</string>
+    <string name="movement_routine_walk_step_4">Dışarı çıkamıyorsan evde, koridorda ya da balkonda dolaş.</string>
+    <string name="movement_routine_walk_step_5">Son 2 dakikada yavaşla, omuzlarını gevşet.</string>
+    <string name="movement_routine_strength_title">Ekipmansız kuvvet</string>
+    <string name="movement_routine_strength_text">Kılavuz haftada 2 gün kas güçlendirmeyi öneriyor. Bu rutin evde, ekipmansız yapılır; zorlanırsan tekrarı azalt, ağrı olursa dur.</string>
+    <string name="movement_routine_strength_source" translatable="false">Teede ve ark. 2023, Hum Reprod; Bull ve ark. 2020 (DSÖ); ESSA 2024, J Sci Med Sport</string>
+    <string name="movement_routine_strength_step_1">2 dakika ısın: yerinde yürü, kollarını öne ve arkaya çevir.</string>
+    <string name="movement_routine_strength_step_2">Sandalyeden otur-kalk: yavaşça otur, topuklarından güç alarak kalk.</string>
+    <string name="movement_routine_strength_step_3">Duvar şınavı: ellerin duvarda, göğsünü duvara yaklaştırıp uzaklaştır.</string>
+    <string name="movement_routine_strength_step_4">Köprü: sırtüstü, dizler bükülü; kalçanı kaldır, yavaşça indir.</string>
+    <string name="movement_routine_strength_step_5">Her hareketi 8–12 kez yap, kısa mola ver; turu 2–3 kez tekrarla.</string>
+    <string name="movement_routine_strength_step_6">Son 2 dakika bacaklarını ve göğsünü esneterek bitir.</string>
+    <string name="movement_routine_stretch_title">Esneme ve nefes</string>
+    <string name="movement_routine_stretch_text">Yavaş nefes ve hafif esneme gevşemeye yardımcı olabilir. PCOS&#8217;ta yoga ve farkındalık çalışmalarında kaygı ve streste azalma görüldü; çalışmalar küçük.</string>
+    <string name="movement_routine_stretch_source" translatable="false">Nidhi ve ark. 2012, Int J Yoga; Stefanaki ve ark. 2015, Stress</string>
+    <string name="movement_routine_stretch_step_1">Rahat otur; 4&#8217;e kadar sayarak burnundan al, 6&#8217;ya kadar sayarak ver.</string>
+    <string name="movement_routine_stretch_step_2">Omuzlarını kulaklarına doğru kaldır, bırak; başını yavaşça iki yana eğ.</string>
+    <string name="movement_routine_stretch_step_3">Dört ayak üstünde sırtını yavaşça yuvarla, sonra çukurlaştır.</string>
+    <string name="movement_routine_stretch_step_4">Dizlerini aç, kalçanı topuklarına indir, kollarını öne uzat; nefes al.</string>
+    <string name="movement_routine_stretch_step_5">Sırtüstü uzan, dizlerini göğsüne çek, iki yana hafifçe sallan.</string>
+    <string name="movement_routine_stretch_step_6">Son 2 dakika gözlerin kapalı, yalnızca nefesini izle.</string>
+    <string name="movement_routine_sit_break_title">Oturma molası</string>
+    <string name="movement_routine_sit_break_text">Uzun oturmayı kısa yürüyüşlerle bölmek tokluk kan şekeri yükselişini azaltabilir. Kılavuz da oturarak geçen süreyi azaltmayı öneriyor.</string>
+    <string name="movement_routine_sit_break_source" translatable="false">Buffey ve ark. 2022, Sports Med; Teede ve ark. 2023, Hum Reprod</string>
+    <string name="movement_routine_sit_break_step_1">Uzun süre oturuyorsan yarım saatte ya da saatte bir kalk.</string>
+    <string name="movement_routine_sit_break_step_2">2–3 dakika yürü: su doldur, merdiven in-çık ya da odanı dolaş.</string>
+    <string name="movement_routine_sit_break_step_3">Ayakta omuzlarını çevir, parmak ucunda yükselip in.</string>
+    <string name="movement_routine_sit_break_step_4">Telefonla konuşurken ayakta durmak ya da yürümek de sayılır.</string>
+    <string name="movement_safety_title">Güvenle hareket</string>
+    <string name="movement_safety_text">Göğüs ağrısı, nefes darlığı, baş dönmesi ya da keskin bir ağrı olursa dur. Gebeysen ya da bir sağlık durumun varsa sana uygun hareketleri doktoruna sor.</string>
+    <string name="movement_safety_source" translatable="false">Riebe ve ark. 2015, Med Sci Sports Exerc (ACSM); ACOG 2020, Komite Görüşü No. 804</string>
+    <string name="movement_cycle_period_title">Adet günlerinde</string>
+    <string name="movement_cycle_period_text">Bugün kanama kaydın var. İstersen yürüyüş ya da esneme gibi hafif hareket, istersen dinlenme; ikisi de olur. Düzenli hareket adet ağrısını hafifletebilir.</string>
+    <string name="movement_cycle_period_source" translatable="false">Armour ve ark. 2019, Cochrane</string>
+    <string name="movement_cycle_other_title">Bugün için</string>
+    <string name="movement_cycle_other_text">Hangi rutin bugüne uyuyorsa onu seç. Döngü evresine göre öneri yapmıyoruz; PCOS&#8217;ta yumurtlama düzensiz olabildiği için evre tahmini güvenilir değil.</string>
+    <string name="movement_cycle_other_source" translatable="false">McNulty ve ark. 2020, Sports Med; Teede ve ark. 2023, Hum Reprod</string>
+    <string name="movement_cycle_why_title">Neden evreye göre değil?</string>
+    <string name="movement_cycle_why_text">Döngü evresine göre antrenman popüler ama çalışmalar net bir fark göstermiyor. PCOS&#8217;ta yumurtlama öngörülemez olabildiği için takvimden evre tahmin etmiyoruz.</string>
+    <string name="movement_cycle_why_source" translatable="false">McNulty ve ark. 2020, Sports Med; Colenso-Semple ve ark. 2023, Front Sports Act Living</string>
+    <string name="movement_cycle_general_title">Kendini dinle</string>
+    <string name="movement_cycle_general_text">Hareket için en iyi gün, kendini hazır hissettiğin gün. Kanama, kramp ya da yorgunluk olan günlerde hafif hareket de dinlenmek de olur.</string>
+    <string name="movement_cycle_general_source" translatable="false">Armour ve ark. 2019, Cochrane</string>
+    <string name="herbal_intro_title">Bitkisel destekler</string>
+    <string name="herbal_intro_text">Burada yalnızca PCOS&#8217;ta denenmiş ve kanıt düzeyi belli bitkiler var. Tedavi yerine geçmezler; miktar ya da süre önermiyoruz.</string>
+    <string name="herbal_tell_professional">Kullanıyorsan doktoruna ya da eczacına söyle.</string>
+    <string name="herbal_field_tried">Ne denendi?</string>
+    <string name="herbal_field_allergen">Alerji</string>
+    <string name="herbal_field_caution">Dikkat</string>
+    <string name="herbal_tea_iron_note">Bitki çayları yemekle birlikte içildiğinde demir emilimini azaltabilir. Demir eksikliğin varsa çayı öğün aralarında içmek daha uygun olabilir.</string>
+    <string name="herbal_spearmint_title">Yeşil nane (spearmint) çayı</string>
+    <string name="herbal_spearmint_tried">Küçük bir çalışmada yeşil nane çayı içen PCOS&#8217;u olan kadınlarda testosteron düştü. Kadınlar tüylenmede azalma bildirdi; ölçümle bakılan tüylenme değişmedi.</string>
+    <string name="herbal_spearmint_note">Çalışmalarda yeşil nane (Mentha spicata) kullanıldı; tıbbi nane (peppermint) farklı bir bitkidir.</string>
+    <string name="herbal_spearmint_allergen">Nane ya da aynı aileden bitkilere (kekik, fesleğen, adaçayı gibi) alerjin varsa uygun olmayabilir.</string>
+    <string name="herbal_spearmint_caution">Mide yanması ya da reflüyü artırabilir. Gebeysen, gebelik planlıyorsan ya da emziriyorsan düzenli içmeden önce doktoruna danış.</string>
+    <string name="herbal_spearmint_source" translatable="false">Grant 2010, Phytother Res; Akdoğan ve ark. 2007, Phytother Res</string>
+    <string name="herbal_cinnamon_title">Tarçın</string>
+    <string name="herbal_cinnamon_tried">Birkaç küçük çalışmada PCOS&#8217;u olan kadınlara kapsülle tarçın verildi; bazılarında insülin direnci göstergeleri iyileşti, birinde daha sık adet görüldü. Sonuçlar kesin değil.</string>
+    <string name="herbal_cinnamon_allergen">Tarçına alerjin varsa uygun değil. Ağızda yanma, kaşıntı ya da ciltte döküntü olursa bırak ve doktoruna danış.</string>
+    <string name="herbal_cinnamon_caution">Yaygın satılan kasya (Çin) tarçını kumarin içerir; uzun süre yüksek miktarda alınması karaciğeri zorlayabilir.</string>
+    <string name="herbal_cinnamon_caution_2">Karaciğer hastalığın varsa, gebeysen ya da kan şekerini düşüren ilaç kullanıyorsan önce doktoruna danış.</string>
+    <string name="herbal_cinnamon_source" translatable="false">Heydarpour ve ark. 2020, J Ethnopharmacol; Kort ve Lobo 2014, Am J Obstet Gynecol; BfR 2012</string>
+    <string name="herbal_excluded_title">Listeye almadıklarımız</string>
+    <string name="herbal_excluded_text">Bunlar PCOS için sıkça anılsa da etkileşim ya da güvenlik nedeniyle listemizde yok. Kullanıyorsan doktoruna ya da eczacına söyle.</string>
+    <string name="herbal_excluded_st_johns_wort_title">Sarı kantaron</string>
+    <string name="herbal_excluded_st_johns_wort_text">Ağızdan alınan sarı kantaron (çay, kapsül, damla) doğum kontrol hapı, bant, halka ve implantın etkisini azaltabilir; istenmeyen gebelik riski doğar.</string>
+    <string name="herbal_excluded_st_johns_wort_source" translatable="false">MHRA 2014, Drug Safety Update; FSRH 2022</string>
+    <string name="herbal_excluded_licorice_title">Meyan kökü</string>
+    <string name="herbal_excluded_licorice_text">Meyan kökü (şerbet, çay, takviye) bol ve uzun süre alınınca tansiyonu yükseltip potasyumu düşürebilir. Tansiyon, kalp, böbrek sorununda ve gebelikte uygun değil.</string>
+    <string name="herbal_excluded_licorice_source" translatable="false">NCCIH, Licorice Root; EMA/HMPC, Liquiritiae radix monografı</string>
+    <string name="herbal_excluded_berberine_title">Berberin</string>
+    <string name="herbal_excluded_berberine_text">Berberin birçok ilacın vücuttaki düzeyini değiştirebilir, kan şekeri ilaçlarıyla birlikte şekeri fazla düşürebilir. Gebelikte ve emzirirken güvenli kabul edilmez.</string>
+    <string name="herbal_excluded_berberine_source" translatable="false">MedlinePlus (ABD Ulusal Tıp Kütüphanesi), Berberine</string>
+    <string name="herbal_excluded_vitex_title">Hayıt (Vitex, keşiş biberi)</string>
+    <string name="herbal_excluded_vitex_text">Hayıt hormonları ve dopamini etkileyebilir. Hormonal doğum kontrol ya da hormon tedavisi kullanıyorsan, gebeysen ya da emziriyorsan önce doktoruna danış.</string>
+    <string name="herbal_excluded_vitex_source" translatable="false">NCCIH, Chasteberry</string>
+    <string name="herbal_excluded_turmeric_title">Zerdeçal ve kurkumin takviyeleri</string>
+    <string name="herbal_excluded_turmeric_text">Zerdeçal ya da kurkumin içeren takviyelerle ilişkili karaciğer hasarı bildirimleri var. Karaciğer sorunun varsa ya da düzenli ilaç kullanıyorsan önce doktoruna danış.</string>
+    <string name="herbal_excluded_turmeric_source" translatable="false">TGA 2023, güvenlik uyarısı</string>
+    <string name="evidence_strong_label">Güçlü kanıt</string>
+    <string name="evidence_strong_text">Uluslararası kılavuzlar ya da çok sayıda çalışmayı birleştiren analizler aynı yönü gösteriyor.</string>
+    <string name="evidence_moderate_label">Orta kanıt</string>
+    <string name="evidence_moderate_text">İyi tasarlanmış çalışmalar var ama sayıları az ya da çoğu PCOS&#8217;a özgü değil; yeni çalışmalarla değişebilir.</string>
+    <string name="evidence_limited_label">Sınırlı kanıt</string>
+    <string name="evidence_limited_text">Küçük ya da az sayıda çalışma var. Sonuç umut verici olabilir ama kesin değil.</string>
+    <string name="evidence_experimental_label">Deneysel</string>
+    <string name="evidence_experimental_text">Uluslararası kılavuz bu yöntemi henüz deneysel sayıyor; etkisi araştırılıyor.</string>
+    <string name="evidence_expert_label">Uzman görüşü</string>
+    <string name="evidence_expert_text">Doğrudan çalışma yerine uzmanların ortak görüşüne ve sağlık kurumlarının önerilerine dayanır.</string>
+    <string name="evidence_info_title">Kanıt düzeyi ne demek?</string>
+    <string name="evidence_info_text">Kanıt düzeyi, bir bilginin ne kadar ve nasıl araştırıldığını gösterir; sana iyi gelip gelmeyeceğini değil. Her kartta kaynağı da görebilirsin.</string>
+    <string name="evidence_safety_note">Güvenlik uyarılarında ihtiyatlıyız: kanıt sınırlı olsa bile olası riski bilmeni isteriz.</string>
+</resources>

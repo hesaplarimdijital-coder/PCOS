@@ -149,7 +149,7 @@ private fun MedicationRow(med: MedicationEntity, onClick: () -> Unit) {
     val badge: @Composable () -> Unit = {
         Surface(shape = CircleShape, color = colors.lavantaAcik) {
             Text(
-                stringResource(R.string.meds_evidence_limited),
+                stringResource(R.string.evidence_limited_label),
                 style = MaterialTheme.typography.labelSmall,
                 color = colors.lavanta,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),

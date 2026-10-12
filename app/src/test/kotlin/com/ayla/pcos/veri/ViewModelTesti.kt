@@ -5,6 +5,7 @@ import com.ayla.pcos.data.db.DoseStatus
 import com.ayla.pcos.data.db.MedicationEntity
 import com.ayla.pcos.data.db.MedicationKind
 import com.ayla.pcos.data.repo.duration
+import com.ayla.pcos.ui.plan.MovementCycleCard
 import com.ayla.pcos.ui.plan.PlanViewModel
 import com.ayla.pcos.ui.today.TodayViewModel
 import kotlinx.coroutines.delay
@@ -21,6 +22,8 @@ import kotlin.test.assertTrue
 class ViewModelTesti : VeriTestOrtami() {
 
     private fun today() = TodayViewModel(cycles, meds, water, prefs, ticker, scheduler, notifier, doctorNote)
+
+    private fun plan() = PlanViewModel(water, sleep, prefs, scheduler, ticker, cycles, logs, meds)
 
     @Test
     fun `hap modunda bugunku hap numarasi ve alinan haplar hesaplanir`() {
@@ -149,7 +152,7 @@ class ViewModelTesti : VeriTestOrtami() {
 
     @Test
     fun `uyku gece yarisini gecince yatis onceki gune yazilir`() {
-        val vm = PlanViewModel(water, sleep, prefs, scheduler, ticker)
+        val vm = plan()
         vm.addSleep(LocalTime.of(23, 30), LocalTime.of(7, 0), quality = 3)
         val night = bekle(vm.uiState) { it.lastNight != null }.lastNight!!
         assertEquals(bugun, night.date)
@@ -159,7 +162,7 @@ class ViewModelTesti : VeriTestOrtami() {
 
     @Test
     fun `gece yarisindan sonra yatis ayni gune yazilir`() {
-        val vm = PlanViewModel(water, sleep, prefs, scheduler, ticker)
+        val vm = plan()
         vm.addSleep(LocalTime.of(1, 0), LocalTime.of(8, 30), quality = null)
         val night = bekle(vm.uiState) { it.lastNight != null }.lastNight!!
         assertEquals(Duration.ofMinutes(7 * 60 + 30), night.duration)
@@ -168,7 +171,7 @@ class ViewModelTesti : VeriTestOrtami() {
 
     @Test
     fun `su ekleme ve cikarma sifirin altina inmez`() {
-        val vm = PlanViewModel(water, sleep, prefs, scheduler, ticker)
+        val vm = plan()
         calistir {
             vm.removeCup().join()
             vm.addCup().join()
@@ -200,5 +203,23 @@ class ViewModelTesti : VeriTestOrtami() {
             }
         }
         assertEquals(9, calistir { meds.get(id)?.stockCount })
+    }
+
+    @Test
+    fun `hareket karti riza acikken kayitli adet gunune gore secilir, hapta genel kalir`() {
+        calistir { cycles.addPeriodStart(bugun.minusDays(1)) }
+        val vm = plan()
+        assertEquals(MovementCycleCard.GENERAL, bekle(vm.uiState) { !it.loading }.movementCycleCard, "rıza varsayılan kapalı")
+        calistir { prefs.update { it.copy(consentPersonalization = true) } }
+        bekle(vm.uiState) { it.movementCycleCard == MovementCycleCard.PERIOD }
+        calistir {
+            meds.add(
+                MedicationEntity(
+                    name = "Hap", doseText = "1 tablet", kind = MedicationKind.CONTRACEPTIVE,
+                    times = listOf(LocalTime.of(22, 0)), pillActiveDays = 24, pillPlaceboDays = 4, packStartDate = bugun,
+                ),
+            )
+        }
+        bekle(vm.uiState) { it.movementCycleCard == MovementCycleCard.GENERAL }
     }
 }

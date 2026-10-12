@@ -1,7 +1,9 @@
 package com.ayla.pcos.ekran
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +20,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import com.ayla.pcos.ui.AppLockContent
 import com.ayla.pcos.ui.calendar.CalendarContent
 import com.ayla.pcos.ui.components.AltGezinme
@@ -32,7 +35,13 @@ import com.ayla.pcos.ui.meds.EditMedicationState
 import com.ayla.pcos.ui.meds.MedsContent
 import com.ayla.pcos.ui.navigation.Screen
 import com.ayla.pcos.ui.onboarding.OnboardingContent
+import com.ayla.pcos.ui.plan.BitkiselKart
+import com.ayla.pcos.ui.plan.ListeDisiKarti
+import com.ayla.pcos.ui.plan.MovementCycleCard
 import com.ayla.pcos.ui.plan.PlanContent
+import com.ayla.pcos.ui.plan.PlanIcerigi
+import com.ayla.pcos.ui.plan.PlanUiState
+import com.ayla.pcos.ui.plan.RutinKarti
 import com.ayla.pcos.ui.theme.AylaTheme
 import com.ayla.pcos.ui.today.TodayContent
 import com.ayla.pcos.ui.today.TodayUiState
@@ -139,8 +148,9 @@ class EkranGoruntuleriTest {
     )
 
     @Composable
-    private fun Plan() = PlanContent(
-        state = Ornek.plan, onAddCup = {}, onRemoveCup = {}, onAddSleep = { _, _, _ -> }, onDeleteSleep = {}, onEveningRoutine = {},
+    private fun Plan(sekme: Int = 0, durum: PlanUiState = Ornek.plan, acikRutin: String? = null) = PlanContent(
+        state = durum, onAddCup = {}, onRemoveCup = {}, onAddSleep = { _, _, _ -> }, onDeleteSleep = {}, onEveningRoutine = {},
+        initialTab = sekme, initialExpandedRoutine = acikRutin,
     )
 
     // --- README: beş sekme, ilk ekran ---
@@ -243,6 +253,42 @@ class EkranGoruntuleriTest {
     @Config(qualifiers = UZUN)
     @Test fun t30_gizlilik_politikasi() = ekran("30-gizlilik-politikasi") { GizlilikPolitikasiIcerik(onClose = {}, closeIsBack = true) }
 
+    @Test fun t31_planim_beslenme() = ekran("31-planim-beslenme", sekme = Screen.Plan) { Plan(sekme = 1) }
+
+    @Test fun t32_planim_hareket_adet() = ekran("32-planim-hareket-adet", sekme = Screen.Plan) {
+        Plan(sekme = 2, durum = Ornek.plan.copy(movementCycleCard = MovementCycleCard.PERIOD))
+    }
+
+    @Test fun t33_koyu_beslenme() = ekran("33-koyu-beslenme", sekme = Screen.Plan, koyu = true) { Plan(sekme = 1) }
+
+    @Config(qualifiers = BESLENME_TUM)
+    @Test fun u09_beslenme_tum() = ekran("u09-beslenme-tum", sekme = Screen.Plan) { Plan(sekme = 1) }
+
+    @Config(qualifiers = HAREKET_TUM)
+    @Test fun u10_hareket_tum() = ekran("u10-hareket-tum", sekme = Screen.Plan) {
+        Plan(sekme = 2, durum = Ornek.plan.copy(movementCycleCard = MovementCycleCard.OTHER), acikRutin = PlanIcerigi.ROUTINE_WALK)
+    }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y10_yazi200_beslenme() = ekran("y10-yazi200-beslenme", sekme = Screen.Plan, sistemYaziOlcegi = 2f) { Plan(sekme = 1) }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y11_yazi200_hareket() = ekran("y11-yazi200-hareket", sekme = Screen.Plan, sistemYaziOlcegi = 2f) {
+        Plan(sekme = 2, durum = Ornek.plan.copy(movementCycleCard = MovementCycleCard.OTHER))
+    }
+
+    @Config(qualifiers = HAREKET_TUM)
+    @Test fun y12_yazi200_bitkisel_ve_rutin() = ekran("y12-yazi200-bitkisel-rutin", sistemYaziOlcegi = 2f) {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            BitkiselKart(PlanIcerigi.herbal.first())
+            RutinKarti(PlanIcerigi.routines[1], expanded = true, onToggle = {})
+            ListeDisiKarti()
+        }
+    }
+
     @Test fun t28_planim_uyku_bos() = ekran("28-planim-uyku-bos", sekme = Screen.Plan) {
         PlanContent(
             state = Ornek.plan.copy(lastNight = null, sleepWeek = emptyList()),
@@ -326,3 +372,5 @@ class EkranGoruntuleriTest {
 internal const val TELEFON = "w393dp-h852dp-xhdpi"
 internal const val UZUN = "w393dp-h1800dp-xhdpi"
 internal const val KUCUK = "w360dp-h740dp-xhdpi"
+internal const val BESLENME_TUM = "w393dp-h5200dp-xhdpi"
+internal const val HAREKET_TUM = "w393dp-h3400dp-xhdpi"

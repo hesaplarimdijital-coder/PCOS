@@ -90,7 +90,7 @@ internal object Ornek {
         createdAt = instant(bugun.minusDays(40), LocalTime.NOON),
     )
     val naneCayi = MedicationEntity(
-        id = 3, name = "Nane çayı", doseText = "1 fincan", kind = MedicationKind.HERBAL,
+        id = 3, name = "Yeşil nane çayı", doseText = "1 fincan", kind = MedicationKind.HERBAL,
         form = MedicationForm.TEA, times = listOf(LocalTime.of(16, 0)), withFood = null,
         createdAt = instant(bugun.minusDays(20), LocalTime.NOON),
     )
