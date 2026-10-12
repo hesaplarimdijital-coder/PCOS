@@ -2,7 +2,6 @@ package com.ayla.pcos.report
 
 import android.content.Context
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -60,7 +59,6 @@ class PdfReportWriterTest {
 
     private fun sayfalar(report: DoctorReport) = ReportLayout(PaintTextMeasurer()).layout(report) { n, t -> "$n/$t" }
 
-    @Ignore("PdfDocument yerel kodu Robolectric'te yok (ADR-0009); cihazda doğrulanır. Deneme: pdf-deneme dalı")
     @Test
     fun `tek sayfa pdf yazar`() {
         val pages = sayfalar(rapor())
@@ -74,7 +72,6 @@ class PdfReportWriterTest {
         assertEquals("%PDF-", String(bytes, 0, 5, Charsets.US_ASCII))
     }
 
-    @Ignore("PdfDocument yerel kodu Robolectric'te yok (ADR-0009); cihazda doğrulanır. Deneme: pdf-deneme dalı")
     @Test
     fun `iki sayfa yazilir ve sayfa sayisi dosyada gorunur`() {
         val pages = sayfalar(rapor(paragraphs = 60))
@@ -88,7 +85,6 @@ class PdfReportWriterTest {
         assertTrue(pageObjects == 2 || content.contains("/Count 2"), "sayfa nesneleri: $pageObjects")
     }
 
-    @Ignore("PdfDocument yerel kodu Robolectric'te yok (ADR-0009); cihazda doğrulanır. Deneme: pdf-deneme dalı")
     @Test
     fun `rapor yardimcisi onbellek dizinine yazar ve eski dosyalari temizler`() {
         val dir = writer.directory
