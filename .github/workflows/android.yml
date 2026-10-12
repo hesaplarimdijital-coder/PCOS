@@ -272,6 +272,21 @@ jobs:
             echo "::error title=R8::$(printf '%s' "$line" | sed 's/%/%25/g')"
           done
 
+      - name: İzin denetimi (birleştirilmiş manifest)
+        shell: bash
+        run: |
+          # Gizlilik politikası "internet izni yok" der; bir kütüphane manifest birleştirmesiyle INTERNET
+          # eklerse CI kırmızıya döner. İzin listesi her çalıştırmada açıklama olarak yayımlanır.
+          set -e
+          apk=$(ls app/build/outputs/apk/release/*.apk | head -1)
+          aapt2=$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)aapt2
+          perms=$("$aapt2" dump permissions "$apk" | grep -oE "name='[^']+'" | sed "s/name='//; s/'//" | sort -u)
+          echo "::notice title=İzinler::$(echo "$perms" | tr '\n' ' ')"
+          if echo "$perms" | grep -qx 'android.permission.INTERNET'; then
+            echo "::error title=İzin::INTERNET izni eklendi; gizlilik politikası ve Veri güvenliği formu buna göre güncellenmeden yayımlanamaz"
+            exit 1
+          fi
+
       - name: Lint
         continue-on-error: true
         shell: bash

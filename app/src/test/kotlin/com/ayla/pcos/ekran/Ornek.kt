@@ -193,6 +193,7 @@ internal object Ornek {
         date = bugun, loaded = true, mood = 4, energy = 2, flow = 0,
         symptoms = setOf(SymptomCatalog.BLOATING, SymptomCatalog.ACNE, SymptomCatalog.SWEET_CRAVING),
         note = "Öğle yemeğinden sonra 15 dakika yürüdüm, şişkinlik azaldı.",
+        hasSavedLog = true,
     )
 
     val ayarlar = UserPreferences(

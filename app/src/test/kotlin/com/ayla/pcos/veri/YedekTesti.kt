@@ -23,6 +23,7 @@ import kotlin.test.assertTrue
 class YedekTesti : VeriTestOrtami() {
 
     private val json = AppModule.provideJson()
+    private val rizaZamani = java.time.Instant.parse("2026-10-12T07:00:00Z")
     private val exporter by lazy { DataExporter(context, db, json, prefs) }
     private val importer by lazy { DataImporter(context, db, json, prefs, scheduler) }
 
@@ -51,7 +52,7 @@ class YedekTesti : VeriTestOrtami() {
         // Yeni cihaz: veri yok, rızalar farklı.
         calistir {
             exporter.wipeAll()
-            prefs.update { UserPreferences(onboardingDone = true, consentAnalytics = true, consentPersonalization = false) }
+            prefs.update { UserPreferences(onboardingDone = true, consentPersonalization = true, healthDataConsentAt = rizaZamani) }
         }
 
         val bundle = importer.parse(text)
@@ -78,8 +79,8 @@ class YedekTesti : VeriTestOrtami() {
             assertEquals(10, p.waterGoalCups)
             assertEquals(bugun.minusDays(40), p.trackingSince)
             // Rızalar ve karşılama durumu cihazdaki gibi kalır.
-            assertTrue(p.consentAnalytics)
-            assertEquals(false, p.consentPersonalization)
+            assertTrue(p.consentPersonalization)
+            assertEquals(rizaZamani, p.healthDataConsentAt)
             assertTrue(p.onboardingDone)
         }
     }

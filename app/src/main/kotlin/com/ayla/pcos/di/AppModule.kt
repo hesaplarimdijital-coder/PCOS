@@ -15,6 +15,7 @@ import com.ayla.pcos.data.db.HydrationDao
 import com.ayla.pcos.data.db.MedicationDao
 import com.ayla.pcos.data.db.PeriodDao
 import com.ayla.pcos.data.db.SleepDao
+import com.ayla.pcos.export.DataExporter
 import com.ayla.pcos.security.DatabaseKeyProvider
 import com.ayla.pcos.security.DatabaseKeyUnavailableException
 import dagger.Module
@@ -94,7 +95,7 @@ object AppModule {
         val stamp = System.currentTimeMillis()
         listOf("", "-wal", "-shm", "-journal").forEach { suffix ->
             val f = File(dbFile.path + suffix)
-            if (f.exists()) f.renameTo(File(dbFile.path + ".kilitli-$stamp" + suffix))
+            if (f.exists()) f.renameTo(File(dbFile.path + DataExporter.QUARANTINE_MARKER + stamp + suffix))
         }
     }
 

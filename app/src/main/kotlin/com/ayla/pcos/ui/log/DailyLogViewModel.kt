@@ -29,6 +29,8 @@ data class DailyLogUiState(
     val saved: Boolean = false,
     /** Başlık: bugün için "Bugün nasılsın?", geçmiş gün için "O gün nasıldın?". */
     val isToday: Boolean = true,
+    /** O gün için kaydedilmiş bir kayıt var; "Bu günün kaydını sil" yalnızca o zaman görünür. */
+    val hasSavedLog: Boolean = false,
 )
 
 @HiltViewModel
@@ -58,6 +60,7 @@ class DailyLogViewModel @Inject constructor(
                 waistCm = existing?.waistCm?.toString() ?: "",
                 showBodyMeasurements = showBody,
                 isToday = date == ticker.now(),
+                hasSavedLog = existing != null,
             )
         }
     }
@@ -88,6 +91,15 @@ class DailyLogViewModel @Inject constructor(
                 ),
             )
             _state.update { it.copy(saved = true) }
+            onDone()
+        }
+    }
+
+    /** O günün kaydını tamamen siler (KVKK: tek tek silme her zaman mümkün). */
+    fun delete(onDone: () -> Unit) {
+        val date = _state.value.date
+        viewModelScope.launch {
+            repository.delete(date)
             onDone()
         }
     }

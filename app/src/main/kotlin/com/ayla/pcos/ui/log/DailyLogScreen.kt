@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.SentimentDissatisfied
@@ -24,6 +27,7 @@ import androidx.compose.material.icons.rounded.SentimentNeutral
 import androidx.compose.material.icons.rounded.SentimentSatisfied
 import androidx.compose.material.icons.rounded.SentimentVeryDissatisfied
 import androidx.compose.material.icons.rounded.SentimentVerySatisfied
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -34,9 +38,13 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -72,6 +80,7 @@ fun DailyLogScreen(date: LocalDate, onClose: () -> Unit, viewModel: DailyLogView
         onWaist = { viewModel.setWaist(it) },
         onNote = { viewModel.setNote(it) },
         onSave = { viewModel.save(onClose) },
+        onDelete = { viewModel.delete(onClose) },
     )
 }
 
@@ -89,8 +98,10 @@ internal fun DailyLogContent(
     onWaist: (String) -> Unit,
     onNote: (String) -> Unit,
     onSave: () -> Unit,
+    onDelete: () -> Unit = {},
 ) {
     val date = state.date
+    var confirmDelete by remember { mutableStateOf(false) }
     val dateText = date.format(DateTimeFormatter.ofPattern("d MMMM", Locale.forLanguageTag("tr")))
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -209,6 +220,14 @@ internal fun DailyLogContent(
                     shape = MaterialTheme.shapes.medium,
                 )
             }
+            if (state.hasSavedLog) {
+                Spacer(Modifier.height(12.dp))
+                TextButton(onClick = { confirmDelete = true }, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Icon(Icons.Outlined.DeleteOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.log_delete), color = MaterialTheme.colorScheme.error)
+                }
+            }
             Spacer(Modifier.height(16.dp))
         }
         Button(
@@ -219,6 +238,21 @@ internal fun DailyLogContent(
             Spacer(Modifier.height(0.dp))
             Text(" " + stringResource(R.string.action_save))
         }
+    }
+
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            title = { Text(stringResource(R.string.log_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.log_delete_confirm_text)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmDelete = false
+                    onDelete()
+                }) { Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.action_cancel)) } },
+        )
     }
 }
 

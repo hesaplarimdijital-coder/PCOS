@@ -36,6 +36,8 @@ import com.ayla.pcos.R
 import com.ayla.pcos.ui.calendar.CalendarScreen
 import com.ayla.pcos.ui.components.AltGezinme
 import com.ayla.pcos.ui.log.DailyLogScreen
+import com.ayla.pcos.ui.me.GizlilikPolitikasiDialog
+import com.ayla.pcos.ui.me.GizlilikPolitikasiEkrani
 import com.ayla.pcos.ui.me.MeScreen
 import com.ayla.pcos.ui.me.SettingsScreen
 import com.ayla.pcos.ui.meds.AddMedicationScreen
@@ -87,6 +89,23 @@ fun AylaRoot(
             onRestoreOpened = { restoreRequested = false },
         )
     }
+
+    // Rızası kaydedilmemiş kurulumlar (bu sürümden önce karşılamayı bitirenler) bir kez açık rıza verir.
+    var showPolicy by rememberSaveable { mutableStateOf(false) }
+    if (!state.loading && state.needsHealthConsent && !state.dataResetNotice) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(stringResource(R.string.consent_dialog_title)) },
+            text = { Text(stringResource(R.string.consent_dialog_text)) },
+            confirmButton = {
+                TextButton(onClick = viewModel::giveHealthDataConsent) { Text(stringResource(R.string.consent_dialog_accept)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPolicy = true }) { Text(stringResource(R.string.privacy_policy_read)) }
+            },
+        )
+    }
+    if (showPolicy) GizlilikPolitikasiDialog(onDismiss = { showPolicy = false })
 
     if (!state.loading && state.dataResetNotice) {
         AlertDialog(
@@ -191,7 +210,12 @@ private fun ScreenHost(screen: Screen, navigator: AylaNavigator) {
             onCustom = { navigator.replaceTop(Screen.EditMedication(0)) },
         )
         is Screen.EditMedication -> EditMedicationScreen(id = screen.id, onDone = { navigator.pop() })
-        Screen.Settings -> SettingsScreen(onBack = { navigator.pop() })
-        Screen.RestoreBackup -> SettingsScreen(onBack = { navigator.pop() }, autoStartImport = true)
+        Screen.Settings -> SettingsScreen(onBack = { navigator.pop() }, onOpenPrivacyPolicy = { navigator.push(Screen.PrivacyPolicy) })
+        Screen.RestoreBackup -> SettingsScreen(
+            onBack = { navigator.pop() },
+            autoStartImport = true,
+            onOpenPrivacyPolicy = { navigator.push(Screen.PrivacyPolicy) },
+        )
+        Screen.PrivacyPolicy -> GizlilikPolitikasiEkrani(onBack = { navigator.pop() })
     }
 }

@@ -24,10 +24,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -38,8 +40,10 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Medication
+import androidx.compose.material.icons.rounded.Policy
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Icon
@@ -63,6 +67,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
@@ -75,6 +80,7 @@ import com.ayla.pcos.data.prefs.Goal
 import com.ayla.pcos.ui.components.SimgeZemini
 import com.ayla.pcos.ui.components.openExactAlarmSettings
 import com.ayla.pcos.ui.components.openNotificationSettings
+import com.ayla.pcos.ui.me.GizlilikPolitikasiDialog
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import java.time.Instant
@@ -123,7 +129,9 @@ fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
         onPauseOrDispose { }
     }
 
+    var showPolicy by rememberSaveable { mutableStateOf(false) }
     BackHandler(enabled = state.step > 0) { viewModel.back() }
+    if (showPolicy) GizlilikPolitikasiDialog(onDismiss = { showPolicy = false })
     OnboardingContent(
         state = state,
         onBack = { viewModel.back() },
@@ -132,7 +140,9 @@ fun OnboardingScreen(viewModel: OnboardingViewModel = hiltViewModel()) {
         onName = { viewModel.setName(it) },
         onToggleGoal = { viewModel.toggleGoal(it) },
         onLastPeriod = { viewModel.setLastPeriod(it) },
-        onConsent = { p, a, r -> viewModel.setConsent(p, a, r) },
+        onHealthConsent = { viewModel.setHealthDataConsent(it) },
+        onPersonalization = { viewModel.setPersonalization(it) },
+        onOpenPrivacyPolicy = { showPolicy = true },
         permissions = permissions,
         onRequestNotifications = {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !denied) {
@@ -155,7 +165,9 @@ internal fun OnboardingContent(
     onName: (String) -> Unit,
     onToggleGoal: (Goal) -> Unit,
     onLastPeriod: (LocalDate?) -> Unit,
-    onConsent: (Boolean?, Boolean?, Boolean?) -> Unit,
+    onHealthConsent: (Boolean) -> Unit,
+    onPersonalization: (Boolean) -> Unit,
+    onOpenPrivacyPolicy: () -> Unit = {},
     permissions: OnboardingPermissions = OnboardingPermissions(),
     onRequestNotifications: () -> Unit = {},
     onOpenExactAlarmSettings: () -> Unit = {},
@@ -195,15 +207,24 @@ internal fun OnboardingContent(
                     0 -> WelcomeStep(state.name, onName)
                     1 -> GoalsStep(state.goals, onToggleGoal)
                     2 -> LastPeriodStep(state.lastPeriod, onLastPeriod)
-                    else -> ConsentStep(state, onConsent, permissions, onRequestNotifications, onOpenExactAlarmSettings)
+                    else -> ConsentStep(state, onHealthConsent, onPersonalization, onOpenPrivacyPolicy, permissions, onRequestNotifications, onOpenExactAlarmSettings)
                 }
                 Spacer(Modifier.height(24.dp))
             }
         }
 
+        val lastStep = state.step == OnboardingState.STEP_COUNT - 1
+        if (lastStep && !state.healthDataConsent) {
+            Text(
+                stringResource(R.string.consent_health_required),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+        }
         Button(
-            onClick = { if (state.step == OnboardingState.STEP_COUNT - 1) onFinish() else onNext() },
-            enabled = !state.saving,
+            onClick = { if (lastStep) onFinish() else onNext() },
+            enabled = if (lastStep) state.canFinish else !state.saving,
             modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
         ) {
             Text(if (state.step == OnboardingState.STEP_COUNT - 1) stringResource(R.string.onboarding_start) else stringResource(R.string.action_continue))
@@ -343,7 +364,9 @@ private fun LastPeriodStep(lastPeriod: LocalDate?, onPick: (LocalDate?) -> Unit)
 @Composable
 private fun ConsentStep(
     state: OnboardingState,
-    onConsent: (Boolean?, Boolean?, Boolean?) -> Unit,
+    onHealthConsent: (Boolean) -> Unit,
+    onPersonalization: (Boolean) -> Unit,
+    onOpenPrivacyPolicy: () -> Unit,
     permissions: OnboardingPermissions,
     onRequestNotifications: () -> Unit,
     onOpenExactAlarmSettings: () -> Unit,
@@ -352,9 +375,14 @@ private fun ConsentStep(
     Spacer(Modifier.height(12.dp))
     Text(stringResource(R.string.onboarding_consent_text), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
     Spacer(Modifier.height(16.dp))
-    ConsentRow(R.string.consent_personalization_title, R.string.consent_personalization_text, state.consentPersonalization) { onConsent(it, null, null) }
-    ConsentRow(R.string.consent_analytics_title, R.string.consent_analytics_text, state.consentAnalytics) { onConsent(null, it, null) }
-    ConsentRow(R.string.consent_research_title, R.string.consent_research_text, state.consentResearch) { onConsent(null, null, it) }
+    AcikRizaSatiri(checked = state.healthDataConsent, onChange = onHealthConsent)
+    TextButton(onClick = onOpenPrivacyPolicy, modifier = Modifier.heightIn(min = 48.dp)) {
+        Icon(Icons.Rounded.Policy, contentDescription = null)
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(R.string.privacy_policy_link))
+    }
+    Spacer(Modifier.height(4.dp))
+    ConsentRow(R.string.consent_personalization_title, R.string.consent_personalization_text, state.consentPersonalization, onPersonalization)
 
     Spacer(Modifier.height(24.dp))
     Text(stringResource(R.string.onboarding_notifications_title), style = MaterialTheme.typography.titleMedium)
@@ -410,6 +438,33 @@ private fun IzinVerildi(text: String) {
         ) {
             Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = colors.basari, modifier = Modifier.size(18.dp))
             Text(text, style = MaterialTheme.typography.labelLarge, color = colors.basari)
+        }
+    }
+}
+
+/**
+ * Sağlık verisinin işlenmesine açık rıza: ayrı, önceden işaretlenmemiş bir onay kutusu. Satırın tamamı
+ * dokunma hedefidir; ekran okuyucu onay kutusu olarak duyurur.
+ */
+@Composable
+private fun AcikRizaSatiri(checked: Boolean, onChange: (Boolean) -> Unit) {
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = if (checked) LocalAylaColors.current.basariAcik else MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .toggleable(value = checked, role = Role.Checkbox, onValueChange = onChange)
+                .padding(horizontal = 12.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Checkbox(checked = checked, onCheckedChange = null)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.consent_health_title), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.consent_health_text), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
     }
 }

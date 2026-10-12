@@ -6,11 +6,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
@@ -38,9 +40,8 @@ class UserPreferencesRepository @Inject constructor(
             displayName = this[Keys.DISPLAY_NAME] ?: defaults.displayName,
             goals = this[Keys.GOALS]?.mapNotNull { runCatching { Goal.valueOf(it) }.getOrNull() }?.toSet() ?: defaults.goals,
             trackingSince = this[Keys.TRACKING_SINCE]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+            healthDataConsentAt = this[Keys.HEALTH_DATA_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
             consentPersonalization = this[Keys.CONSENT_PERSONALIZATION] ?: defaults.consentPersonalization,
-            consentAnalytics = this[Keys.CONSENT_ANALYTICS] ?: defaults.consentAnalytics,
-            consentResearch = this[Keys.CONSENT_RESEARCH] ?: defaults.consentResearch,
             waterGoalCups = this[Keys.WATER_GOAL_CUPS] ?: defaults.waterGoalCups,
             cupMl = this[Keys.CUP_ML] ?: defaults.cupMl,
             waterRemindersEnabled = this[Keys.WATER_REMINDERS] ?: defaults.waterRemindersEnabled,
@@ -70,9 +71,11 @@ class UserPreferencesRepository @Inject constructor(
         this[Keys.DISPLAY_NAME] = p.displayName
         this[Keys.GOALS] = p.goals.map { it.name }.toSet()
         p.trackingSince?.let { this[Keys.TRACKING_SINCE] = it.toString() } ?: remove(Keys.TRACKING_SINCE)
+        p.healthDataConsentAt?.let { this[Keys.HEALTH_DATA_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.HEALTH_DATA_CONSENT_AT)
         this[Keys.CONSENT_PERSONALIZATION] = p.consentPersonalization
-        this[Keys.CONSENT_ANALYTICS] = p.consentAnalytics
-        this[Keys.CONSENT_RESEARCH] = p.consentResearch
+        // Kaldırılan rıza anahtarları (analitik, araştırma) eski kurulumlarda kalmasın.
+        remove(Keys.LEGACY_CONSENT_ANALYTICS)
+        remove(Keys.LEGACY_CONSENT_RESEARCH)
         this[Keys.WATER_GOAL_CUPS] = p.waterGoalCups
         this[Keys.CUP_ML] = p.cupMl
         this[Keys.WATER_REMINDERS] = p.waterRemindersEnabled
@@ -105,8 +108,9 @@ class UserPreferencesRepository @Inject constructor(
         val GOALS = stringSetPreferencesKey("goals")
         val TRACKING_SINCE = stringPreferencesKey("tracking_since")
         val CONSENT_PERSONALIZATION = booleanPreferencesKey("consent_personalization")
-        val CONSENT_ANALYTICS = booleanPreferencesKey("consent_analytics")
-        val CONSENT_RESEARCH = booleanPreferencesKey("consent_research")
+        val HEALTH_DATA_CONSENT_AT = longPreferencesKey("health_data_consent_at")
+        val LEGACY_CONSENT_ANALYTICS = booleanPreferencesKey("consent_analytics")
+        val LEGACY_CONSENT_RESEARCH = booleanPreferencesKey("consent_research")
         val WATER_GOAL_CUPS = intPreferencesKey("water_goal_cups")
         val CUP_ML = intPreferencesKey("cup_ml")
         val WATER_REMINDERS = booleanPreferencesKey("water_reminders")

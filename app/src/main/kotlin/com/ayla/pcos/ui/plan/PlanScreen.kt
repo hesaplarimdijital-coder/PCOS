@@ -404,7 +404,7 @@ private fun UykuKarti(state: PlanUiState, onAdd: () -> Unit, onDelete: (SleepEnt
             val d = night.duration
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 SimgeZemini(icon = Icons.Rounded.Bedtime, background = colors.lavantaAcik, tint = colors.lavanta)
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         stringResource(R.string.sleep_duration, d.toHours().toInt(), (d.toMinutes() % 60).toInt()),
                         style = MaterialTheme.typography.headlineSmall,
@@ -418,6 +418,9 @@ private fun UykuKarti(state: PlanUiState, onAdd: () -> Unit, onDelete: (SleepEnt
                         style = MaterialTheme.typography.bodyMedium,
                         color = scheme.onSurfaceVariant,
                     )
+                }
+                IconButton(onClick = { onDelete(night) }) {
+                    Icon(Icons.Outlined.DeleteOutline, contentDescription = stringResource(R.string.action_delete), tint = scheme.onSurfaceVariant)
                 }
             }
         }

@@ -23,6 +23,7 @@ import com.ayla.pcos.ui.calendar.CalendarContent
 import com.ayla.pcos.ui.components.AltGezinme
 import com.ayla.pcos.ui.log.DailyLogContent
 import com.ayla.pcos.ui.me.BackupImportState
+import com.ayla.pcos.ui.me.GizlilikPolitikasiIcerik
 import com.ayla.pcos.ui.me.MeContent
 import com.ayla.pcos.ui.me.SettingsContent
 import com.ayla.pcos.ui.meds.AddMedicationContent
@@ -174,15 +175,15 @@ class EkranGoruntuleriTest {
     }
 
     @Test fun t11_karsilama() = ekran("11-karsilama") {
-        OnboardingContent(Ornek.karsilama, {}, {}, {}, {}, {}, {}, { _, _, _ -> })
+        OnboardingContent(Ornek.karsilama, {}, {}, {}, {}, {}, {}, {}, {})
     }
 
     @Test fun t12_karsilama_hedefler() = ekran("12-karsilama-hedefler") {
-        OnboardingContent(Ornek.karsilamaHedefler, {}, {}, {}, {}, {}, {}, { _, _, _ -> })
+        OnboardingContent(Ornek.karsilamaHedefler, {}, {}, {}, {}, {}, {}, {}, {})
     }
 
     @Test fun t13_karsilama_izinler() = ekran("13-karsilama-izinler") {
-        OnboardingContent(Ornek.karsilamaIzinler, {}, {}, {}, {}, {}, {}, { _, _, _ -> })
+        OnboardingContent(Ornek.karsilamaIzinler, {}, {}, {}, {}, {}, {}, {}, {})
     }
 
     @Test fun t19_bugun_bildirim_kapali() = ekran("19-bugun-bildirim-kapali", sekme = Screen.Today) {
@@ -238,6 +239,9 @@ class EkranGoruntuleriTest {
             importState = BackupImportState.Preview(Ornek.yedekOzeti),
         )
     }
+
+    @Config(qualifiers = UZUN)
+    @Test fun t30_gizlilik_politikasi() = ekran("30-gizlilik-politikasi") { GizlilikPolitikasiIcerik(onClose = {}, closeIsBack = true) }
 
     @Test fun t28_planim_uyku_bos() = ekran("28-planim-uyku-bos", sekme = Screen.Plan) {
         PlanContent(

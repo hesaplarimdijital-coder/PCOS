@@ -35,6 +35,9 @@ sealed interface Screen {
     /** Ayarlar, yedek dosyası seçici açık başlar (anahtar kaybı diyaloğundan gelinir). */
     data object RestoreBackup : Screen { override val route = "settings/restore" }
 
+    /** Gizlilik politikası ve KVKK aydınlatma metni. */
+    data object PrivacyPolicy : Screen { override val route = "privacy" }
+
     companion object {
         val tabs: List<Tab> = listOf(Today, Calendar, Meds, Plan, Me)
 
@@ -47,6 +50,7 @@ sealed interface Screen {
             route == AddMedication.route -> AddMedication
             route == Settings.route -> Settings
             route == RestoreBackup.route -> RestoreBackup
+            route == PrivacyPolicy.route -> PrivacyPolicy
             route.startsWith("log/") -> runCatching { DailyLog(LocalDate.parse(route.removePrefix("log/"))) }.getOrNull()
             route.startsWith("meds/edit/") -> route.removePrefix("meds/edit/").toLongOrNull()?.let { EditMedication(it) }
             else -> null

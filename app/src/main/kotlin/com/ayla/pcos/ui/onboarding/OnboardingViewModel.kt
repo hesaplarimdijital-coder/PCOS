@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -22,11 +23,14 @@ data class OnboardingState(
     val name: String = "",
     val goals: Set<Goal> = setOf(Goal.CYCLE, Goal.SYMPTOMS),
     val lastPeriod: LocalDate? = null,
-    val consentPersonalization: Boolean = true,
-    val consentAnalytics: Boolean = false,
-    val consentResearch: Boolean = false,
+    /** Sağlık verisinin cihazda işlenmesine açık rıza; işaretlenmeden karşılama bitmez. */
+    val healthDataConsent: Boolean = false,
+    /** İsteğe bağlı; varsayılan kapalı. */
+    val consentPersonalization: Boolean = false,
     val saving: Boolean = false,
 ) {
+    val canFinish: Boolean get() = healthDataConsent && !saving
+
     companion object {
         const val STEP_COUNT = 4
     }
@@ -52,14 +56,9 @@ class OnboardingViewModel @Inject constructor(
 
     fun setLastPeriod(date: LocalDate?) = _state.update { it.copy(lastPeriod = date) }
 
-    fun setConsent(personalization: Boolean? = null, analytics: Boolean? = null, research: Boolean? = null) =
-        _state.update {
-            it.copy(
-                consentPersonalization = personalization ?: it.consentPersonalization,
-                consentAnalytics = analytics ?: it.consentAnalytics,
-                consentResearch = research ?: it.consentResearch,
-            )
-        }
+    fun setHealthDataConsent(value: Boolean) = _state.update { it.copy(healthDataConsent = value) }
+
+    fun setPersonalization(value: Boolean) = _state.update { it.copy(consentPersonalization = value) }
 
     fun next() = _state.update { it.copy(step = (it.step + 1).coerceAtMost(OnboardingState.STEP_COUNT - 1)) }
 
@@ -68,7 +67,7 @@ class OnboardingViewModel @Inject constructor(
     /** Son adım: tercihleri yazar, varsa son adeti ve hap şablonunu ekler, karşılamayı kapatır. */
     fun finish() {
         val s = _state.value
-        if (s.saving) return
+        if (!s.canFinish) return
         _state.update { it.copy(saving = true) }
         viewModelScope.launch {
             val today = ticker.now()
@@ -76,9 +75,8 @@ class OnboardingViewModel @Inject constructor(
                 it.copy(
                     displayName = s.name.trim(),
                     goals = s.goals,
+                    healthDataConsentAt = Instant.now(),
                     consentPersonalization = s.consentPersonalization,
-                    consentAnalytics = s.consentAnalytics,
-                    consentResearch = s.consentResearch,
                     trackingSince = it.trackingSince ?: today,
                 )
             }

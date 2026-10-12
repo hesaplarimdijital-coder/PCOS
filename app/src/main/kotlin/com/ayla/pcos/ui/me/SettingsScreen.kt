@@ -26,8 +26,10 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Policy
 import androidx.compose.material.icons.rounded.SettingsBackupRestore
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.VerifiedUser
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -102,7 +104,12 @@ enum class SaatAlani { ACTIVE_START, ACTIVE_END, QUIET_START, QUIET_END, DAILY_C
 
 /** Ayarlar: profil, su, bildirimler, koruma, KVKK rızaları, görünüm, veri. */
 @Composable
-fun SettingsScreen(onBack: () -> Unit, autoStartImport: Boolean = false, viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    autoStartImport: Boolean = false,
+    onOpenPrivacyPolicy: () -> Unit = {},
+    viewModel: SettingsViewModel = hiltViewModel(),
+) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
     val importState by viewModel.importState.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
@@ -156,6 +163,7 @@ fun SettingsScreen(onBack: () -> Unit, autoStartImport: Boolean = false, viewMod
         onImport = launchImport,
         onImportConfirm = viewModel::applyBackup,
         onImportCancel = viewModel::cancelImport,
+        onOpenPrivacyPolicy = onOpenPrivacyPolicy,
         onOpenNotificationSettings = { openNotificationSettings(context) },
         onOpenExactAlarmSettings = { openExactAlarmSettings(context) },
     )
@@ -178,6 +186,7 @@ internal fun SettingsContent(
     onImport: () -> Unit = {},
     onImportConfirm: (ImportMode) -> Unit = {},
     onImportCancel: () -> Unit = {},
+    onOpenPrivacyPolicy: () -> Unit = {},
 ) {
     val p = prefs
     var confirmWipe by remember { mutableStateOf(false) }
@@ -321,11 +330,30 @@ internal fun SettingsContent(
             }
 
             Grup(stringResource(R.string.settings_section_consent)) {
+                // Temel işlemeye verilen açık rıza: tarihiyle gösterilir; geri alma yolu tam silmedir.
+                val consentAt = p.healthDataConsentAt
+                Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(vertical = 10.dp)) {
+                    Icon(Icons.Rounded.VerifiedUser, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.settings_health_consent_title), style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            if (consentAt != null) {
+                                stringResource(
+                                    R.string.settings_health_consent_given,
+                                    DateTimeFormatter.ofPattern("d MMMM yyyy", java.util.Locale.forLanguageTag("tr")).format(consentAt.atZone(java.time.ZoneId.systemDefault())),
+                                )
+                            } else {
+                                stringResource(R.string.settings_health_consent_missing)
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                HorizontalDivider()
                 AyarSatiri(R.string.consent_personalization_title, R.string.consent_personalization_text, p.consentPersonalization) { v -> onUpdate { it.copy(consentPersonalization = v) } }
                 HorizontalDivider()
-                AyarSatiri(R.string.consent_analytics_title, R.string.consent_analytics_text, p.consentAnalytics) { v -> onUpdate { it.copy(consentAnalytics = v) } }
-                HorizontalDivider()
-                AyarSatiri(R.string.consent_research_title, R.string.consent_research_text, p.consentResearch) { v -> onUpdate { it.copy(consentResearch = v) } }
+                EylemSatiri(Icons.Rounded.Policy, R.string.privacy_policy_link, null, onClick = onOpenPrivacyPolicy)
             }
 
             Grup(stringResource(R.string.settings_section_display)) {

@@ -155,12 +155,21 @@ class DataExporter @Inject constructor(
         }
     }
 
-    /** Tüm tabloları boşaltır; geri alınamaz. Tercihler ayrıca sıfırlanır. */
+    /**
+     * Tüm tabloları boşaltır; geri alınamaz. Anahtar kaybında kenara ayrılan (artık okunamayan) eski
+     * veritabanı dosyaları da silinir. Tercihler ayrıca sıfırlanır.
+     */
     suspend fun wipeAll() = withContext(Dispatchers.IO) {
         db.clearAllTables()
+        context.getDatabasePath(AylaDatabase.NAME).parentFile
+            ?.listFiles { file -> file.name.startsWith(AylaDatabase.NAME + QUARANTINE_MARKER) }
+            ?.forEach { it.delete() }
     }
 
     companion object {
+        /** AppModule karantina adı: ayla.db.kilitli-<zaman>[-wal|-shm|-journal]. */
+        const val QUARANTINE_MARKER = ".kilitli-"
+
         fun suggestedFileName(): String = "ayla-verilerim-${java.time.LocalDate.now()}.json"
     }
 }

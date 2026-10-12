@@ -1,5 +1,6 @@
 package com.ayla.pcos.data.prefs
 
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -14,10 +15,11 @@ data class UserPreferences(
     /** Kayıt tutmaya başlanan gün; seyrek adet işareti için gerekir. */
     val trackingSince: LocalDate? = null,
 
-    // Rıza (KVKK): temel işlev her zaman açık, diğerleri varsayılan kapalı
-    val consentPersonalization: Boolean = true,
-    val consentAnalytics: Boolean = false,
-    val consentResearch: Boolean = false,
+    // Rıza (KVKK). Sağlık verisinin cihazda işlenmesine açık rıza karşılamada ayrı bir onayla alınır ve
+    // zamanı saklanır. Kişiselleştirme isteğe bağlıdır ve varsayılan kapalıdır (önceden işaretli rıza yok).
+    // Analitik ya da araştırma işlemesi olmadığı için onlara ait rıza anahtarı da yoktur.
+    val healthDataConsentAt: Instant? = null,
+    val consentPersonalization: Boolean = false,
 
     // Su
     val waterGoalCups: Int = 8,

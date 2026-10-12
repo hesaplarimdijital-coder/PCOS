@@ -9,8 +9,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
 
 /** Kök durum: karşılama tamamlandı mı, uygulama kilitli mi. */
@@ -20,6 +21,8 @@ data class RootUiState(
     val locked: Boolean = false,
     /** Önceki veriler açılamadı ve yeni başlangıç yapıldı; kullanıcıya bir kez söylenir. */
     val dataResetNotice: Boolean = false,
+    /** Karşılama bitmiş ama sağlık verisine açık rıza kaydı yok (önceki sürümden kalan kurulum). */
+    val needsHealthConsent: Boolean = false,
 )
 
 @HiltViewModel
@@ -34,15 +37,16 @@ class RootViewModel @Inject constructor(
     private var backgroundedAt: Long? = null
 
     val uiState: StateFlow<RootUiState> = combine(
-        prefs.preferences.map { it.onboardingDone to it.appLockEnabled },
+        prefs.preferences,
         unlocked,
         keyProvider.resetNoticePending,
-    ) { (onboardingDone, lockEnabled), isUnlocked, resetNotice ->
+    ) { p, isUnlocked, resetNotice ->
         RootUiState(
             loading = false,
-            onboardingDone = onboardingDone,
-            locked = lockEnabled && !isUnlocked,
+            onboardingDone = p.onboardingDone,
+            locked = p.appLockEnabled && !isUnlocked,
             dataResetNotice = resetNotice,
+            needsHealthConsent = p.onboardingDone && p.healthDataConsentAt == null,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RootUiState())
 
@@ -51,6 +55,10 @@ class RootViewModel @Inject constructor(
     }
 
     fun acknowledgeDataReset() = keyProvider.acknowledgeResetNotice()
+
+    fun giveHealthDataConsent() = viewModelScope.launch {
+        prefs.update { it.copy(healthDataConsentAt = Instant.now()) }
+    }
 
     fun onBackgrounded(now: Long) {
         backgroundedAt = now
