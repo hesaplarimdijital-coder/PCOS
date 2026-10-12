@@ -1,6 +1,7 @@
 package com.ayla.pcos.ui.components
 
 import android.app.ActivityManager
+import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -27,6 +28,10 @@ fun openExactAlarmSettings(context: Context) {
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     runCatching { context.startActivity(intent) }
 }
+
+/** Android 12+ "Alarmlar ve hatırlatıcılar" izni; eski sürümlerde izin gerekmez. */
+fun exactAlarmsAllowed(context: Context): Boolean =
+    Build.VERSION.SDK_INT < Build.VERSION_CODES.S || context.getSystemService<AlarmManager>()?.canScheduleExactAlarms() != false
 
 /**
  * Pil kısıtı durumu (#17).

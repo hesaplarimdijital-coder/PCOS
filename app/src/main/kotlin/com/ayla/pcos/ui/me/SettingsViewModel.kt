@@ -127,10 +127,10 @@ class SettingsViewModel @Inject constructor(
 
     /** Tüm verileri ve tercihleri siler; uygulama karşılamaya döner. */
     fun wipeAll() = viewModelScope.launch {
+        // Önce Health Connect bağlantısı kesilir (rıza silinir, izinler bırakılır); sonra kayıtlar.
+        healthConnect.disconnect()
         exporter.wipeAll()
         alarmLog.clear()
-        // Rıza tercihlerle birlikte silinir; Health Connect izni de bırakılır (Health Connect'teki kayıtlar değişmez).
-        healthConnect.revokePermissions()
         prefs.update { UserPreferences() }
         runCatching { scheduler.rescheduleAll() }
     }

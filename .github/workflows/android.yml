@@ -286,6 +286,11 @@ jobs:
             echo "::error title=İzin::INTERNET izni eklendi; gizlilik politikası ve Veri güvenliği formu buna göre güncellenmeden yayımlanamaz"
             exit 1
           fi
+          # Politikadaki yer tutucular sahibin kararıdır; yayından önce doldurulmalı (Play ve Health Connect
+          # gerçek geliştirici adı ve iletişim ister). Şimdilik derlemeyi durdurmaz, her çalıştırmada uyarır.
+          if grep -qE '\[(GELİŞTİRİCİ ADI|POSTA ADRESİ|İLETİŞİM E-POSTASI|POLİTİKA URL.Sİ)\]' app/src/main/res/raw/gizlilik_politikasi.md; then
+            echo "::warning title=Gizlilik politikası::Yer tutucular duruyor ([GELİŞTİRİCİ ADI], [POSTA ADRESİ], [İLETİŞİM E-POSTASI], [POLİTİKA URL'Sİ]); yayından önce doldurulmalı"
+          fi
           # Play'in Health Connect beyanı ve politika yalnızca uyku okumayı kapsar (#11).
           extra=$(echo "$perms" | grep '^android.permission.health\.' | grep -vx 'android.permission.health.READ_SLEEP' || true)
           if [ -n "$extra" ]; then

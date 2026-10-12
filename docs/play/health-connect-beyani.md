@@ -16,7 +16,7 @@
 | Health apps formu, ekran 2 | Yalnızca Sleep management > Sleep, okuma; gerekçe metni §3.2'de (İngilizce, yapıştırmaya hazır). |
 | Veri güvenliği formu | "Kullanıcı verisi topluyor veya paylaşıyor mu?" → **Hayır**. Mağazada "veri toplanmıyor / paylaşılmıyor" görünür. |
 | Gizlilik politikası | `docs/gizlilik-politikasi.md`; herkese açık HTML sayfa olarak [POLİTİKA URL'Sİ]'nde, aynı metin uygulama içinde ve Health Connect gerekçe etkinliğinde. |
-| Gönderimden önce düzeltilecekler | §2'deki engelleyici maddeler (rıza anahtarları, karşılamada açık rıza ve politika bağlantısı, gerekçe etkinliği). |
+| Gönderimden önce düzeltilecekler | §2'de açık kalanlar: politikadaki yer tutucular ve politikanın yayımlanması (rıza anahtarları, karşılamada açık rıza, gerekçe etkinliği Ekim 2026'da kapandı). |
 
 ## 1. Doğrulanan politika şartları
 
@@ -66,15 +66,13 @@ Sağlık uygulamaları ve kullanıcı verisi (Health Content and Services; User 
 
 Engelleyici (beyandan önce kapanmalı):
 
-- [ ] **Rıza anahtarları:** Ayarlar ve karşılamadaki "Anonim kullanım istatistikleri" ve "Araştırmaya katkı"
-      anahtarları kaldırılır. Uygulamada analitik ya da araştırma işlemesi yok; bu anahtarlar Veri güvenliği
-      formundaki "veri toplanmıyor" yanıtıyla ve politikayla çelişir, araştırma ise Health Connect'te etik kurul
-      onayı ve ayrı onam gerektirir. "Kişiselleştirme" kalacaksa gerçek bir işleve bağlanır ve **varsayılan
-      kapalı** olur (`UserPreferences.consentPersonalization` bugün `true`).
-- [ ] **Karşılamada açık rıza:** sağlık verilerinin cihazda işlenmesi için ayrı, önceden işaretlenmemiş bir onay
-      ve politika bağlantısı (metinler: `docs/arastirma/health-connect-teknik.md` > Arayüz metinleri).
-- [ ] **Uygulama içi politika:** Ayarlar'da "Gizlilik ve KVKK aydınlatma metni" satırı; Health Connect gerekçe
-      etkinliği (Android 13 ve altı intent-filter, Android 14 ve üstü activity-alias) aynı metni tam olarak gösterir.
+- [x] **Rıza anahtarları:** "Anonim kullanım istatistikleri" ve "Araştırmaya katkı" anahtarları kaldırıldı;
+      "Kişiselleştirme" Hareket kartına bağlı ve **varsayılan kapalı**.
+- [x] **Karşılamada açık rıza:** sağlık verilerinin cihazda işlenmesi için ayrı, önceden işaretlenmemiş onay ve
+      politika bağlantısı var; rıza zamanı saklanır. Health Connect için ayrıca gerekçe ve rıza ekranı var.
+- [x] **Uygulama içi politika:** Ayarlar'da "Gizlilik politikası ve aydınlatma metni" satırı;
+      `PermissionsRationaleActivity` (Android 13 ve altı intent-filter, 14 ve üstü activity-alias) aynı metni tam
+      olarak gösterir.
 - [ ] **Yer tutucular dolduruldu:** [GELİŞTİRİCİ ADI] (Play'deki geliştirici adıyla aynı), [POSTA ADRESİ],
       [İLETİŞİM E-POSTASI], [POLİTİKA URL'Sİ].
 - [ ] **Politika yayında:** [POLİTİKA URL'Sİ] herkese açık HTML sayfa; giriş gerektirmez, PDF değil,
@@ -233,8 +231,8 @@ Mağaza görselleri ve ekran görüntüleri de aynı sınıra uyar (ör. "PCOS'u
 | Politika uyuşmazlığı | Gerekçe etkinliği, Play'deki URL ile **aynı** metni gösterir; politika 6. bölümü Health Connect'i ayrıntılı anlatır. |
 | Politika erişilemiyor | HTML, giriş gerektirmeyen, coğrafi kısıtsız sayfa; PDF değil. |
 | İnceleyici özelliği bulamıyor | Ekran yolu gerekçede; düğme Health Connect yüklü değilse de görünür ve kurulum/güncelleme yolunu gösterir. |
-| Veri güvenliği ile politika çelişkisi | İkisi de "toplama ve paylaşma yok" der; analitik/araştırma anahtarları kaldırılır (§2). |
-| Araştırma çağrışımı | "Araştırmaya katkı" anahtarı Health Connect'in araştırma şartlarını (etik kurul, onam) tetikleyebilir; kaldırılır. |
+| Veri güvenliği ile politika çelişkisi | İkisi de "toplama ve paylaşma yok" der; analitik/araştırma anahtarları kaldırıldı (§2). |
+| Araştırma çağrışımı | "Araştırmaya katkı" anahtarı kaldırıldı; Health Connect'in araştırma şartları (etik kurul, onam) gündeme gelmez. |
 
 ## 8. Beyanı yeniden gönderme tetikleyicileri
 

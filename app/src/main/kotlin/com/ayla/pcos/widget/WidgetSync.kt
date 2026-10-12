@@ -26,9 +26,11 @@ class WidgetSync @Inject constructor(
 ) {
     private val started = AtomicBoolean(false)
 
+    /** [refreshNow]: süreç yeni başladıysa (önceki süreç birleştirme penceresinde ölmüş olabilir) bir kez tazele. */
     @OptIn(FlowPreview::class)
-    fun start() {
+    fun start(refreshNow: Boolean = false) {
         if (!started.compareAndSet(false, true)) return
+        if (refreshNow) WidgetUpdater.requestUpdate(context)
         scope.launch {
             source.observe()
                 .distinctUntilChanged()

@@ -20,6 +20,16 @@ class ReminderPolicyTest {
     private val day: LocalDate = LocalDate.of(2026, 10, 11)
 
     @Test
+    fun `pencereli alarmin teslim araligi yalnizca bugunku saatten sonraki on dakikadir`() {
+        val window = java.time.Duration.ofMinutes(10)
+        val dose = LocalTime.of(21, 0)
+        assertTrue(ReminderPolicy.inFallbackWindow(dose, at(day, LocalTime.of(21, 0)), window), "tam saatinde")
+        assertTrue(ReminderPolicy.inFallbackWindow(dose, at(day, LocalTime.of(21, 9)), window))
+        assertFalse(ReminderPolicy.inFallbackWindow(dose, at(day, LocalTime.of(21, 10)), window), "pencere bitti")
+        assertFalse(ReminderPolicy.inFallbackWindow(dose, at(day, LocalTime.of(20, 59)), window), "henüz gelmedi")
+    }
+
+    @Test
     fun `sessiz saat gece yarisini gecer`() {
         assertTrue(ReminderPolicy.isQuiet(LocalTime.of(23, 0), defaults))
         assertTrue(ReminderPolicy.isQuiet(LocalTime.of(3, 0), defaults))

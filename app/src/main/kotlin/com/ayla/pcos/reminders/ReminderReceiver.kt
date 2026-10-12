@@ -107,7 +107,10 @@ class ReminderReceiver : BroadcastReceiver() {
         }
 
         // Düzenli alarm sıradaki günü kurar; erteleme alarmı kurmaz.
-        if (!snoozed) scheduler.scheduleDose(medicationId, time, earliestDate = date.plusDays(1))
+        if (!snoozed) {
+            scheduler.markDoseDelivered(medicationId, time, date)
+            scheduler.scheduleDose(medicationId, time, earliestDate = date.plusDays(1))
+        }
     }
 
     private suspend fun handleDailyCheck(context: Context) {

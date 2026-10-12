@@ -39,7 +39,8 @@ class MainActivity : FragmentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        openTarget = intent?.getStringExtra(EXTRA_OPEN)
+        // Döndürme, tema değişimi ya da süreç ölümünden dönüşte hedef yeniden uygulanmaz (yığın korunur).
+        if (savedInstanceState == null) openTarget = intent?.getStringExtra(EXTRA_OPEN)
 
         // "Ekran görüntüsünü engelle" ayarı: son uygulamalar ve ekran görüntüsünde içerik gizlenir.
         lifecycleScope.launch {
@@ -58,7 +59,10 @@ class MainActivity : FragmentActivity() {
             AylaTheme {
                 AylaRoot(
                     openTarget = openTarget,
-                    onOpenTargetConsumed = { openTarget = null },
+                    onOpenTargetConsumed = {
+                        openTarget = null
+                        intent?.removeExtra(EXTRA_OPEN)
+                    },
                 )
             }
         }

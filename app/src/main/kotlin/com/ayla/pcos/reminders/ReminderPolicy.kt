@@ -36,6 +36,15 @@ object ReminderPolicy {
     fun effectiveDailyCheckTime(p: UserPreferences): LocalTime =
         if (isQuiet(p.dailyCheckTime, p)) p.quietHoursEnd else p.dailyCheckTime
 
+    /**
+     * Bugünkü [time] anı geçti ama pencereli alarmın teslim aralığı ([window]) henüz bitmedi mi? Bu aralıkta
+     * yapılan yeniden kurulum dozu yarına iterse bugünkü hatırlatma hiç çalmaz.
+     */
+    fun inFallbackWindow(time: LocalTime, now: ZonedDateTime, window: Duration): Boolean {
+        val today = now.toLocalDate().atTime(time).atZone(now.zone)
+        return !today.isAfter(now) && today.isAfter(now.minus(window))
+    }
+
     /** [earliestDate] gününden itibaren [time] saatinin [now]'dan sonraki ilk anı. */
     fun nextOccurrence(time: LocalTime, earliestDate: LocalDate, now: ZonedDateTime): ZonedDateTime {
         var candidate = earliestDate.atTime(time).atZone(now.zone)

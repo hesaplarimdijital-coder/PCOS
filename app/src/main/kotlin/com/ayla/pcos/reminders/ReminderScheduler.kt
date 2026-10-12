@@ -13,6 +13,7 @@ import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Clock
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
@@ -51,11 +52,22 @@ class ReminderScheduler @Inject constructor(
         val p = prefs.current()
         val today = LocalDate.now(clock)
 
+        val now = ZonedDateTime.now(clock)
+        val exact = exactAlarmsAllowed()
         val newKeys = mutableSetOf<String>()
         meds.forEach { med ->
             med.times.forEach { time ->
                 newKeys += doseKey(med.id, time)
-                scheduleDose(med.id, time, earliestDate = today)
+                val dueUndelivered = !exact &&
+                    ReminderPolicy.inFallbackWindow(time, now, FALLBACK_WINDOW) &&
+                    deliveredOn(med.id, time) != today
+                if (dueUndelivered) {
+                    // Pencereli alarm henüz teslim edilmeden yeniden kurulum (soğuk açılış) onu yarına itmesin:
+                    // bugünkü doz hemen hatırlatılır. Alıcı, doz işaretlenmişse bildirim göstermez.
+                    scheduleDoseNow(med.id, time, today, now)
+                } else {
+                    scheduleDose(med.id, time, earliestDate = today)
+                }
             }
         }
         val oldKeys = registry.getStringSet(KEY_DOSES, emptySet()).orEmpty()
@@ -63,6 +75,7 @@ class ReminderScheduler @Inject constructor(
             val (medId, time) = parseDoseKey(key) ?: return@forEach
             cancel(doseIntent(medId, time, snoozed = false))
             cancel(doseIntent(medId, time, snoozed = true))
+            registry.edit { remove(deliveredKey(medId, time)) }
         }
         registry.edit { putStringSet(KEY_DOSES, newKeys) }
 
@@ -96,6 +109,24 @@ class ReminderScheduler @Inject constructor(
         }
         scheduleAt(intent, at)
     }
+
+    /** Bugünkü dozun planlanan anı ([time]) geçti ve alarm teslim edilmedi: şimdi çalar, günlüğe gerçek gecikme yazılır. */
+    private fun scheduleDoseNow(medicationId: Long, time: LocalTime, date: LocalDate, now: ZonedDateTime) {
+        val intent = doseIntent(medicationId, time, snoozed = false).apply {
+            putExtra(EXTRA_DATE, date.toString())
+        }
+        scheduleAt(intent, now, plannedAt = date.atTime(time).atZone(now.zone))
+    }
+
+    /** Doz alarmı çaldı; aynı günün dozu yeniden kurulumda bir daha "teslim edilmedi" sayılmaz. */
+    fun markDoseDelivered(medicationId: Long, time: LocalTime, date: LocalDate) {
+        registry.edit { putString(deliveredKey(medicationId, time), date.toString()) }
+    }
+
+    private fun deliveredOn(medicationId: Long, time: LocalTime): LocalDate? =
+        registry.getString(deliveredKey(medicationId, time), null)?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+
+    private fun deliveredKey(medicationId: Long, time: LocalTime) = "delivered|$medicationId|$time"
 
     /** Aynı doz için [minutes] dakika sonra tek seferlik hatırlatma. */
     fun scheduleSnooze(medicationId: Long, date: LocalDate, time: LocalTime, minutes: Long = SNOOZE_MINUTES) {
@@ -131,10 +162,10 @@ class ReminderScheduler @Inject constructor(
     private fun nextOccurrence(time: LocalTime, earliestDate: LocalDate): ZonedDateTime =
         ReminderPolicy.nextOccurrence(time, earliestDate, ZonedDateTime.now(clock))
 
-    private fun scheduleAt(intent: Intent, at: ZonedDateTime) {
+    private fun scheduleAt(intent: Intent, at: ZonedDateTime, plannedAt: ZonedDateTime = at) {
         val millis = at.toInstant().toEpochMilli()
         // Alıcı gecikmeyi günlüğe yazabilsin diye planlanan an ve alarm türü niyete eklenir (#17).
-        intent.putExtra(EXTRA_SCHEDULED_AT, millis)
+        intent.putExtra(EXTRA_SCHEDULED_AT, plannedAt.toInstant().toEpochMilli())
         if (exactAlarmsAllowed()) {
             try {
                 intent.putExtra(EXTRA_EXACT, true)
@@ -202,6 +233,7 @@ class ReminderScheduler @Inject constructor(
         const val EXTRA_EXACT = "exact"
         const val SNOOZE_MINUTES = 15L
         private const val FALLBACK_WINDOW_MS = 10L * 60L * 1000L
+        private val FALLBACK_WINDOW: Duration = Duration.ofMillis(FALLBACK_WINDOW_MS)
         private const val REGISTRY_PREFS = "ayla_reminder_registry"
         private const val KEY_DOSES = "dose_keys"
         private const val KEY_WATER_AT = "water_at"

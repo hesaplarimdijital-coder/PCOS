@@ -42,9 +42,10 @@ annotation class ApplicationScope
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    /** Dilim değişince (seyahat) alarmlar ve widget yeni dilimle hesaplansın diye dilim her çağrıda okunur. */
     @Provides
     @Singleton
-    fun provideClock(): Clock = Clock.systemDefaultZone()
+    fun provideClock(): Clock = SystemZoneClock
 
     @Provides
     @Singleton

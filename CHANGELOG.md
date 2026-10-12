@@ -33,9 +33,18 @@ Biçim [Keep a Changelog](https://keepachangelog.com/tr-TR/1.1.0/) ilkelerine, s
   uyarı bandı düğmeleri sığmazsa alt satıra geçer; Health Connect gerekçe ekranında rıza ve düğmeler
   kaydırılan alana iner.
 
+### Düzeltildi
+- Bildirimden ya da widget'tan açılan uygulama döndürülünce, tema değişince ya da süreç ölümünden dönünce
+  yeniden Bugün sekmesine atıyor ve açık ekranı kaybettiriyordu.
+- Saat dilimi değişince (seyahat) alarmlar ve widget eski dilimle hesaplanıyordu.
+- Tam zamanlı alarm izni yokken, teslim edilmeden önce yapılan yeniden kurulum bugünkü dozu yarına itebiliyordu.
+- Uygulama açılışında veritabanı ana iş parçacığında açılıyordu.
+- Hatırlatma günlüğü yalnızca 14 gün tutulur; gizlilik ve izin metinleri izin yokken gecikmenin 10 dakikayı
+  aşabileceğini açıkça söyler, İlaçlar ekranı izne yönlendirir.
+
 ### Güvenlik ve gizlilik
 - CI izin denetimi: `INTERNET` ya da `READ_SLEEP` dışındaki bir Health Connect izni eklenirse derleme kırmızıya
-  döner.
+  döner; politikadaki yer tutucular her çalıştırmada uyarı olarak görünür.
 - Dışa açık etkinliğe gelen "geri yükle" hedefi kaldırıldı; geri yükleme yalnızca uygulama içinden açılır.
 
 ## [0.1.0] — yayımlanmadı (MVP 1)

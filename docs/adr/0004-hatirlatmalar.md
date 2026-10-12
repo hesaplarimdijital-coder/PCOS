@@ -22,8 +22,13 @@ açısından kabul edilemez.
 - Günlük kontrol alarmı: eski PENDING dozları MISSED yapar, 60/90. gün uyarısını tek kez gönderir, stok uyarısı.
 
 ## Sonuçlar
-+ İzin varsa dakika hassasiyeti; yoksa en fazla 10 dk gecikme ve şeffaf bilgi. Pil dostu, servis yok.
-− Üretici pil optimizasyonları (bazı OEM'ler) alarmı geciktirebilir; ayarlara yönlendirme MVP 2'de.
++ İzin varsa dakika hassasiyeti. Pil dostu, servis yok.
+− İzin yoksa (Android 14+ yeni kurulumlarda varsayılan) yedek `setWindow` alarmı Doze'da bakım penceresine
+  ertelenir; telefon uzun süre kullanılmadığında gecikme 10 dakikayı aşabilir. Metinler bunu açıkça söyler,
+  İlaçlar ve Ayarlar kapatılamayan bir bantla izne yönlendirir (Ekim 2026 güncellemesi). Kademeli yaklaşan
+  `setAndAllowWhileIdle` yedeği ayrı bir işte değerlendirilecek.
+− Üretici pil optimizasyonları (bazı OEM'ler) alarmı geciktirebilir; MVP 2'de pil ayarı yönlendirmesi ve
+  hatırlatma günlüğü eklendi (#17).
 − Zincirleme planlama tek bir kaçırılmış alarmda bir günlük boşluk bırakabilir; açılış ve günlük kontrol telafi eder.
 
 ## Alternatifler

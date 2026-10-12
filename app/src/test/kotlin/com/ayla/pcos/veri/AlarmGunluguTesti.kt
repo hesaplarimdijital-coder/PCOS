@@ -11,6 +11,7 @@ import com.ayla.pcos.reminders.ReminderScheduler
 import com.ayla.pcos.ui.me.AlarmLogText
 import org.junit.Test
 import org.robolectric.Shadows.shadowOf
+import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
@@ -22,12 +23,14 @@ class AlarmGunluguTesti : VeriTestOrtami() {
 
     private val dokuz: Instant get() = bugun.atTime(9, 0).atZone(zone).toInstant()
 
+    private fun gunluk() = AlarmLog(context, Clock.fixed(bugun.atTime(10, 0).atZone(zone).toInstant(), zone))
+
     private fun kayit(planned: Instant, gecikmeSn: Long, kind: ReminderKind = ReminderKind.DOSE) =
         AlarmLogEntry(kind, planned, planned.plusSeconds(gecikmeSn), exact = true)
 
     @Test
     fun `gunluk kayitlari sirayla saklar, en eski kayitlar sinirda duser`() {
-        val log = AlarmLog(context)
+        val log = gunluk()
         repeat(AlarmLog.MAX_ENTRIES + 5) { i -> log.record(kayit(dokuz.plusSeconds(i * 60L), gecikmeSn = 3)) }
         val okunan = log.read()
         assertEquals(AlarmLog.MAX_ENTRIES, okunan.size)
@@ -43,9 +46,20 @@ class AlarmGunluguTesti : VeriTestOrtami() {
         context.getSharedPreferences("ayla_alarm_log", Context.MODE_PRIVATE).edit()
             .putString("entries", "DOSE|$ms|${ms + 4000}|1\nbozuk\nYOK|1|2|0\nWATER|$ms|abc|0\nEVENING|$ms|${ms + 1000}|0")
             .commit()
-        val okunan = AlarmLog(context).read()
+        val okunan = gunluk().read()
         assertEquals(listOf(ReminderKind.DOSE, ReminderKind.EVENING), okunan.map { it.kind })
         assertEquals(false, okunan.last().exact)
+    }
+
+    @Test
+    fun `14 gunden eski kayitlar okunmaz ve bir sonraki yazmada duser`() {
+        val log = gunluk()
+        log.record(kayit(dokuz.minus(Duration.ofDays(15)), gecikmeSn = 5))
+        log.record(kayit(dokuz.minus(Duration.ofDays(13)), gecikmeSn = 5))
+        log.record(kayit(dokuz, gecikmeSn = 5))
+        assertEquals(2, log.read().size)
+        val ham = context.getSharedPreferences("ayla_alarm_log", Context.MODE_PRIVATE).getString("entries", null).orEmpty()
+        assertEquals(2, ham.lines().size, "eski kayıt dosyada da tutulmaz")
     }
 
     @Suppress("DEPRECATION") // ScheduledAlarm.operation Robolectric'te eskimiş ama erişimcisi yok
@@ -63,6 +77,33 @@ class AlarmGunluguTesti : VeriTestOrtami() {
         val beklenen = bugun.atTime(13, 0).atZone(zone).toInstant().toEpochMilli()
         assertEquals(beklenen, niyet.getLongExtra(ReminderScheduler.EXTRA_SCHEDULED_AT, -1))
         assertEquals(scheduler.exactAlarmsAllowed(), niyet.getBooleanExtra(ReminderScheduler.EXTRA_EXACT, !scheduler.exactAlarmsAllowed()))
+    }
+
+    @Suppress("DEPRECATION") // ScheduledAlarm.operation Robolectric'te eskimiş ama erişimcisi yok
+    private fun dozAlarmGunu(): String? {
+        val am = context.getSystemService(AlarmManager::class.java)
+        return shadowOf(am).scheduledAlarms
+            .mapNotNull { alarm -> alarm.operation?.let { shadowOf(it).savedIntent } }
+            .firstOrNull { it.dataString?.contains("/dose/") == true }
+            ?.getStringExtra(ReminderScheduler.EXTRA_DATE)
+    }
+
+    @Test
+    fun `tam alarm izni yokken teslim edilmemis bugunku doz yeniden kurulumda yarina itilmez`() {
+        // Robolectric'te tam zamanlı alarm izni varsayılan olarak kapalıdır (Android 14+ yeni kurulum gibi).
+        val saat2105 = Clock.fixed(bugun.atTime(21, 5).atZone(zone).toInstant(), zone)
+        val zamanlayici = ReminderScheduler(context, db.medicationDao(), prefs, saat2105)
+        val id = calistir {
+            db.medicationDao().insert(
+                MedicationEntity(name = "D", doseText = "1", kind = MedicationKind.SUPPLEMENT, times = listOf(LocalTime.of(21, 0))),
+            )
+        }
+        calistir { zamanlayici.rescheduleAll() }
+        assertEquals(bugun.toString(), dozAlarmGunu(), "21:00 dozu 21:05'te hâlâ bugün için kurulu")
+
+        zamanlayici.markDoseDelivered(id, LocalTime.of(21, 0), bugun)
+        calistir { zamanlayici.rescheduleAll() }
+        assertEquals(bugun.plusDays(1).toString(), dozAlarmGunu(), "teslim edildiyse sıradaki gün")
     }
 
     @Test

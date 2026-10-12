@@ -48,7 +48,8 @@ görüntüsü. Uygulamaya geçerken şunlar netleşti:
 6. Sağlayıcı `exported="false"`. Hilt bileşeni değildir; bağımlılıklar `WidgetEntryPoint` ile, IO'da alınır.
 
 ## Sonuçlar
-+ Manifest izinleri ve politika değişmedi; WorkManager ve ek veritabanı yok.
++ Manifest izin listesi değişmedi; WorkManager ve ek veritabanı yok. Gizlilik politikasına yalnızca widget'ın
+  ana ekranda ne gösterdiğini anlatan paragraf eklendi (8. bölüm).
 + Widget ekran görüntüleri CI'da (`38-widget`, `39-widget-koyu`, `y16-yazi200-widget`) ve düzen testleri
   Robolectric'te çalışır.
 − Duyarlı düzen ve gece rengi XML'de elle tutulur (`values-night/colors.xml`, `widget_*` tokenları).

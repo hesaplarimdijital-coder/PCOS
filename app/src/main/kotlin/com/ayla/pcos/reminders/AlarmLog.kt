@@ -3,6 +3,7 @@ package com.ayla.pcos.reminders
 import android.content.Context
 import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
@@ -38,11 +39,12 @@ fun summarizeAlarmLog(entries: List<AlarmLogEntry>, now: Instant, window: Durati
 }
 
 /**
- * Alarm günlüğü: yalnızca tür ve zaman (ilaç adı ya da kimliği yok); son [MAX_ENTRIES] kayıt cihazda,
- * uygulamanın özel alanında. Kullanıcı Ayarlar'dan görür, paylaşır ya da temizler; tam silme de temizler.
+ * Alarm günlüğü: yalnızca tür ve zaman (ilaç adı ya da kimliği yok); son [RETENTION] içindeki en fazla
+ * [MAX_ENTRIES] kayıt cihazda, uygulamanın özel alanında. Özellik yalnızca son 48 saati kullanır; daha
+ * eskisi tutulmaz. Kullanıcı Ayarlar'dan görür, paylaşır ya da temizler; tam silme de temizler.
  */
 @Singleton
-class AlarmLog @Inject constructor(@ApplicationContext context: Context) {
+class AlarmLog @Inject constructor(@ApplicationContext context: Context, private val clock: Clock) {
     private val prefs by lazy { context.getSharedPreferences(PREFS, Context.MODE_PRIVATE) }
 
     @Synchronized
@@ -51,9 +53,15 @@ class AlarmLog @Inject constructor(@ApplicationContext context: Context) {
         prefs.edit { putString(KEY, lines.joinToString("\n")) }
     }
 
+    /** Saklama süresini aşan kayıtlar okunmaz; bir sonraki yazmada dosyadan da düşer. */
     @Synchronized
-    fun read(): List<AlarmLogEntry> =
-        prefs.getString(KEY, null).orEmpty().lineSequence().mapNotNull { decode(it) }.toList()
+    fun read(): List<AlarmLogEntry> {
+        val cutoff = clock.instant().minus(RETENTION)
+        return prefs.getString(KEY, null).orEmpty().lineSequence()
+            .mapNotNull { decode(it) }
+            .filter { !it.firedAt.isBefore(cutoff) }
+            .toList()
+    }
 
     @Synchronized
     fun clear() = prefs.edit { remove(KEY) }
@@ -71,6 +79,7 @@ class AlarmLog @Inject constructor(@ApplicationContext context: Context) {
 
     companion object {
         const val MAX_ENTRIES = 200
+        val RETENTION: Duration = Duration.ofDays(14)
         private const val PREFS = "ayla_alarm_log"
         private const val KEY = "entries"
     }

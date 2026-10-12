@@ -53,8 +53,10 @@ import com.ayla.pcos.ui.components.PilBandi
 import com.ayla.pcos.ui.components.SatirZemini
 import com.ayla.pcos.ui.components.UyariBandi
 import com.ayla.pcos.ui.components.batteryStatus
+import com.ayla.pcos.ui.components.exactAlarmsAllowed
 import com.ayla.pcos.ui.components.oemBatteryNote
 import com.ayla.pcos.ui.components.openAppBatterySettings
+import com.ayla.pcos.ui.components.openExactAlarmSettings
 import com.ayla.pcos.ui.components.saatMetni
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import kotlin.math.roundToInt
@@ -64,9 +66,11 @@ fun MedsScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit, viewModel: MedsViewMod
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var battery by remember { mutableStateOf(batteryStatus(context)) }
-    // Pil ayarlarından dönünce yeniden oku.
+    var exactAllowed by remember { mutableStateOf(exactAlarmsAllowed(context)) }
+    // Pil ve alarm ayarlarından dönünce yeniden oku.
     LifecycleResumeEffect(Unit) {
         battery = batteryStatus(context)
+        exactAllowed = exactAlarmsAllowed(context)
         onPauseOrDispose { }
     }
     MedsContent(
@@ -78,6 +82,8 @@ fun MedsScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit, viewModel: MedsViewMod
         batteryStatus = battery,
         oemNote = oemBatteryNote(Build.MANUFACTURER),
         onOpenBatterySettings = { openAppBatterySettings(context) },
+        exactAlarmsAllowed = exactAllowed,
+        onOpenExactAlarmSettings = { openExactAlarmSettings(context) },
         onDismissBatteryBand = { viewModel.dismissBatteryBand() },
     )
 }
@@ -94,6 +100,8 @@ internal fun MedsContent(
     oemNote: Int? = null,
     onOpenBatterySettings: () -> Unit = {},
     onDismissBatteryBand: () -> Unit = {},
+    exactAlarmsAllowed: Boolean = true,
+    onOpenExactAlarmSettings: () -> Unit = {},
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -133,7 +141,21 @@ internal fun MedsContent(
             BatteryStatus.OPTIMIZED -> !state.batteryBandDismissed
             BatteryStatus.BACKGROUND_RESTRICTED -> true
         }
-        if (showBattery && state.medications.any { it.times.isNotEmpty() }) {
+        val hasDoseReminders = state.medications.any { it.times.isNotEmpty() }
+        // Tam zamanlı alarm izni yoksa yedek alarm, telefon uzun süre kullanılmadığında ertelenebilir; pil ayarı
+        // bunu çözmez. Bu bant kapatılamaz, izin açılınca kaybolur.
+        if (!exactAlarmsAllowed && hasDoseReminders) {
+            item {
+                UyariBandi(
+                    tur = BantTuru.DIKKAT,
+                    title = stringResource(R.string.onboarding_exact_alarm_title),
+                    text = stringResource(R.string.settings_exact_alarm_missing),
+                    actionLabel = stringResource(R.string.onboarding_allow_exact_alarm),
+                    onAction = onOpenExactAlarmSettings,
+                )
+            }
+        }
+        if (showBattery && hasDoseReminders) {
             item {
                 PilBandi(status = batteryStatus, oemNote = oemNote, onOpenSettings = onOpenBatterySettings, onDismiss = onDismissBatteryBand)
             }

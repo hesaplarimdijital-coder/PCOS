@@ -48,11 +48,11 @@ class ReminderActionReceiver : BroadcastReceiver() {
                     }
                 }
                 if (notificationId >= 0) notifier.cancel(notificationId)
-                // Widget'tan ya da bildirimden işaretlendi: widget sıradaki doza geçsin.
-                WidgetUpdater.requestUpdate(context)
             } catch (t: Throwable) {
                 Log.w(TAG, "Bildirim eylemi işlenemedi: $action", t)
             } finally {
+                // Widget'tan ya da bildirimden işaretlendi (ya da yazılamadı): widget gerçek durumu göstersin.
+                runCatching { WidgetUpdater.requestUpdate(context) }
                 pending.finish()
             }
         }

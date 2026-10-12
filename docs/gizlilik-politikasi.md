@@ -11,7 +11,7 @@ Bu metin hem Ayla'nın gizlilik politikası hem de 6698 sayılı Kişisel Verile
 
 - Ayla'yı kullanmak için hesap açman gerekmez. Ayla'nın sunucusu yoktur ve uygulamanın internet erişim izni yoktur; kayıtların bize ya da başka birine gönderilmez.
 - Reklam, analitik, çökme raporu ya da izleme amaçlı hiçbir üçüncü taraf yazılım kiti (SDK) kullanmayız.
-- Kayıtların yalnızca bu cihazda, şifreli bir veritabanında saklanır. Şifrenin anahtarı Android Keystore ile korunur.
+- Sağlık kayıtların yalnızca bu cihazda, şifreli bir veritabanında saklanır; şifrenin anahtarı Android Keystore ile korunur. Ayarların ve ilaç adı içermeyen hatırlatma günlüğü uygulamanın kendi alanındaki ayrı bir dosyadadır.
 - Health Connect'ten yalnızca uyku oturumlarını, yalnızca sen bağlantıyı kurduktan sonra ve uygulama açıkken okuruz. Health Connect'e hiçbir şey yazmayız.
 - Verilerini istediğin an bir dosyaya aktarabilir, düzeltebilir ya da tamamen silebilirsin.
 - Ayla tıbbi cihaz değildir; tanı koymaz, tedavi önermez, doz hesaplamaz.
@@ -56,7 +56,7 @@ Aşağıdaki kayıtların hepsi yalnızca bu cihazda tutulur ve sen silene ya da
 - **Neden:** hatırlatma göndermek, hap paketini takip etmek, stok azaldığında haber vermek ve uyumunu göstermek. Ayla doz hesaplamaz, ilaç önermez ve etkileşim uyarısı vermez; ilaç adlarını sen girersin.
 - **Nerede:** şifreli veritabanında. Hatırlatma alarmları Android'in alarm hizmetine yalnızca kayıt numarası, gün ve saatle kurulur; ilacın adı bu alarmlara yazılmaz.
 - **Nasıl silinir:** bir ilacı listeden kaldırdığında hatırlatmaları durur, ancak geçmiş doz kayıtları uyum geçmişin için saklanmaya devam eder. Bunları da silmek için Tüm verilerimi sil'i kullan.
-- **Hatırlatma günlüğü:** hatırlatmaların zamanında çalıp çalmadığını görebilmen için son 200 hatırlatmanın türü (doz, su, günlük kontrol, akşam rutini ya da haftalık özet), planlandığı ve gerçekten çaldığı an ve alarmın tam zamanlı olup olmadığı kaydedilir. İlacın adı ya da kayıt numarası yazılmaz. Günlük, 3.6. bölümdeki ayar dosyası gibi Ayla'nın uygulama alanında tutulur; Ben > Ayarlar > Bildirimler > Hatırlatma günlüğü > Temizle ile ya da Tüm verilerimi sil ile silinir.
+- **Hatırlatma günlüğü:** hatırlatmaların zamanında çalıp çalmadığını görebilmen için son 14 gündeki en fazla 200 hatırlatmanın türü (doz, su, günlük kontrol, akşam rutini ya da haftalık özet), planlandığı ve gerçekten çaldığı an ve alarmın tam zamanlı olup olmadığı kaydedilir. İlacın adı ya da kayıt numarası yazılmaz. Günlük, 3.6. bölümdeki ayar dosyası gibi Ayla'nın uygulama alanında tutulur; Ben > Ayarlar > Bildirimler > Hatırlatma günlüğü > Temizle ile ya da Tüm verilerimi sil ile silinir.
 
 ### 3.4 Su
 
@@ -85,7 +85,7 @@ Ayla konumunu, rehberini, fotoğraflarını, kamerayı, mikrofonu, reklam kimli�
 
 ## 4. Hukuki sebepler, açık rıza ve toplama yöntemi
 
-- **Sağlık verileri:** adet, günlük kayıt, semptomlar, kilo ve bel çevresi, ilaç ve dozlar, uyku kayıtları ve önceliklerin arasındaki gebelik planı ile hap kullanımı, KVKK'ya göre özel nitelikli kişisel veridir. Bu veriler KVKK madde 6/3-(a) uyarınca açık rızana dayanarak işlenir. Bu rızayı karşılama ekranında, bu metne ulaşabileceğin bağlantıyla birlikte, ayrı bir onay vererek verirsin. Health Connect bağlantısı için, bağlantıyı kurarken ayrıca onay istenir.
+- **Sağlık verileri:** adet, günlük kayıt, semptomlar, kilo ve bel çevresi, ilaç ve dozlar (hatırlatma günlüğündeki doz saatleri dahil), uyku kayıtları ve önceliklerin arasındaki gebelik planı ile hap kullanımı, KVKK'ya göre özel nitelikli kişisel veridir. Bu veriler KVKK madde 6/3-(a) uyarınca açık rızana dayanarak işlenir. Bu rızayı karşılama ekranında, bu metne ulaşabileceğin bağlantıyla birlikte, ayrı bir onay vererek verirsin. Health Connect bağlantısı için, bağlantıyı kurarken ayrıca onay istenir.
 - **Kişiselleştirme (isteğe bağlı, varsayılan kapalı):** açarsan Hareket sekmesindeki öneri, kaydettiğin adet günlerine göre seçilir. Bu da yalnızca cihazında yapılır; Ben > Ayarlar > İzinlerin bölümünden istediğin an kapatabilirsin. Kapalıyken herkese aynı genel içerik gösterilir.
 - **Adın ve uygulama ayarların:** uygulamayı sana sunabilmemiz için gereklidir (KVKK madde 5/2-(c)).
 - **Toplama yöntemi:** veriler uygulama üzerinden, elektronik ortamda toplanır: senin girdiğin kayıtlar, sen istediğinde Health Connect'ten okunan uyku oturumları ve seçtiğin yedek dosyasından içe aktarılan kayıtlar.
@@ -131,12 +131,12 @@ Verilerin yalnızca senin açıkça başlattığın şu işlemlerle cihazından 
 
 Hatırlatma bildirimlerinde ilacın adı ve dozu, su ve döngüyle ilgili kısa metinler ve haftalık özet görünebilir. Ben > Ayarlar > Koruma > Gizli bildirimler açıkken kilit ekranında yalnızca "Bir hatırlatman var" gibi genel bir metin görünür. Bildirimleri Android gösterir; bildirim erişimi verdiğin başka uygulamalar (örneğin akıllı saat uygulamaları) bildirim içeriğini görebilir. Bildirimleri Android ayarlarından tamamen kapatabilirsin.
 
-Ana ekran widget'ı isteğe bağlıdır; eklersen ana ekranında bugünün döngü ya da hap günü, sıradaki dozun saati ve adı ve su sayın görünür. Telefonunun kilidini açabilen herkes bunları görebilir. Uygulama kilidi ya da Gizli bildirimler açıkken widget yalnızca "Ayla" yazar. Widget kilit ekranına eklenemez; durumunu ayrı bir yerde saklamaz, her seferinde şifreli veritabanından okur.
+Ana ekran widget'ı isteğe bağlıdır; eklersen ana ekranında bugünün döngü ya da hap günü, sıradaki dozun saati ve adı ve su sayın görünür. Telefonunun kilidini açabilen herkes bunları görebilir. Ekran görüntüsü engeli yalnızca Ayla'nın kendi ekranlarını kapsar; ana ekranın görüntüsünü aldığında ya da ekranını paylaştığında widget'taki bilgiler de görünür. Uygulama kilidi ya da Gizli bildirimler açıkken widget yalnızca "Ayla" yazar. Widget kilit ekranına eklenemez; durumunu ayrı bir yerde saklamaz, her seferinde şifreli veritabanından okur.
 
 ## 9. Android izinleri
 
 - **Bildirim gösterme (POST_NOTIFICATIONS):** hatırlatmalar için. İlk kez gerektiğinde istenir; vermezsen Ayla bildirimsiz çalışır.
-- **Tam zamanlı alarm (SCHEDULE_EXACT_ALARM):** hatırlatmaların tam saatinde çalması için. Vermezsen hatırlatmalar yaklaşık 10 dakikalık bir aralık içinde gelir.
+- **Tam zamanlı alarm (SCHEDULE_EXACT_ALARM):** hatırlatmaların tam saatinde çalması için. Vermezsen hatırlatmalar gecikebilir; telefon uzun süre kullanılmadığında gecikme 10 dakikayı aşabilir.
 - **Açılışta başlatma (RECEIVE_BOOT_COMPLETED):** telefon yeniden başladığında hatırlatmaları yeniden kurmak için.
 - **Titreşim (VIBRATE):** bildirimlerde titreşim için.
 - **Biyometrik doğrulama (USE_BIOMETRIC; eski Android sürümlerinde USE_FINGERPRINT):** isteğe bağlı uygulama kilidi için.

@@ -37,13 +37,14 @@ object WidgetUpdater {
 
     /**
      * Gün dönümünde döngü günü ve günün dozları değişir. Uyandırmayan RTC alarmı: telefon uyanınca çalar,
-     * tam zamanlı alarm izni gerekmez, WorkManager kullanılmaz.
+     * tam zamanlı alarm izni gerekmez, WorkManager kullanılmaz. Pencere açıkça verilir; `set()` Android 12
+     * öncesinde kalan sürenin %75'i kadar (saatlerce) kayabilir.
      */
     fun scheduleMidnight(context: Context, zone: ZoneId = ZoneId.systemDefault()) {
         val alarmManager = context.getSystemService<AlarmManager>() ?: return
         val pending = midnightPendingIntent(context, PendingIntent.FLAG_UPDATE_CURRENT) ?: return
         val nextMidnight = LocalDate.now(zone).plusDays(1).atStartOfDay(zone).plusMinutes(1).toInstant().toEpochMilli()
-        alarmManager.set(AlarmManager.RTC, nextMidnight, pending)
+        alarmManager.setWindow(AlarmManager.RTC, nextMidnight, MIDNIGHT_WINDOW_MS, pending)
     }
 
     fun cancelMidnight(context: Context) {
@@ -52,4 +53,5 @@ object WidgetUpdater {
     }
 
     private const val REQUEST_MIDNIGHT = 7_001
+    private const val MIDNIGHT_WINDOW_MS = 15L * 60L * 1000L
 }

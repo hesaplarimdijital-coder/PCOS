@@ -149,7 +149,7 @@
     <string name="onboarding_notifications_title">Hatırlatmalar için izin</string>
     <string name="onboarding_notifications_text">Doz, su ve döngü hatırlatmaları bildirimle gelir. İstemezsen Ayla bildirimsiz de çalışır.</string>
     <string name="onboarding_exact_alarm_title">Tam zamanlı hatırlatma</string>
-    <string name="onboarding_exact_alarm_text">Günde iki dozluk takviyelerin tam saatinde hatırlatılması için Android&#8217;in &#8220;Alarmlar ve hatırlatıcılar&#8221; izni gerekir. İzin yoksa hatırlatma 10 dakikaya kadar gecikebilir.</string>
+    <string name="onboarding_exact_alarm_text">Günde iki dozluk takviyelerin tam saatinde hatırlatılması için Android&#8217;in &#8220;Alarmlar ve hatırlatıcılar&#8221; izni gerekir. İzin yoksa hatırlatmalar gecikebilir; telefon uzun süre kullanılmadığında gecikme 10 dakikayı aşabilir.</string>
     <string name="onboarding_allow_notifications">Bildirimlere izin ver</string>
     <string name="onboarding_allow_exact_alarm">Alarm iznini aç</string>
     <string name="onboarding_notifications_granted">Bildirimler açık</string>
@@ -371,7 +371,7 @@
     <string name="settings_progress_notifications">Haftalık özet</string>
     <string name="settings_progress_notifications_text">Pazar akşamı 19:00\'da haftanın kısa özeti</string>
     <string name="settings_quiet_hours">Sessiz saatler</string>
-    <string name="settings_exact_alarm_missing">Hatırlatmalar tam saatinde çalmayabilir: tam zamanlı alarm izni kapalı.</string>
+    <string name="settings_exact_alarm_missing">Hatırlatmalar tam saatinde çalmayabilir: tam zamanlı alarm izni kapalı. Telefon uzun süre kullanılmadığında gecikme 10 dakikayı aşabilir.</string>
     <string name="settings_section_display">Görünüm</string>
     <string name="settings_hide_prediction">Tahmini gizle</string>
     <string name="settings_hide_prediction_text">Takvim ve halkada aralık gösterilmez</string>
@@ -382,7 +382,7 @@
     <string name="settings_export_text">JSON dosyası</string>
     <string name="settings_delete_all">Tüm verilerimi sil</string>
     <string name="settings_delete_confirm_title">Tüm veriler silinsin mi?</string>
-    <string name="settings_delete_confirm_text">Adet, kayıt, ilaç, su ve uyku verilerin kalıcı olarak silinir. Bu işlem geri alınamaz.</string>
+    <string name="settings_delete_confirm_text">Adet, kayıt, ilaç, su ve uyku verilerin, hatırlatma günlüğün ve ayarların kalıcı olarak silinir; rızaların sıfırlanır ve Health Connect bağlantısı kesilir. Health Connect&#8217;teki asıl kayıtlar değişmez. Bu işlem geri alınamaz.</string>
     <string name="settings_water_goal">Günlük hedef</string>
     <string name="settings_cup_size">Bardak hacmi</string>
     <string name="settings_name">Adın</string>
@@ -486,7 +486,7 @@
     <string name="widget_no_doses">Bugün planlı doz yok</string>
     <string name="widget_water">Su %1$d/%2$d bardak</string>
     <string name="widget_preview_headline">23. gün</string>
-    <string name="widget_preview_dose">21:00 · Inofolic Combi</string>
+    <string name="widget_preview_dose">21:00 · Akşam takviyesi</string>
 
     <!-- Pil tasarrufu ve hatırlatma günlüğü (#17) -->
     <string name="battery_band_title">Hatırlatmaların gecikmesin</string>
@@ -516,7 +516,7 @@
     <string name="alarm_log_window">10&#160;dk pencereli</string>
     <string name="alarm_log_delay_seconds">%1$d&#160;sn</string>
     <string name="alarm_log_delay_minutes">%1$d&#160;dk</string>
-    <string name="alarm_log_privacy">Günlükte yalnızca hatırlatma türü ve saatler var, ilaç adı yok. Telefonunda kalır; paylaşırsan yalnızca seçtiğin yere gider.</string>
+    <string name="alarm_log_privacy">Günlükte yalnızca son 14 günün hatırlatma türü ve saatleri var, ilaç adı yok; telefonunda kalır. Paylaşırsan metne günlüğün tamamı ile telefonunun marka ve modeli, Android sürümü, alarm izni ve pil durumu da eklenir; yalnızca seçtiğin yere gider.</string>
     <string name="alarm_log_share">Paylaş</string>
     <string name="alarm_log_clear">Temizle</string>
     <string name="alarm_log_share_subject">Ayla hatırlatma günlüğü</string>
