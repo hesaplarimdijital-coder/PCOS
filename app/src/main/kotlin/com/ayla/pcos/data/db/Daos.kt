@@ -192,3 +192,100 @@ interface SleepDao {
     @Query("DELETE FROM sleep_sessions")
     suspend fun deleteAll()
 }
+
+@Dao
+interface FertilityEntryDao {
+    @Query("SELECT * FROM fertility_entries WHERE date = :date")
+    fun observe(date: LocalDate): Flow<FertilityEntryEntity?>
+
+    @Query("SELECT * FROM fertility_entries WHERE date = :date")
+    suspend fun get(date: LocalDate): FertilityEntryEntity?
+
+    @Query("SELECT * FROM fertility_entries WHERE date BETWEEN :from AND :to ORDER BY date ASC")
+    fun observeRange(from: LocalDate, to: LocalDate): Flow<List<FertilityEntryEntity>>
+
+    @Query("SELECT * FROM fertility_entries WHERE date BETWEEN :from AND :to ORDER BY date ASC")
+    suspend fun getRange(from: LocalDate, to: LocalDate): List<FertilityEntryEntity>
+
+    @Query("SELECT * FROM fertility_entries ORDER BY date ASC")
+    fun observeAll(): Flow<List<FertilityEntryEntity>>
+
+    @Query("SELECT * FROM fertility_entries ORDER BY date ASC")
+    suspend fun getAll(): List<FertilityEntryEntity>
+
+    @Upsert
+    suspend fun upsert(entry: FertilityEntryEntity)
+
+    @Query("DELETE FROM fertility_entries WHERE date = :date")
+    suspend fun delete(date: LocalDate)
+
+    @Query("DELETE FROM fertility_entries")
+    suspend fun deleteAll()
+}
+
+/** Tek satırlı profil; satır kimliği her zaman [SkinProfileEntity.SINGLE_ID] (1). */
+@Dao
+interface SkinProfileDao {
+    @Query("SELECT * FROM skin_profile WHERE id = 1")
+    fun observe(): Flow<SkinProfileEntity?>
+
+    @Query("SELECT * FROM skin_profile WHERE id = 1")
+    suspend fun get(): SkinProfileEntity?
+
+    @Upsert
+    suspend fun upsert(profile: SkinProfileEntity)
+
+    @Query("DELETE FROM skin_profile")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface SkinRoutineCheckDao {
+    @Query("SELECT * FROM skin_routine_checks WHERE date = :date ORDER BY slot ASC")
+    fun observe(date: LocalDate): Flow<List<SkinRoutineCheckEntity>>
+
+    @Query("SELECT * FROM skin_routine_checks WHERE date = :date AND slot = :slot")
+    suspend fun get(date: LocalDate, slot: RoutineSlot): SkinRoutineCheckEntity?
+
+    @Query("SELECT * FROM skin_routine_checks WHERE date BETWEEN :from AND :to ORDER BY date ASC, slot ASC")
+    fun observeRange(from: LocalDate, to: LocalDate): Flow<List<SkinRoutineCheckEntity>>
+
+    @Query("SELECT * FROM skin_routine_checks WHERE date BETWEEN :from AND :to ORDER BY date ASC, slot ASC")
+    suspend fun getRange(from: LocalDate, to: LocalDate): List<SkinRoutineCheckEntity>
+
+    @Query("SELECT * FROM skin_routine_checks ORDER BY date ASC, slot ASC")
+    suspend fun getAll(): List<SkinRoutineCheckEntity>
+
+    @Upsert
+    suspend fun upsert(check: SkinRoutineCheckEntity)
+
+    @Query("DELETE FROM skin_routine_checks WHERE date = :date AND slot = :slot")
+    suspend fun delete(date: LocalDate, slot: RoutineSlot)
+
+    @Query("DELETE FROM skin_routine_checks")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface DoctorQuestionDao {
+    @Query("SELECT * FROM doctor_questions ORDER BY created_at ASC, id ASC")
+    fun observeAll(): Flow<List<DoctorQuestionEntity>>
+
+    @Query("SELECT * FROM doctor_questions ORDER BY created_at ASC, id ASC")
+    suspend fun getAll(): List<DoctorQuestionEntity>
+
+    @Query("SELECT * FROM doctor_questions WHERE id = :id")
+    suspend fun get(id: Long): DoctorQuestionEntity?
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(question: DoctorQuestionEntity): Long
+
+    @Query("UPDATE doctor_questions SET asked_at = :askedAt WHERE id = :id")
+    suspend fun setAskedAt(id: Long, askedAt: Instant?)
+
+    @Query("DELETE FROM doctor_questions WHERE id = :id")
+    suspend fun delete(id: Long)
+
+    @Query("DELETE FROM doctor_questions")
+    suspend fun deleteAll()
+}

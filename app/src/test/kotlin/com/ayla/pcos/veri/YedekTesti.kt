@@ -1,11 +1,19 @@
 package com.ayla.pcos.veri
 
+import com.ayla.cycle.CervicalMucus
+import com.ayla.cycle.LhResult
+import com.ayla.pcos.data.db.AcneSelfReport
 import com.ayla.pcos.data.db.DailyLogEntity
+import com.ayla.pcos.data.db.FertilityEntryEntity
 import com.ayla.pcos.data.db.MedicationEntity
 import com.ayla.pcos.data.db.MedicationKind
+import com.ayla.pcos.data.db.RoutineSlot
+import com.ayla.pcos.data.db.SkinProfileEntity
+import com.ayla.pcos.data.db.SkinType
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.repo.SymptomCatalog
 import com.ayla.pcos.di.AppModule
+import com.ayla.pcos.export.BACKUP_SCHEMA_VERSION
 import com.ayla.pcos.export.DataExporter
 import com.ayla.pcos.export.DataImporter
 import com.ayla.pcos.export.ImportMode
@@ -16,6 +24,8 @@ import org.junit.Test
 import java.time.LocalTime
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -176,5 +186,185 @@ class YedekTesti : VeriTestOrtami() {
             assertEquals(ad, yazim.normalizedName(), yazim)
         }
         assertTrue("Inofolic Plus".normalizedName() != ad)
+    }
+
+    // --- Sürüm 3 (ADR-0009): doğurganlık, cilt/saç, doktora sorular ---
+
+    private suspend fun mvp3VerisiYaz() {
+        fertility.save(FertilityEntryEntity(date = bugun.minusDays(2), bbtCelsius = 36.41, bbtTime = LocalTime.of(6, 30), lhResult = LhResult.NEGATIVE))
+        fertility.save(FertilityEntryEntity(date = bugun.minusDays(1), bbtCelsius = 36.72, bbtDisturbed = true, lhResult = LhResult.POSITIVE, mucus = CervicalMucus.EGG_WHITE))
+        skin.saveProfile(SkinProfileEntity(skinType = SkinType.OILY, acne = AcneSelfReport.MODERATE, acanthosis = true, morningReminder = LocalTime.of(8, 0)))
+        skin.setSteps(bugun, RoutineSlot.MORNING, listOf("skin_step_cleanse", "skin_step_spf"))
+        skin.setSteps(bugun.minusDays(1), RoutineSlot.EVENING, listOf("skin_step_cleanse"))
+        questions.add("Metformin dozum uygun mu?")
+        questions.add("İnositol ne kadar süre?")
+    }
+
+    @Test
+    fun `surum 3 yedegi tam tur gider gelir ve tam silme dort tabloyu da bosaltir`() {
+        val text = calistir {
+            cycles.addPeriodStart(bugun.minusDays(20))
+            mvp3VerisiYaz()
+            val id = questions.getAll().first().id
+            questions.markAsked(id, true, java.time.Instant.parse("2026-10-11T09:00:00Z"))
+            json.encodeToString(exporter.buildBundle())
+        }
+        assertTrue("\"schemaVersion\": $BACKUP_SCHEMA_VERSION" in text)
+        assertTrue("\"skinProfile\"" in text && "\"fertility\"" in text)
+
+        calistir {
+            exporter.wipeAll()
+            assertTrue(db.fertilityEntryDao().getAll().isEmpty())
+            assertNull(db.skinProfileDao().get())
+            assertTrue(db.skinRoutineCheckDao().getAll().isEmpty())
+            assertTrue(db.doctorQuestionDao().getAll().isEmpty())
+            assertTrue(db.periodDao().getAll().isEmpty())
+        }
+
+        val bundle = importer.parse(text)
+        val summary = importer.summarize(bundle)
+        assertEquals(2, summary.fertilityDays)
+        assertTrue(summary.hasSkinProfile)
+        assertEquals(2, summary.skinRoutineSlots)
+        assertEquals(2, summary.doctorQuestions)
+        assertFalse(summary.isEmpty)
+
+        val result = calistir { importer.apply(bundle, ImportMode.REPLACE) }
+        calistir {
+            val kayitlar = db.fertilityEntryDao().getAll()
+            assertEquals(listOf(bugun.minusDays(2), bugun.minusDays(1)), kayitlar.map { it.date })
+            assertEquals(36.41, kayitlar[0].bbtCelsius)
+            assertEquals(LocalTime.of(6, 30), kayitlar[0].bbtTime)
+            assertEquals(LhResult.NEGATIVE, kayitlar[0].lhResult)
+            assertTrue(kayitlar[1].bbtDisturbed)
+            assertEquals(CervicalMucus.EGG_WHITE, kayitlar[1].mucus)
+
+            val profil = db.skinProfileDao().get()
+            assertNotNull(profil)
+            assertEquals(SkinType.OILY, profil.skinType)
+            assertEquals(AcneSelfReport.MODERATE, profil.acne)
+            assertTrue(profil.acanthosis)
+            assertFalse(profil.hairThinning)
+            assertEquals(LocalTime.of(8, 0), profil.morningReminder)
+            assertNull(profil.eveningReminder)
+
+            val rutin = db.skinRoutineCheckDao().getAll()
+            assertEquals(2, rutin.size)
+            assertEquals(listOf("skin_step_cleanse", "skin_step_spf"), rutin.last().doneSteps)
+            assertEquals(RoutineSlot.MORNING, rutin.last().slot)
+
+            val sorular = db.doctorQuestionDao().getAll()
+            assertEquals(listOf("Metformin dozum uygun mu?", "İnositol ne kadar süre?"), sorular.map { it.text })
+            assertEquals(java.time.Instant.parse("2026-10-11T09:00:00Z"), sorular[0].askedAt)
+            assertNull(sorular[1].askedAt)
+
+            // adet + 2 doğurganlık + profil + 2 rutin + 2 soru
+            assertEquals(1 + 2 + 1 + 2 + 2, result.added)
+            assertEquals(0, result.skipped)
+        }
+    }
+
+    @Test
+    fun `birlestirmede surum 3 kayitlarinda cihazdaki kazanir, eksikler eklenir`() {
+        val text = calistir {
+            mvp3VerisiYaz()
+            json.encodeToString(exporter.buildBundle())
+        }
+
+        // Cihaz: aynı günün farklı doğurganlık kaydı, farklı profil, aynı dilimde farklı adımlar, aynı soru farklı yazımla.
+        calistir {
+            exporter.wipeAll()
+            fertility.save(FertilityEntryEntity(date = bugun.minusDays(1), bbtCelsius = 36.9))
+            skin.saveProfile(SkinProfileEntity(skinType = SkinType.DRY))
+            skin.setSteps(bugun, RoutineSlot.MORNING, listOf("skin_step_moisturize"))
+            questions.add("metformin  dozum uygun mu?")
+        }
+
+        val result = calistir { importer.apply(importer.parse(text), ImportMode.MERGE) }
+
+        calistir {
+            assertEquals(36.9, fertility.get(bugun.minusDays(1))?.bbtCelsius, "aynı günün kaydı cihazdaki gibi kalır")
+            assertEquals(36.41, fertility.get(bugun.minusDays(2))?.bbtCelsius, "eksik gün eklenir")
+            assertEquals(SkinType.DRY, skin.profile()?.skinType, "profil cihazdaki gibi kalır")
+            assertEquals(listOf("skin_step_moisturize"), skin.routine(bugun, RoutineSlot.MORNING)?.doneSteps)
+            assertEquals(listOf("skin_step_cleanse"), skin.routine(bugun.minusDays(1), RoutineSlot.EVENING)?.doneSteps)
+            // Yedekteki soru oluşturulma zamanını korur, bu yüzden listede cihazdakinden önce gelir; küme karşılaştırılır.
+            assertEquals(setOf("metformin  dozum uygun mu?", "İnositol ne kadar süre?"), questions.getAll().map { it.text }.toSet())
+            // eklenen: 1 doğurganlık + 1 rutin + 1 soru; atlanan: doğurganlık, profil, rutin, soru
+            assertEquals(3, result.added)
+            assertEquals(4, result.skipped)
+        }
+    }
+
+    @Test
+    fun `surum 2 yedegi aynen okunur, yeni alanlar bos kalir`() {
+        val v2 = """
+            {"app":"Ayla","schemaVersion":2,"exportedAt":"2026-10-01T08:00:00Z",
+             "periods":[{"start":"2026-09-10","end":null,"excludedFromStats":false}],
+             "dailyLogs":[],"medications":[],"doses":[],"hydration":[{"date":"2026-09-10","cups":4}],"sleep":[],
+             "preferences":{"displayName":"Elif","goals":["CYCLE"]}}
+        """.trimIndent()
+
+        val bundle = importer.parse(v2)
+        val summary = importer.summarize(bundle)
+        assertEquals(1, summary.periods)
+        assertEquals(0, summary.fertilityDays)
+        assertFalse(summary.hasSkinProfile)
+        assertEquals(0, summary.skinRoutineSlots)
+        assertEquals(0, summary.doctorQuestions)
+
+        val result = calistir { importer.apply(bundle, ImportMode.REPLACE) }
+        calistir {
+            assertEquals(2, result.added)
+            assertEquals(1, db.periodDao().getAll().size)
+            assertTrue(db.fertilityEntryDao().getAll().isEmpty())
+            assertNull(db.skinProfileDao().get())
+            assertEquals("Elif", prefs.current().displayName)
+        }
+    }
+
+    @Test
+    fun `bilinmeyen enum adi tasiyan surum 3 kaydi atlanir, dosya reddedilmez`() {
+        val v3 = """
+            {"app":"Ayla","schemaVersion":3,"exportedAt":"2026-10-01T08:00:00Z",
+             "fertility":[
+               {"date":"2026-09-20","bbtCelsius":36.456,"lh":"MAYBE"},
+               {"date":"2026-09-21","bbtCelsius":36.5,"mucus":"EGG_WHITE","lh":"NEGATIVE"},
+               {"date":"2026-09-22","mucus":"FOAMY"}],
+             "skinProfile":{"skinType":"GLASS","darkSpots":true},
+             "skinRoutine":[
+               {"date":"2026-09-21","slot":"NOON","doneSteps":["skin_step_spf"]},
+               {"date":"2026-09-21","slot":"EVENING","doneSteps":["skin_step_cleanse","","skin_step_cleanse"]},
+               {"date":"2026-09-22","slot":"MORNING","doneSteps":[]}],
+             "doctorQuestions":[{"text":"   ","createdAt":"2026-09-21T10:00:00Z"},{"text":" Soru ","createdAt":"2026-09-21T10:00:00Z","askedAt":null}]}
+        """.trimIndent()
+
+        val bundle = importer.parse(v3)
+        val result = calistir { importer.apply(bundle, ImportMode.MERGE) }
+        calistir {
+            val kayitlar = db.fertilityEntryDao().getAll()
+            assertEquals(listOf(java.time.LocalDate.of(2026, 9, 21)), kayitlar.map { it.date }, "bilinmeyen LH ve mukus adı taşıyan günler atlanır")
+            assertEquals(CervicalMucus.EGG_WHITE, kayitlar.single().mucus)
+            assertNull(db.skinProfileDao().get(), "bilinmeyen cilt tipi: profil atlanır")
+            val rutin = db.skinRoutineCheckDao().getAll()
+            assertEquals(1, rutin.size, "bilinmeyen dilim ve boş adım listesi atlanır")
+            assertEquals(RoutineSlot.EVENING, rutin.single().slot)
+            assertEquals(listOf("skin_step_cleanse"), rutin.single().doneSteps)
+            assertEquals(listOf("Soru"), db.doctorQuestionDao().getAll().map { it.text })
+            assertEquals(3, result.added)
+        }
+    }
+
+    @Test
+    fun `isi degeri ice aktarmada da iki ondaliga yuvarlanir`() {
+        val v3 = """
+            {"app":"Ayla","schemaVersion":3,"exportedAt":"2026-10-01T08:00:00Z",
+             "fertility":[{"date":"2026-09-20","bbtCelsius":36.456,"bbtTime":"06:30"}]}
+        """.trimIndent()
+        calistir { importer.apply(importer.parse(v3), ImportMode.MERGE) }
+        val kayit = calistir { fertility.get(java.time.LocalDate.of(2026, 9, 20)) }
+        assertNotNull(kayit)
+        assertEquals(36.46, kayit.bbtCelsius)
+        assertEquals(LocalTime.of(6, 30), kayit.bbtTime)
     }
 }

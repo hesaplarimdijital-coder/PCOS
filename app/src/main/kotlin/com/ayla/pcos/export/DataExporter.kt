@@ -17,11 +17,13 @@ import javax.inject.Singleton
 
 /** Yedek dosyasının adı ve şu anki biçim sürümü. */
 const val BACKUP_APP_NAME = "Ayla"
-const val BACKUP_SCHEMA_VERSION = 2
+const val BACKUP_SCHEMA_VERSION = 3
 
 /**
- * Dışa aktarılan dosyanın biçimi. Sürüm 2, sürüm 1'e yalnızca varsayılanı olan alanlar ekler
- * (stok eşiği, oluşturulma zamanı, Health Connect kimliği, tercihler); eski dosyalar aynen okunur.
+ * Dışa aktarılan dosyanın biçimi. Her sürüm bir öncekine yalnızca varsayılanı olan alanlar ekler; eski
+ * dosyalar aynen okunur, yeni alanlar boş kalır.
+ * - Sürüm 2: stok eşiği, oluşturulma zamanı, Health Connect kimliği, tercihler.
+ * - Sürüm 3 (ADR-0009): doğurganlık kayıtları, cilt/saç profili, rutin işaretleri, doktora sorular.
  */
 @Serializable
 data class ExportBundle(
@@ -35,6 +37,11 @@ data class ExportBundle(
     val hydration: List<ExportHydration> = emptyList(),
     val sleep: List<ExportSleep> = emptyList(),
     val preferences: ExportPreferences? = null,
+    val fertility: List<ExportFertility> = emptyList(),
+    /** Tek nesne; profil hiç doldurulmamışsa null. */
+    val skinProfile: ExportSkinProfile? = null,
+    val skinRoutine: List<ExportSkinRoutine> = emptyList(),
+    val doctorQuestions: List<ExportDoctorQuestion> = emptyList(),
 )
 
 @Serializable
@@ -85,6 +92,38 @@ data class ExportSleep(
     val source: String,
     val externalId: String? = null,
 )
+
+/** Doğurganlık kaydı; enum alanları adıyla (`LhResult`, `CervicalMucus`), saat ISO metni. */
+@Serializable
+data class ExportFertility(
+    val date: String,
+    val bbtCelsius: Double? = null,
+    val bbtTime: String? = null,
+    val bbtDisturbed: Boolean = false,
+    val lh: String? = null,
+    val mucus: String? = null,
+)
+
+/** Cilt/saç profili; enum alanları adıyla (`SkinType`, `AcneSelfReport`). */
+@Serializable
+data class ExportSkinProfile(
+    val skinType: String? = null,
+    val acne: String? = null,
+    val darkSpots: Boolean = false,
+    val acanthosis: Boolean = false,
+    val unwantedHair: Boolean = false,
+    val hairThinning: Boolean = false,
+    val pregnantOrBreastfeeding: Boolean = false,
+    val morningReminder: String? = null,
+    val eveningReminder: String? = null,
+)
+
+/** Bir günün bir dilimindeki tamamlanan rutin adımları; `slot` `RoutineSlot` adıdır. */
+@Serializable
+data class ExportSkinRoutine(val date: String, val slot: String, val doneSteps: List<String> = emptyList())
+
+@Serializable
+data class ExportDoctorQuestion(val text: String, val createdAt: String, val askedAt: String? = null)
 
 /**
  * Geri yüklenebilen tercihler. Rızalar (KVKK) ve koruma ayarları (kilit, ekran görüntüsü, gizli bildirim)
@@ -144,6 +183,33 @@ class DataExporter @Inject constructor(
                 ExportSleep(it.date.toString(), it.startAt.toString(), it.endAt.toString(), it.quality, it.source.name, it.externalId)
             },
             preferences = prefs.current().toExport(),
+            fertility = db.fertilityEntryDao().getAll().map {
+                ExportFertility(
+                    date = it.date.toString(),
+                    bbtCelsius = it.bbtCelsius,
+                    bbtTime = it.bbtTime?.toString(),
+                    bbtDisturbed = it.bbtDisturbed,
+                    lh = it.lhResult?.name,
+                    mucus = it.mucus?.name,
+                )
+            },
+            skinProfile = db.skinProfileDao().get()?.let {
+                ExportSkinProfile(
+                    skinType = it.skinType?.name,
+                    acne = it.acne?.name,
+                    darkSpots = it.darkSpots,
+                    acanthosis = it.acanthosis,
+                    unwantedHair = it.unwantedHair,
+                    hairThinning = it.hairThinning,
+                    pregnantOrBreastfeeding = it.pregnantOrBreastfeeding,
+                    morningReminder = it.morningReminder?.toString(),
+                    eveningReminder = it.eveningReminder?.toString(),
+                )
+            },
+            skinRoutine = db.skinRoutineCheckDao().getAll().map { ExportSkinRoutine(it.date.toString(), it.slot.name, it.doneSteps) },
+            doctorQuestions = db.doctorQuestionDao().getAll().map {
+                ExportDoctorQuestion(it.text, it.createdAt.toString(), it.askedAt?.toString())
+            },
         )
     }
 
@@ -158,6 +224,9 @@ class DataExporter @Inject constructor(
     /**
      * Tüm tabloları boşaltır; geri alınamaz. Anahtar kaybında kenara ayrılan (artık okunamayan) eski
      * veritabanı dosyaları da silinir. Tercihler ayrıca sıfırlanır.
+     *
+     * clearAllTables, @Database listesindeki her tabloyu kapsar; MVP 3 tabloları (doğurganlık, cilt
+     * profili, rutin işaretleri, sorular) da böylece boşalır (YedekTesti bunu doğrular).
      */
     suspend fun wipeAll() = withContext(Dispatchers.IO) {
         db.clearAllTables()

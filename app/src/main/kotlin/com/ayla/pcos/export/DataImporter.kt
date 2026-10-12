@@ -3,20 +3,31 @@ package com.ayla.pcos.export
 import android.content.Context
 import android.net.Uri
 import androidx.room.withTransaction
+import com.ayla.cycle.CervicalMucus
+import com.ayla.cycle.LhResult
+import com.ayla.pcos.data.db.AcneSelfReport
 import com.ayla.pcos.data.db.AylaDatabase
 import com.ayla.pcos.data.db.DailyLogEntity
+import com.ayla.pcos.data.db.DoctorQuestionEntity
 import com.ayla.pcos.data.db.DoseEventEntity
 import com.ayla.pcos.data.db.DoseStatus
+import com.ayla.pcos.data.db.FertilityEntryEntity
 import com.ayla.pcos.data.db.HydrationEntity
 import com.ayla.pcos.data.db.MedicationEntity
 import com.ayla.pcos.data.db.MedicationForm
 import com.ayla.pcos.data.db.MedicationKind
 import com.ayla.pcos.data.db.PeriodEntity
+import com.ayla.pcos.data.db.RoutineSlot
+import com.ayla.pcos.data.db.SkinProfileEntity
+import com.ayla.pcos.data.db.SkinRoutineCheckEntity
+import com.ayla.pcos.data.db.SkinType
 import com.ayla.pcos.data.db.SleepEntity
 import com.ayla.pcos.data.db.SleepSource
 import com.ayla.pcos.data.prefs.Goal
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
+import com.ayla.pcos.data.repo.DoctorQuestionRepository
+import com.ayla.pcos.data.repo.normalized
 import com.ayla.pcos.reminders.ReminderScheduler
 import com.ayla.pcos.ui.me.AyarSinirlari
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -60,7 +71,7 @@ class InvalidBackupException(val reason: Reason, cause: Throwable? = null) : Exc
     }
 }
 
-/** Önizleme: yedekte ne var (yazmadan önce kullanıcıya gösterilir). */
+/** Önizleme: yedekte ne var (yazmadan önce kullanıcıya gösterilir). Sürüm 3 alanları varsayılanlıdır. */
 data class ImportSummary(
     val exportedAt: Instant?,
     val periods: Int,
@@ -69,8 +80,14 @@ data class ImportSummary(
     val doses: Int,
     val hydrationDays: Int,
     val sleepNights: Int,
+    val fertilityDays: Int = 0,
+    val hasSkinProfile: Boolean = false,
+    val skinRoutineSlots: Int = 0,
+    val doctorQuestions: Int = 0,
 ) {
-    val isEmpty: Boolean get() = periods + dailyLogs + medications + doses + hydrationDays + sleepNights == 0
+    val isEmpty: Boolean
+        get() = periods + dailyLogs + medications + doses + hydrationDays + sleepNights +
+            fertilityDays + skinRoutineSlots + doctorQuestions == 0 && !hasSkinProfile
 }
 
 /** Yazılan kayıt sayısı ve cihazda zaten bulunduğu (ya da bağlanamadığı) için atlanan sayı. */
@@ -87,6 +104,10 @@ internal data class ParsedBackup(
     val hydration: List<HydrationEntity>,
     val sleep: List<SleepEntity>,
     val preferences: ExportPreferences?,
+    val fertility: List<FertilityEntryEntity> = emptyList(),
+    val skinProfile: SkinProfileEntity? = null,
+    val skinRoutine: List<SkinRoutineCheckEntity> = emptyList(),
+    val doctorQuestions: List<DoctorQuestionEntity> = emptyList(),
 )
 
 /**
@@ -96,7 +117,10 @@ internal data class ParsedBackup(
  * - Yazma tek işlemdedir (ya hepsi ya hiçbiri).
  * - Birleştirmede cihazdaki kayıt kazanır: aynı güne ait günlük ve doz değiştirilmez; su için büyük
  *   sayı alınır; açık kalmış adetin bitişi yedekten tamamlanır; aynı ad ve türdeki ilaç yeniden eklenmez,
- *   yedekteki dozlar mevcut ilaca bağlanır.
+ *   yedekteki dozlar mevcut ilaca bağlanır. Sürüm 3 kayıtları (doğurganlık günü, cilt profili, rutin
+ *   dilimi, aynı metinli soru) cihazda varsa atlanır.
+ * - Bilinmeyen enum adı (ör. daha yeni sürümde eklenmiş LH sonucu) taşıyan kayıt sessizce atlanır;
+ *   dosyanın tamamı reddedilmez.
  */
 @Singleton
 class DataImporter @Inject constructor(
@@ -149,6 +173,10 @@ class DataImporter @Inject constructor(
         doses = bundle.doses.size,
         hydrationDays = bundle.hydration.size,
         sleepNights = bundle.sleep.size,
+        fertilityDays = bundle.fertility.size,
+        hasSkinProfile = bundle.skinProfile != null,
+        skinRoutineSlots = bundle.skinRoutine.size,
+        doctorQuestions = bundle.doctorQuestions.size,
     )
 
     /** Yedeği yazar, tercihleri günceller ve hatırlatmaları yeniden kurar. */
@@ -227,6 +255,49 @@ class DataImporter @Inject constructor(
                 )
             }.filter { it.endAt.isAfter(it.startAt) },
             preferences = b.preferences,
+            fertility = b.fertility.mapNotNull { f ->
+                // Bilinmeyen enum adı: kayıt atlanır (null alan ise "girilmedi" demektir, kayıt kalır).
+                val lh = f.lh?.let { enumOrNull<LhResult>(it) ?: return@mapNotNull null }
+                val mucus = f.mucus?.let { enumOrNull<CervicalMucus>(it) ?: return@mapNotNull null }
+                FertilityEntryEntity(
+                    date = LocalDate.parse(f.date),
+                    bbtCelsius = f.bbtCelsius,
+                    bbtTime = f.bbtTime?.let(LocalTime::parse),
+                    bbtDisturbed = f.bbtDisturbed,
+                    lhResult = lh,
+                    mucus = mucus,
+                ).normalized()
+            }.distinctBy { it.date },
+            skinProfile = b.skinProfile?.let profile@{ p ->
+                val skinType = p.skinType?.let { enumOrNull<SkinType>(it) ?: return@profile null }
+                val acne = p.acne?.let { enumOrNull<AcneSelfReport>(it) ?: return@profile null }
+                SkinProfileEntity(
+                    skinType = skinType,
+                    acne = acne,
+                    darkSpots = p.darkSpots,
+                    acanthosis = p.acanthosis,
+                    unwantedHair = p.unwantedHair,
+                    hairThinning = p.hairThinning,
+                    pregnantOrBreastfeeding = p.pregnantOrBreastfeeding,
+                    morningReminder = p.morningReminder?.let(LocalTime::parse),
+                    eveningReminder = p.eveningReminder?.let(LocalTime::parse),
+                )
+            },
+            skinRoutine = b.skinRoutine.mapNotNull { r ->
+                val slot = enumOrNull<RoutineSlot>(r.slot) ?: return@mapNotNull null
+                val steps = r.doneSteps.filter { it.isNotBlank() && '|' !in it }.distinct()
+                if (steps.isEmpty()) return@mapNotNull null
+                SkinRoutineCheckEntity(date = LocalDate.parse(r.date), slot = slot, doneSteps = steps)
+            }.distinctBy { it.date to it.slot },
+            doctorQuestions = b.doctorQuestions.mapNotNull { q ->
+                val text = q.text.trim().take(DoctorQuestionRepository.MAX_LENGTH)
+                if (text.isEmpty()) return@mapNotNull null
+                DoctorQuestionEntity(
+                    text = text,
+                    createdAt = Instant.parse(q.createdAt),
+                    askedAt = q.askedAt?.let(Instant::parse),
+                )
+            },
         )
     } catch (e: InvalidBackupException) {
         throw e
@@ -241,6 +312,10 @@ class DataImporter @Inject constructor(
         db.dailyLogDao().deleteAll()
         db.hydrationDao().deleteAll()
         db.sleepDao().deleteAll()
+        db.fertilityEntryDao().deleteAll()
+        db.skinProfileDao().deleteAll()
+        db.skinRoutineCheckDao().deleteAll()
+        db.doctorQuestionDao().deleteAll()
     }
 
     private suspend fun write(d: ParsedBackup): ImportResult {
@@ -326,6 +401,48 @@ class DataImporter @Inject constructor(
                 added++
             }
         }
+
+        // Sürüm 3: aynı anahtar cihazda varsa atlanır (cihazdaki kayıt kazanır).
+        val fertilityDao = db.fertilityEntryDao()
+        d.fertility.forEach { entry ->
+            if (fertilityDao.get(entry.date) == null) {
+                fertilityDao.upsert(entry)
+                added++
+            } else {
+                skipped++
+            }
+        }
+
+        val profileDao = db.skinProfileDao()
+        d.skinProfile?.let { profile ->
+            if (profileDao.get() == null) {
+                profileDao.upsert(profile)
+                added++
+            } else {
+                skipped++
+            }
+        }
+
+        val routineDao = db.skinRoutineCheckDao()
+        d.skinRoutine.forEach { check ->
+            if (routineDao.get(check.date, check.slot) == null) {
+                routineDao.upsert(check)
+                added++
+            } else {
+                skipped++
+            }
+        }
+
+        val questionDao = db.doctorQuestionDao()
+        val knownQuestions = questionDao.getAll().map { it.text.normalizedName() }.toMutableSet()
+        d.doctorQuestions.forEach { question ->
+            if (knownQuestions.add(question.text.normalizedName())) {
+                questionDao.insert(question)
+                added++
+            } else {
+                skipped++
+            }
+        }
         return ImportResult(added, skipped)
     }
 
@@ -380,3 +497,7 @@ internal fun String.normalizedName(): String =
 
 private inline fun <reified E : Enum<E>> enumOr(name: String, fallback: E): E =
     enumValues<E>().firstOrNull { it.name == name } ?: fallback
+
+/** Varsayılanı olmayan enum alanları için: ad bilinmiyorsa null (çağıran kaydı atlar). */
+private inline fun <reified E : Enum<E>> enumOrNull(name: String): E? =
+    enumValues<E>().firstOrNull { it.name == name }

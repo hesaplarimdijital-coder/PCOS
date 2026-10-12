@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.ayla.cycle.CervicalMucus
+import com.ayla.cycle.LhResult
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -108,4 +110,81 @@ data class SleepEntity(
     val source: SleepSource = SleepSource.MANUAL,
     /** Health Connect kayıt kimliği; yinelenen içe aktarmayı önler. */
     @ColumnInfo(name = "external_id") val externalId: String? = null,
+)
+
+/*
+ * MVP 3 varlıkları (ADR-0009, şema sürümü 2). Hepsi sağlık verisidir ve yalnızca şifreli veritabanında
+ * durur; DataStore'a yazılmaz. Enum'lar Room tarafından adıyla TEXT olarak saklanır.
+ */
+
+/**
+ * Bir güne ait doğurganlık kaydı: bazal vücut ısısı, LH testi ve servikal mukus. Alanlar isteğe bağlıdır;
+ * core:cycle motorunun [com.ayla.cycle.FertilityEntry] girdisine birebir eşlenir. Isı 2 ondalıkla
+ * saklanır; akla yatkın aralık dışı değerler kaydedilir ama motor hesaba katmaz.
+ */
+@Entity(tableName = "fertility_entries")
+data class FertilityEntryEntity(
+    @PrimaryKey val date: LocalDate,
+    @ColumnInfo(name = "bbt_celsius") val bbtCelsius: Double? = null,
+    @ColumnInfo(name = "bbt_time") val bbtTime: LocalTime? = null,
+    /** Ateş, alkol, az uyku, geç ölçüm: örtü çizgisi ve yükselme hesabına girmez. */
+    @ColumnInfo(name = "bbt_disturbed") val bbtDisturbed: Boolean = false,
+    @ColumnInfo(name = "lh_result") val lhResult: LhResult? = null,
+    val mucus: CervicalMucus? = null,
+    @ColumnInfo(name = "updated_at") val updatedAt: Instant = Instant.now(),
+)
+
+/** Cilt tipi öz-beyanı. */
+enum class SkinType { DRY, OILY, COMBINATION, NORMAL, SENSITIVE }
+
+/** Sivilce öz-beyanı; tanı ya da derecelendirme değildir, kullanıcının kendi değerlendirmesidir. */
+enum class AcneSelfReport { NONE, MILD, MODERATE, SEVERE }
+
+/** Cilt bakım rutini dilimi. */
+enum class RoutineSlot { MORNING, EVENING }
+
+/**
+ * Cilt/saç profili; tek satırdır ([SINGLE_ID]). Öz-beyanlar ve "doktoruna söyle" işaretleri
+ * ([acanthosis], [unwantedHair], [hairThinning]) buradadır. Gebelik planı tercihlerdeki TTC hedefiyle
+ * birleşir; [pregnantOrBreastfeeding] içerik süzgeci içindir (bazı adımlar gebelikte gösterilmez).
+ */
+@Entity(tableName = "skin_profile")
+data class SkinProfileEntity(
+    @PrimaryKey val id: Int = SINGLE_ID,
+    @ColumnInfo(name = "skin_type") val skinType: SkinType? = null,
+    val acne: AcneSelfReport? = null,
+    @ColumnInfo(name = "dark_spots") val darkSpots: Boolean = false,
+    val acanthosis: Boolean = false,
+    @ColumnInfo(name = "unwanted_hair") val unwantedHair: Boolean = false,
+    @ColumnInfo(name = "hair_thinning") val hairThinning: Boolean = false,
+    @ColumnInfo(name = "pregnant_or_breastfeeding") val pregnantOrBreastfeeding: Boolean = false,
+    @ColumnInfo(name = "morning_reminder") val morningReminder: LocalTime? = null,
+    @ColumnInfo(name = "evening_reminder") val eveningReminder: LocalTime? = null,
+    @ColumnInfo(name = "updated_at") val updatedAt: Instant = Instant.now(),
+) {
+    companion object {
+        /** Tablodaki tek satırın kimliği. */
+        const val SINGLE_ID = 1
+    }
+}
+
+/**
+ * Bir günün bir dilimindeki (sabah/akşam) tamamlanan rutin adımları. Adım anahtarları içerik
+ * tablosundan gelir (`skin_step_*`); metinleri strings.xml'dedir.
+ */
+@Entity(tableName = "skin_routine_checks", primaryKeys = ["date", "slot"])
+data class SkinRoutineCheckEntity(
+    val date: LocalDate,
+    val slot: RoutineSlot,
+    @ColumnInfo(name = "done_steps") val doneSteps: List<String> = emptyList(),
+    @ColumnInfo(name = "updated_at") val updatedAt: Instant = Instant.now(),
+)
+
+/** Doktora sorulacak bir soru. "Sordum" işaretlenen ([askedAt]) soru raporun "sorulanlar" kısmına düşer. */
+@Entity(tableName = "doctor_questions")
+data class DoctorQuestionEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val text: String,
+    @ColumnInfo(name = "created_at") val createdAt: Instant = Instant.now(),
+    @ColumnInfo(name = "asked_at") val askedAt: Instant? = null,
 )

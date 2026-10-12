@@ -11,8 +11,11 @@ import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.data.repo.CycleRepository
 import com.ayla.pcos.data.repo.DailyLogRepository
 import com.ayla.pcos.data.repo.DateTicker
+import com.ayla.pcos.data.repo.DoctorQuestionRepository
+import com.ayla.pcos.data.repo.FertilityRepository
 import com.ayla.pcos.data.repo.HydrationRepository
 import com.ayla.pcos.data.repo.MedicationRepository
+import com.ayla.pcos.data.repo.SkinRepository
 import com.ayla.pcos.data.repo.SleepRepository
 import com.ayla.pcos.reminders.ReminderNotifier
 import com.ayla.pcos.reminders.ReminderScheduler
@@ -85,6 +88,9 @@ abstract class VeriTestOrtami {
     protected lateinit var water: HydrationRepository
     protected lateinit var sleep: SleepRepository
     protected lateinit var doctorNote: DoctorNoteRepository
+    protected lateinit var fertility: FertilityRepository
+    protected lateinit var skin: SkinRepository
+    protected lateinit var questions: DoctorQuestionRepository
     private val dataStoreScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     @Before
@@ -106,6 +112,9 @@ abstract class VeriTestOrtami {
         water = HydrationRepository(db.hydrationDao())
         sleep = SleepRepository(db.sleepDao(), prefs)
         doctorNote = DoctorNoteRepository(context, cycles, logs, db.medicationDao(), db.doseEventDao(), ticker)
+        fertility = FertilityRepository(db.fertilityEntryDao(), db.periodDao(), db.medicationDao(), prefs, ticker)
+        skin = SkinRepository(db.skinProfileDao(), db.skinRoutineCheckDao())
+        questions = DoctorQuestionRepository(db.doctorQuestionDao())
     }
 
     @After

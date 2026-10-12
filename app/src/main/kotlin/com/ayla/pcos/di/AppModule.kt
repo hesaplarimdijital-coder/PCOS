@@ -8,12 +8,17 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.ayla.cycle.CycleEngine
+import com.ayla.pcos.data.db.ALL_MIGRATIONS
 import com.ayla.pcos.data.db.AylaDatabase
 import com.ayla.pcos.data.db.DailyLogDao
+import com.ayla.pcos.data.db.DoctorQuestionDao
 import com.ayla.pcos.data.db.DoseEventDao
+import com.ayla.pcos.data.db.FertilityEntryDao
 import com.ayla.pcos.data.db.HydrationDao
 import com.ayla.pcos.data.db.MedicationDao
 import com.ayla.pcos.data.db.PeriodDao
+import com.ayla.pcos.data.db.SkinProfileDao
+import com.ayla.pcos.data.db.SkinRoutineCheckDao
 import com.ayla.pcos.data.db.SleepDao
 import com.ayla.pcos.export.DataExporter
 import com.ayla.pcos.security.DatabaseKeyProvider
@@ -87,6 +92,8 @@ object AppModule {
         val factory = SupportOpenHelperFactory(passphrase)
         return Room.databaseBuilder(context, AylaDatabase::class.java, AylaDatabase.NAME)
             .openHelperFactory(factory)
+            // Sürüm artışları yalnızca tablo/sütun ekler (data/db/Migrations.kt); kullanıcı verisi korunur.
+            .addMigrations(*ALL_MIGRATIONS)
             .fallbackToDestructiveMigrationOnDowngrade(dropAllTables = true)
             .build()
     }
@@ -108,4 +115,8 @@ object AppModule {
     @Provides fun provideDoseEventDao(db: AylaDatabase): DoseEventDao = db.doseEventDao()
     @Provides fun provideHydrationDao(db: AylaDatabase): HydrationDao = db.hydrationDao()
     @Provides fun provideSleepDao(db: AylaDatabase): SleepDao = db.sleepDao()
+    @Provides fun provideFertilityEntryDao(db: AylaDatabase): FertilityEntryDao = db.fertilityEntryDao()
+    @Provides fun provideSkinProfileDao(db: AylaDatabase): SkinProfileDao = db.skinProfileDao()
+    @Provides fun provideSkinRoutineCheckDao(db: AylaDatabase): SkinRoutineCheckDao = db.skinRoutineCheckDao()
+    @Provides fun provideDoctorQuestionDao(db: AylaDatabase): DoctorQuestionDao = db.doctorQuestionDao()
 }
