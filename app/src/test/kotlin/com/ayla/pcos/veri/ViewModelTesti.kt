@@ -21,9 +21,9 @@ import kotlin.test.assertTrue
 /** ViewModel durum birleşimi: gerçek depolar, sabit gün. */
 class ViewModelTesti : VeriTestOrtami() {
 
-    private fun today() = TodayViewModel(cycles, meds, water, prefs, ticker, scheduler, notifier, doctorNote)
+    private fun today() = kaydet(TodayViewModel(cycles, meds, water, prefs, ticker, scheduler, notifier, doctorNote))
 
-    private fun plan() = PlanViewModel(water, sleep, prefs, scheduler, ticker, cycles, logs, meds)
+    private fun plan() = kaydet(PlanViewModel(water, sleep, prefs, scheduler, ticker, cycles, logs, meds))
 
     @Test
     fun `hap modunda bugunku hap numarasi ve alinan haplar hesaplanir`() {

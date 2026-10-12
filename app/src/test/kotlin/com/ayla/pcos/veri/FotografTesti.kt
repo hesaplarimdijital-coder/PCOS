@@ -8,6 +8,7 @@ import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
 import android.net.Uri
+import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import com.ayla.pcos.data.photos.PhotoCipher
 import com.ayla.pcos.data.photos.PhotoKeyProvider
@@ -99,6 +100,7 @@ class FotografTesti {
     @Before
     fun kur() {
         context = RuntimeEnvironment.getApplication()
+        fileProviderOnbelleginiTemizle()
         fotografDizini.deleteRecursively()
         kameraDizini.deleteRecursively()
         anahtar = YazilimsalFotografAnahtari()
@@ -106,6 +108,18 @@ class FotografTesti {
     }
 
     private fun <T> calistir(block: suspend () -> T): T = runBlocking { block() }
+
+    /**
+     * FileProvider kök dizinlerini yetki başına statik olarak önbelleğe alır; Robolectric her teste yeni bir veri
+     * dizini verdiği için önceki testin kökleri bu testin dosyasını içermez ("Failed to find configured root").
+     * Önbellek alan adı değişirse testler yine çalışır (yalnızca ilk sınıf-yükleme kökleri kalır).
+     */
+    private fun fileProviderOnbelleginiTemizle() {
+        runCatching {
+            val alan = FileProvider::class.java.getDeclaredField("sCache").apply { isAccessible = true }
+            (alan.get(null) as? MutableMap<*, *>)?.clear()
+        }
+    }
 
     private fun sifreliDosya(record: PhotoRecord): File = File(fotografDizini, record.id + ".enc")
 

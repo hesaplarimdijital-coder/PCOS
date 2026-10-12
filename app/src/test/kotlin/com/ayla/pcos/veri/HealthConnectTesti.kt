@@ -80,12 +80,14 @@ class HealthConnectTesti : VeriTestOrtami() {
     }
 
     /** Ön plana geliş sinyali olmayan gün kaynağı: başlangıçtaki sessiz eşitleme testleri karıştırmasın. */
-    private fun vm() = HealthConnectViewModel(
-        depo,
-        prefs,
-        object : DateTicker(saat) {
-            override val foreground: Flow<Unit> = emptyFlow()
-        },
+    private fun vm() = kaydet(
+        HealthConnectViewModel(
+            depo,
+            prefs,
+            object : DateTicker(saat) {
+                override val foreground: Flow<Unit> = emptyFlow()
+            },
+        ),
     )
 
     private fun rizaVer() = calistir { depo.giveConsent() }

@@ -4,6 +4,8 @@ import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelStore
 import androidx.room.Room
 import com.ayla.cycle.CycleEngine
 import com.ayla.pcos.data.db.AylaDatabase
@@ -93,6 +95,19 @@ abstract class VeriTestOrtami {
     protected lateinit var questions: DoctorQuestionRepository
     private val dataStoreScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    /**
+     * Testte kurulan ViewModel'ler burada tutulur ve test bitince temizlenir ([ViewModelStore.clear] →
+     * `viewModelScope` iptali). Aksi hâlde `WhileSubscribed` zamanlayıcıları ana dağıtıcıda yaşamaya devam
+     * eder ve bir sonraki sınıfın `Dispatchers.setMain` çağrısı "used concurrently" ile düşer.
+     */
+    private val viewModelStore = ViewModelStore()
+
+    /** ViewModel'i test bitiminde temizlenmek üzere kaydeder. */
+    protected fun <T : ViewModel> kaydet(viewModel: T): T {
+        viewModelStore.put(System.identityHashCode(viewModel).toString(), viewModel)
+        return viewModel
+    }
+
     @Before
     fun ortamiKur() {
         TimeZone.setDefault(TimeZone.getTimeZone(zone))
@@ -119,6 +134,7 @@ abstract class VeriTestOrtami {
 
     @After
     fun ortamiKapat() {
+        viewModelStore.clear()
         db.close()
         dataStoreScope.cancel()
         Dispatchers.resetMain()
