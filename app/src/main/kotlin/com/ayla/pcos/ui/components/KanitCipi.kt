@@ -67,7 +67,7 @@ fun KanitCipi(level: EvidenceLevel, modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Icon(level.icon, contentDescription = null, tint = colors.lavanta, modifier = Modifier.size(14.dp))
+            Icon(level.icon, contentDescription = null, tint = colors.lavanta, modifier = Modifier.size(yaziOlcekli(14.dp)))
             Text(label, style = MaterialTheme.typography.labelMedium, color = colors.lavanta, maxLines = 1)
         }
     }

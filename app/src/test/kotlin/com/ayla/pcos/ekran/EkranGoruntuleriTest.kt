@@ -21,12 +21,15 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import com.ayla.pcos.R
 import com.ayla.pcos.ui.AppLockContent
 import com.ayla.pcos.ui.calendar.CalendarContent
 import com.ayla.pcos.ui.components.AltGezinme
+import com.ayla.pcos.ui.components.BatteryStatus
 import com.ayla.pcos.ui.log.DailyLogContent
 import com.ayla.pcos.ui.me.BackupImportState
 import com.ayla.pcos.ui.me.GizlilikPolitikasiIcerik
+import com.ayla.pcos.ui.me.HatirlatmaGunluguDialog
 import com.ayla.pcos.ui.me.MeContent
 import com.ayla.pcos.ui.me.SettingsContent
 import com.ayla.pcos.ui.meds.AddMedicationContent
@@ -139,7 +142,9 @@ class EkranGoruntuleriTest {
     )
 
     @Composable
-    private fun Ilaclar() = MedsContent(state = Ornek.ilaclar, onAdd = {}, onTaken = {}, onUndo = {}, onEdit = {})
+    private fun Ilaclar(pil: BatteryStatus = BatteryStatus.UNRESTRICTED, uretici: Int? = null) = MedsContent(
+        state = Ornek.ilaclar, onAdd = {}, onTaken = {}, onUndo = {}, onEdit = {}, batteryStatus = pil, oemNote = uretici,
+    )
 
     @Composable
     private fun IlacFormu(state: EditMedicationState) = EditMedicationContent(
@@ -261,6 +266,19 @@ class EkranGoruntuleriTest {
 
     @Test fun t33_koyu_beslenme() = ekran("33-koyu-beslenme", sekme = Screen.Plan, koyu = true) { Plan(sekme = 1) }
 
+    @Test fun t34_ilaclar_pil_bandi() = ekran("34-ilaclar-pil-bandi", sekme = Screen.Meds) {
+        Ilaclar(pil = BatteryStatus.OPTIMIZED, uretici = R.string.battery_oem_xiaomi)
+    }
+
+    @Test fun t35_hatirlatma_gunlugu() = ekran("35-hatirlatma-gunlugu", tumEkran = true) {
+        HatirlatmaGunluguDialog(entries = Ornek.alarmGunlugu, onShare = {}, onClear = {}, onDismiss = {}, now = Ornek.alarmSimdi, zone = Ornek.zone)
+    }
+
+    @Config(qualifiers = UZUN)
+    @Test fun y13_yazi200_hatirlatma_gunlugu() = ekran("y13-yazi200-hatirlatma-gunlugu", sistemYaziOlcegi = 2f, tumEkran = true) {
+        HatirlatmaGunluguDialog(entries = Ornek.alarmGunlugu, onShare = {}, onClear = {}, onDismiss = {}, now = Ornek.alarmSimdi, zone = Ornek.zone)
+    }
+
     @Config(qualifiers = BESLENME_TUM)
     @Test fun u09_beslenme_tum() = ekran("u09-beslenme-tum", sekme = Screen.Plan) { Plan(sekme = 1) }
 
@@ -311,13 +329,15 @@ class EkranGoruntuleriTest {
     @Test fun y04_yazi200_ben() = ekran("y04-yazi200-ben", sekme = Screen.Me, sistemYaziOlcegi = 2f) { MeContent(state = Ornek.ben, onOpenSettings = {}) }
 
     @Config(qualifiers = UZUN)
-    @Test fun y05_yazi200_ilaclar() = ekran("y05-yazi200-ilaclar", sekme = Screen.Meds, sistemYaziOlcegi = 2f) { Ilaclar() }
+    @Test fun y05_yazi200_ilaclar() = ekran("y05-yazi200-ilaclar", sekme = Screen.Meds, sistemYaziOlcegi = 2f) {
+        Ilaclar(pil = BatteryStatus.OPTIMIZED, uretici = R.string.battery_oem_samsung)
+    }
 
     @Config(qualifiers = UZUN)
     @Test fun y06_yazi200_ayarlar() = ekran("y06-yazi200-ayarlar", sistemYaziOlcegi = 2f) {
         SettingsContent(
             prefs = Ornek.ayarlar, exactAlarmsAllowed = true, snackbar = remember { SnackbarHostState() },
-            onBack = {}, onUpdate = {}, onExport = {}, onWipe = {},
+            onBack = {}, onUpdate = {}, onExport = {}, onWipe = {}, hasDoseReminders = true,
         )
     }
 
@@ -346,7 +366,7 @@ class EkranGoruntuleriTest {
     @Test fun u02_takvim_tum() = ekran("u02-takvim-tum", sekme = Screen.Calendar) { Takvim() }
 
     @Config(qualifiers = UZUN)
-    @Test fun u03_ilaclar_tum() = ekran("u03-ilaclar-tum", sekme = Screen.Meds) { Ilaclar() }
+    @Test fun u03_ilaclar_tum() = ekran("u03-ilaclar-tum", sekme = Screen.Meds) { Ilaclar(pil = BatteryStatus.BACKGROUND_RESTRICTED) }
 
     @Config(qualifiers = UZUN)
     @Test fun u04_planim_tum() = ekran("u04-planim-tum", sekme = Screen.Plan) { Plan() }
@@ -359,6 +379,7 @@ class EkranGoruntuleriTest {
         SettingsContent(
             prefs = Ornek.ayarlar, exactAlarmsAllowed = false, snackbar = remember { SnackbarHostState() },
             onBack = {}, onUpdate = {}, onExport = {}, onWipe = {},
+            hasDoseReminders = true, batteryStatus = BatteryStatus.OPTIMIZED, oemBatteryNote = R.string.battery_oem_samsung,
         )
     }
 

@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
+import com.ayla.pcos.data.repo.MedicationRepository
 import com.ayla.pcos.export.DataExporter
 import com.ayla.pcos.export.DataImporter
 import com.ayla.pcos.export.ExportBundle
 import com.ayla.pcos.export.ImportMode
 import com.ayla.pcos.export.ImportSummary
 import com.ayla.pcos.export.InvalidBackupException
+import com.ayla.pcos.reminders.AlarmLog
+import com.ayla.pcos.reminders.AlarmLogEntry
 import com.ayla.pcos.reminders.ReminderNotifier
 import com.ayla.pcos.reminders.ReminderScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,7 +49,18 @@ class SettingsViewModel @Inject constructor(
     private val importer: DataImporter,
     private val scheduler: ReminderScheduler,
     private val notifier: ReminderNotifier,
+    medications: MedicationRepository,
+    private val alarmLog: AlarmLog,
 ) : ViewModel() {
+
+    /** Doz hatırlatması olan biri için pil tasarrufu yönlendirmesi gösterilir (#17). */
+    val hasDoseReminders: StateFlow<Boolean> = medications.activeMedications
+        .map { meds -> meds.any { it.times.isNotEmpty() } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+
+    fun alarmLogEntries(): List<AlarmLogEntry> = alarmLog.read()
+
+    fun clearAlarmLog() = alarmLog.clear()
 
     val preferences: StateFlow<UserPreferences?> = prefs.preferences
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
@@ -111,6 +126,7 @@ class SettingsViewModel @Inject constructor(
     /** Tüm verileri ve tercihleri siler; uygulama karşılamaya döner. */
     fun wipeAll() = viewModelScope.launch {
         exporter.wipeAll()
+        alarmLog.clear()
         prefs.update { UserPreferences() }
         runCatching { scheduler.rescheduleAll() }
     }

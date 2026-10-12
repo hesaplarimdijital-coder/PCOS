@@ -39,6 +39,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.ayla.pcos.R
 import com.ayla.pcos.ui.components.AylaCard
+import com.ayla.pcos.ui.components.yaziOlcekli
 import com.ayla.pcos.ui.theme.LocalAylaColors
 
 /**
@@ -137,8 +138,8 @@ private fun TabakAciklamasi(colors: Pair<Color, Color>, labelRes: Int, examplesR
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
         Box(
             modifier = Modifier
-                .padding(top = 4.dp)
-                .size(14.dp)
+                .padding(top = yaziOlcekli(4.dp))
+                .size(yaziOlcekli(14.dp))
                 .background(colors.first, CircleShape)
                 .border(1.5.dp, colors.second, CircleShape),
         )

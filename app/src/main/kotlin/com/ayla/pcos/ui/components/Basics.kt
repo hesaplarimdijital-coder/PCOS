@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ayla.pcos.R
 import com.ayla.pcos.ui.navigation.Screen
@@ -157,6 +158,13 @@ fun YaziOlcegiSiniri(max: Float = DAR_ALAN_YAZI_SINIRI, content: @Composable () 
     val capped = if (density.fontScale > max) Density(density.density, max) else density
     CompositionLocalProvider(LocalDensity provides capped, content = content)
 }
+
+/**
+ * Yazıya eşlik eden küçük simge, nokta ve rozetlerin boyutu: yazı büyüdükçe [max] ölçeğe kadar büyür
+ * (14 dp simge %200 yazıda 21 dp). Aksi hâlde büyük yazının yanında simge kaybolur, rozet taşar.
+ */
+@Composable
+fun yaziOlcekli(base: Dp, max: Float = DAR_ALAN_YAZI_SINIRI): Dp = base * LocalDensity.current.fontScale.coerceIn(1f, max)
 
 private fun Screen.Tab.icon(selected: Boolean): ImageVector = when (this) {
     Screen.Today -> if (selected) Icons.Rounded.Today else Icons.Outlined.Today

@@ -1,5 +1,6 @@
 package com.ayla.pcos.ui.meds
 
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,12 +27,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ayla.pcos.R
 import com.ayla.pcos.data.db.MedicationEntity
@@ -40,10 +46,15 @@ import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
 import com.ayla.pcos.ui.components.BantTuru
+import com.ayla.pcos.ui.components.BatteryStatus
 import com.ayla.pcos.ui.components.DozSatiri
 import com.ayla.pcos.ui.components.Overline
+import com.ayla.pcos.ui.components.PilBandi
 import com.ayla.pcos.ui.components.SatirZemini
 import com.ayla.pcos.ui.components.UyariBandi
+import com.ayla.pcos.ui.components.batteryStatus
+import com.ayla.pcos.ui.components.oemBatteryNote
+import com.ayla.pcos.ui.components.openAppBatterySettings
 import com.ayla.pcos.ui.components.saatMetni
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import kotlin.math.roundToInt
@@ -51,12 +62,23 @@ import kotlin.math.roundToInt
 @Composable
 fun MedsScreen(onAdd: () -> Unit, onEdit: (Long) -> Unit, viewModel: MedsViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var battery by remember { mutableStateOf(batteryStatus(context)) }
+    // Pil ayarlarından dönünce yeniden oku.
+    LifecycleResumeEffect(Unit) {
+        battery = batteryStatus(context)
+        onPauseOrDispose { }
+    }
     MedsContent(
         state = state,
         onAdd = onAdd,
         onTaken = { viewModel.markTaken(it) },
         onUndo = { viewModel.undo(it) },
         onEdit = { onEdit(it.id) },
+        batteryStatus = battery,
+        oemNote = oemBatteryNote(Build.MANUFACTURER),
+        onOpenBatterySettings = { openAppBatterySettings(context) },
+        onDismissBatteryBand = { viewModel.dismissBatteryBand() },
     )
 }
 
@@ -68,6 +90,10 @@ internal fun MedsContent(
     onTaken: (DoseItem) -> Unit,
     onUndo: (DoseItem) -> Unit,
     onEdit: (MedicationEntity) -> Unit,
+    batteryStatus: BatteryStatus = BatteryStatus.UNRESTRICTED,
+    oemNote: Int? = null,
+    onOpenBatterySettings: () -> Unit = {},
+    onDismissBatteryBand: () -> Unit = {},
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -98,6 +124,19 @@ internal fun MedsContent(
                 }
             }
             return@LazyColumn
+        }
+
+        // Doz hatırlatması olanlara: bazı telefonlar uygulamayı uyutup alarmları geciktirir (#17). Kısıtlı
+        // arka plan uyarısı kapatılamaz; pil optimizasyonu bilgisi bir kez "Anladım" ile kapanır.
+        val showBattery = when (batteryStatus) {
+            BatteryStatus.UNRESTRICTED -> false
+            BatteryStatus.OPTIMIZED -> !state.batteryBandDismissed
+            BatteryStatus.BACKGROUND_RESTRICTED -> true
+        }
+        if (showBattery && state.medications.any { it.times.isNotEmpty() }) {
+            item {
+                PilBandi(status = batteryStatus, oemNote = oemNote, onOpenSettings = onOpenBatterySettings, onDismiss = onDismissBatteryBand)
+            }
         }
 
         item { Overline(stringResource(R.string.label_today)) }

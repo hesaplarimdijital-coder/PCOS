@@ -132,17 +132,20 @@ class ReminderScheduler @Inject constructor(
         ReminderPolicy.nextOccurrence(time, earliestDate, ZonedDateTime.now(clock))
 
     private fun scheduleAt(intent: Intent, at: ZonedDateTime) {
-        val pending = pendingIntent(intent)
         val millis = at.toInstant().toEpochMilli()
+        // Alıcı gecikmeyi günlüğe yazabilsin diye planlanan an ve alarm türü niyete eklenir (#17).
+        intent.putExtra(EXTRA_SCHEDULED_AT, millis)
         if (exactAlarmsAllowed()) {
             try {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, millis, pending)
+                intent.putExtra(EXTRA_EXACT, true)
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, millis, pendingIntent(intent))
                 return
             } catch (_: SecurityException) {
                 // izin tam bu anda geri alındıysa pencereli alarma düş
             }
         }
-        alarmManager.setWindow(AlarmManager.RTC_WAKEUP, millis, FALLBACK_WINDOW_MS, pending)
+        intent.putExtra(EXTRA_EXACT, false)
+        alarmManager.setWindow(AlarmManager.RTC_WAKEUP, millis, FALLBACK_WINDOW_MS, pendingIntent(intent))
     }
 
     private fun cancel(intent: Intent) {
@@ -195,6 +198,8 @@ class ReminderScheduler @Inject constructor(
         const val EXTRA_TIME = "time"
         const val EXTRA_DATE = "date"
         const val EXTRA_SNOOZED = "snoozed"
+        const val EXTRA_SCHEDULED_AT = "scheduled_at"
+        const val EXTRA_EXACT = "exact"
         const val SNOOZE_MINUTES = 15L
         private const val FALLBACK_WINDOW_MS = 10L * 60L * 1000L
         private const val REGISTRY_PREFS = "ayla_reminder_registry"

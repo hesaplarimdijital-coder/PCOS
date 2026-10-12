@@ -40,6 +40,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.ayla.pcos.R
 import com.ayla.pcos.ui.components.AylaCard
+import com.ayla.pcos.ui.components.YaziOlcegiSiniri
+import com.ayla.pcos.ui.components.yaziOlcekli
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalReducedMotion
 
@@ -124,20 +126,18 @@ private fun SureCipi(minutes: Int) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Icon(Icons.Rounded.Timer, contentDescription = null, modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSecondaryContainer)
+            Icon(Icons.Rounded.Timer, contentDescription = null, modifier = Modifier.size(yaziOlcekli(14.dp)), tint = MaterialTheme.colorScheme.onSecondaryContainer)
             Text(stringResource(R.string.movement_duration_short, minutes), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSecondaryContainer)
         }
     }
 }
 
+/** Adım numarası: daire yazıyla birlikte büyür, rakam en fazla dar alan ölçeğinde kalır (taşmaz). */
 @Composable
 private fun AdimNumarasi(number: Int) {
-    Box(
-        modifier = Modifier.size(26.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(26.dp)) {
-            Box(contentAlignment = Alignment.Center) {
+    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(yaziOlcekli(26.dp))) {
+        Box(contentAlignment = Alignment.Center) {
+            YaziOlcegiSiniri {
                 Text(number.toString(), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onPrimaryContainer)
             }
         }

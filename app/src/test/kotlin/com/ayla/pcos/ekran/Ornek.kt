@@ -17,6 +17,8 @@ import com.ayla.pcos.data.repo.Adherence
 import com.ayla.pcos.data.repo.DoseItem
 import com.ayla.pcos.data.repo.SymptomCatalog
 import com.ayla.pcos.export.ImportSummary
+import com.ayla.pcos.reminders.AlarmLogEntry
+import com.ayla.pcos.reminders.ReminderKind
 import com.ayla.pcos.ui.calendar.CalendarUiState
 import com.ayla.pcos.ui.calendar.CycleRow
 import com.ayla.pcos.ui.calendar.DayActions
@@ -203,6 +205,23 @@ internal object Ornek {
 
     val ilacDuzenle = EditMedicationState.from(inofolic, bugun)
     val hapDuzenle = EditMedicationState.from(hap, bugun)
+
+    /** Hatırlatma günlüğü: bugün 10:00'da bakılıyor; dün akşamki doz pil tasarrufu yüzünden gecikmiş. */
+    val alarmSimdi: Instant = bugun.atTime(10, 0).atZone(zone).toInstant()
+
+    val alarmGunlugu: List<AlarmLogEntry> = listOf(
+        alarmKaydi(ReminderKind.DOSE, 1, 9, 0, gecikmeSn = 4),
+        alarmKaydi(ReminderKind.WATER, 1, 11, 0, gecikmeSn = 310, exact = false),
+        alarmKaydi(ReminderKind.DAILY_CHECK, 1, 20, 0, gecikmeSn = 2),
+        alarmKaydi(ReminderKind.DOSE, 1, 21, 0, gecikmeSn = 23 * 60 + 40),
+        alarmKaydi(ReminderKind.EVENING, 1, 22, 30, gecikmeSn = 6),
+        alarmKaydi(ReminderKind.DOSE, 0, 9, 0, gecikmeSn = 12),
+    )
+
+    private fun alarmKaydi(kind: ReminderKind, gunOnce: Long, saat: Int, dakika: Int, gecikmeSn: Long, exact: Boolean = true): AlarmLogEntry {
+        val planned = bugun.minusDays(gunOnce).atTime(saat, dakika).atZone(zone).toInstant()
+        return AlarmLogEntry(kind, planned, planned.plusSeconds(gecikmeSn), exact)
+    }
 
     val karsilama = OnboardingState(step = 0, name = "Elif")
     val karsilamaHedefler = OnboardingState(step = 1, name = "Elif", goals = setOf(Goal.CYCLE, Goal.SYMPTOMS))

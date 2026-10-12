@@ -1,6 +1,7 @@
 package com.ayla.pcos.ui.me
 
 import android.content.res.Resources
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -23,9 +24,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.BatteryFull
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Policy
 import androidx.compose.material.icons.rounded.SettingsBackupRestore
 import androidx.compose.material.icons.rounded.Shield
@@ -74,21 +77,32 @@ import com.ayla.pcos.export.DataExporter
 import com.ayla.pcos.export.ImportMode
 import com.ayla.pcos.export.ImportSummary
 import com.ayla.pcos.export.InvalidBackupException
+import com.ayla.pcos.reminders.AlarmLogEntry
 import com.ayla.pcos.ui.components.AdimSayaci
 import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.BUYUK_YAZI_ESIGI
 import com.ayla.pcos.ui.components.BantTuru
+import com.ayla.pcos.ui.components.BatteryStatus
 import com.ayla.pcos.ui.components.CipEtiketi
 import com.ayla.pcos.ui.components.DegerSatiri
 import com.ayla.pcos.ui.components.Overline
+import com.ayla.pcos.ui.components.PilBandi
 import com.ayla.pcos.ui.components.SaatSeciciDialog
 import com.ayla.pcos.ui.components.SegmentEtiketi
 import com.ayla.pcos.ui.components.UyariBandi
+import com.ayla.pcos.ui.components.batteryStatus
+import com.ayla.pcos.ui.components.labelRes
+import com.ayla.pcos.ui.components.oemBatteryNote
+import com.ayla.pcos.ui.components.openAppBatterySettings
 import com.ayla.pcos.ui.components.openExactAlarmSettings
 import com.ayla.pcos.ui.components.openNotificationSettings
 import com.ayla.pcos.ui.components.saatMetni
 import com.ayla.pcos.ui.components.segmentSimgesi
+import com.ayla.pcos.ui.components.shareText
+import com.ayla.pcos.ui.theme.LocalAylaColors
+import java.time.Instant
 import java.time.LocalTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /** Ayar sınırları; arayüz ve testler aynı değerleri kullanır. */
@@ -117,11 +131,14 @@ fun SettingsScreen(
     val resources = LocalResources.current
     var exactAllowed by remember { mutableStateOf(viewModel.exactAlarmsAllowed()) }
     var notificationsEnabled by remember { mutableStateOf(viewModel.notificationsEnabled()) }
+    var battery by remember { mutableStateOf(batteryStatus(context)) }
+    val hasDoseReminders by viewModel.hasDoseReminders.collectAsStateWithLifecycle()
 
-    // Sistem ayarlarından dönünce izinleri yeniden oku.
+    // Sistem ayarlarından dönünce izinleri ve pil durumunu yeniden oku.
     LifecycleResumeEffect(Unit) {
         exactAllowed = viewModel.exactAlarmsAllowed()
         notificationsEnabled = viewModel.notificationsEnabled()
+        battery = batteryStatus(context)
         onPauseOrDispose { }
     }
 
@@ -166,6 +183,22 @@ fun SettingsScreen(
         onOpenPrivacyPolicy = onOpenPrivacyPolicy,
         onOpenNotificationSettings = { openNotificationSettings(context) },
         onOpenExactAlarmSettings = { openExactAlarmSettings(context) },
+        hasDoseReminders = hasDoseReminders,
+        batteryStatus = battery,
+        oemBatteryNote = oemBatteryNote(Build.MANUFACTURER),
+        onOpenBatterySettings = { openAppBatterySettings(context) },
+        alarmLogEntries = viewModel::alarmLogEntries,
+        onClearAlarmLog = viewModel::clearAlarmLog,
+        onShareAlarmLog = { entries ->
+            // Cihaz ve izin satırları gecikmenin nedenini anlamaya yarar; ilaç adı günlükte zaten yok.
+            val deviceLines = listOf(
+                resources.getString(R.string.alarm_log_share_device, "${Build.MANUFACTURER} ${Build.MODEL}", Build.VERSION.RELEASE),
+                resources.getString(R.string.alarm_log_share_exact, resources.getString(if (exactAllowed) R.string.state_on else R.string.state_off)),
+                resources.getString(R.string.alarm_log_share_battery, resources.getString(battery.labelRes())),
+            )
+            val subject = resources.getString(R.string.alarm_log_share_subject)
+            shareText(context, subject, AlarmLogText.shareText(resources, entries, deviceLines, Instant.now(), ZoneId.systemDefault()), subject)
+        },
     )
 }
 
@@ -187,8 +220,17 @@ internal fun SettingsContent(
     onImportConfirm: (ImportMode) -> Unit = {},
     onImportCancel: () -> Unit = {},
     onOpenPrivacyPolicy: () -> Unit = {},
+    hasDoseReminders: Boolean = false,
+    batteryStatus: BatteryStatus = BatteryStatus.UNRESTRICTED,
+    oemBatteryNote: Int? = null,
+    onOpenBatterySettings: () -> Unit = {},
+    alarmLogEntries: () -> List<AlarmLogEntry> = { emptyList() },
+    onShareAlarmLog: (List<AlarmLogEntry>) -> Unit = {},
+    onClearAlarmLog: () -> Unit = {},
+    initialAlarmLog: List<AlarmLogEntry>? = null,
 ) {
     val p = prefs
+    var alarmLog by remember { mutableStateOf(initialAlarmLog) }
     var confirmWipe by remember { mutableStateOf(false) }
     var confirmReplace by remember { mutableStateOf(false) }
     var editingName by rememberSaveable { mutableStateOf(false) }
@@ -281,6 +323,16 @@ internal fun SettingsContent(
                     )
                     Spacer(Modifier.height(8.dp))
                 }
+                // Doz hatırlatması varsa pil durumu her zaman görünür (#17); bildirimler kapalıyken anlamsız.
+                if (hasDoseReminders && notificationsEnabled) {
+                    if (batteryStatus == BatteryStatus.UNRESTRICTED) {
+                        PilDurumuSatiri()
+                        HorizontalDivider()
+                    } else {
+                        PilBandi(status = batteryStatus, oemNote = oemBatteryNote, onOpenSettings = onOpenBatterySettings)
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
                 AyarSatiri(R.string.settings_cycle_notifications, R.string.settings_cycle_notifications_text, p.cycleNotificationsEnabled) { v -> onUpdate { it.copy(cycleNotificationsEnabled = v) } }
                 HorizontalDivider()
                 AyarSatiri(R.string.settings_progress_notifications, R.string.settings_progress_notifications_text, p.progressNotificationsEnabled) { v -> onUpdate { it.copy(progressNotificationsEnabled = v) } }
@@ -314,6 +366,8 @@ internal fun SettingsContent(
                         onClick = { editingTime = SaatAlani.QUIET_END },
                     )
                 }
+                HorizontalDivider()
+                EylemSatiri(Icons.Rounded.History, R.string.alarm_log_title, R.string.alarm_log_row_text) { alarmLog = alarmLogEntries() }
             }
 
             Grup(stringResource(R.string.settings_section_protection)) {
@@ -409,6 +463,18 @@ internal fun SettingsContent(
                 editingTime = null
                 onUpdate { it.withTime(field, time) }
             },
+        )
+    }
+
+    alarmLog?.let { entries ->
+        HatirlatmaGunluguDialog(
+            entries = entries,
+            onShare = { onShareAlarmLog(entries) },
+            onClear = {
+                onClearAlarmLog()
+                alarmLog = emptyList()
+            },
+            onDismiss = { alarmLog = null },
         )
     }
 
@@ -619,6 +685,18 @@ private fun AdDialog(initial: String, onDismiss: () -> Unit, onSave: (String) ->
         confirmButton = { TextButton(onClick = { onSave(name) }) { Text(stringResource(R.string.action_save)) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )
+}
+
+/** Pil tasarrufu Ayla'yı kısıtlamıyorsa: simge + kısa durum (renk tek başına anlam taşımaz). */
+@Composable
+private fun PilDurumuSatiri() {
+    Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(vertical = 10.dp)) {
+        Icon(Icons.Rounded.BatteryFull, contentDescription = null, tint = LocalAylaColors.current.basari)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(stringResource(R.string.battery_unrestricted), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.battery_unrestricted_text), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
 }
 
 @Composable

@@ -1,4 +1,4 @@
-# İlk cihaz testi (MVP 1 debug APK)
+# İlk cihaz testi (debug APK)
 
 CI her `main` push'unda debug APK üretir. Ajan oturumları uygulamayı çalıştıramaz; bu liste gerçek cihazda
 ilk kez açan kişi içindir. Bulguları GitHub Issues'a (etiket `mvp-1`) yaz.
@@ -32,8 +32,24 @@ ilk kez açan kişi içindir. Bulguları GitHub Issues'a (etiket `mvp-1`) yaz.
 | 18 | Telefonu yeniden başlat | Bir sonraki doz alarmı yine çalar (SystemEventReceiver) |
 | 19 | Sessiz saatlerde (22:30–08:00) su hatırlatması | Gelmez; akşam rutini açıksa 22:30'da gelir |
 | 20 | Ben → Doktor notu | Paylaşım menüsü açılır; metnin en üstünde "tanı ya da tıbbi tavsiye içermez" ibaresi, altında döngü, ilaç uyumu ve son 4 hafta semptomları |
-| 21 | Ayarlar: Tüm verilerimi sil → onayla | Karşılama ekranına dönülür, veriler ve ilaçlar silinmiştir |
+| 21 | Ayarlar: Yedekten geri yükle → 13. adımdaki dosya → Birleştir | Önizlemede tarih ve kayıt sayıları; sonuç "N kayıt zaten vardı" der, hiçbir kayıt ikilenmez |
+| 22 | Planım → Beslenme: bir kanıt çipine dokun; "Yürüyüş rutinini aç" | Çip düzeyin ne anlama geldiğini açıklar; Hareket sekmesine geçilir, yürüyüş rutininin adımları açık |
+| 23 | İlaçlar (doz saati olan bir ilaç varken), pil ayarı "Optimize edilmiş" | "Hatırlatmaların gecikmesin" bandı; Xiaomi/Samsung vb. cihazda üreticiye özel ek not. "Pil ayarlarını aç" uygulama bilgilerini açar; "Kısıtlanmamış" seçip dönünce bant kaybolur, Ayarlar > Bildirimler'de "Pil tasarrufu kısıtlamıyor" yazar |
+| 24 | Uygulama bilgileri > Pil > "Kısıtlanmış" | İlaçlar'da kapatılamayan "Arka plan kullanımı kısıtlı" bandı |
+| 25 | Ayarlar: Tüm verilerimi sil → onayla | Karşılama ekranına dönülür, veriler, ilaçlar ve hatırlatma günlüğü silinmiştir |
+
+## 48 saatlik alarm güvenilirliği (#17)
+Üreticilerin pil tasarrufu kuralları emülatörde görülmez; bu test her yeni cihaz modelinde bir kez yapılır.
+
+1. Inofolic Combi'yi (09:00 ve 21:00) ekle, su hatırlatmasını ve akşam rutinini açık bırak. Pil ayarına
+   dokunma (varsayılan "Optimize edilmiş"); telefonu normal kullan, geceleri ekran kapalı beklesin.
+2. 48 saat sonra Ayarlar > Bildirimler > Hatırlatma günlüğü. Beklenen: tam zamanlı alarm izni açıkken doz
+   gecikmeleri 1 dakikanın altında; izin kapalıyken en fazla 10 dakika. Beklenen saatte kaydı olmayan bir doz,
+   alarmın hiç çalmadığı anlamına gelir.
+3. "10 dakikadan fazla gecikti" satırı çıkıyorsa ya da kayıt eksikse: İlaçlar'daki banttan pil ayarını
+   "Kısıtlanmamış" yap, üreticiye özel notu uygula, günlüğü temizleyip 48 saati tekrarla.
+4. Günlükte Paylaş → metni cihaz testi issue'suna (#5, #7) yapıştır. Metin cihaz modelini, Android sürümünü,
+   tam zamanlı alarm iznini ve pil durumunu kendisi ekler; ilaç adı içermez.
 
 ## Bilinen eksikler
-Health Connect uyku içe aktarma (#11), beslenme/hareket içeriği (#12) ve widget (#14) MVP 2'dedir.
-Gerçek cihazda alarm güvenilirliği (üretici pil optimizasyonları) için #17.
+Health Connect uyku içe aktarma (#11) ve widget (#14) MVP 2'nin kalan işleridir.

@@ -20,6 +20,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
@@ -42,6 +43,7 @@ class ReminderReceiver : BroadcastReceiver() {
     @Inject lateinit var dailyLogRepository: DailyLogRepository
     @Inject lateinit var prefs: UserPreferencesRepository
     @Inject lateinit var clock: Clock
+    @Inject lateinit var alarmLog: AlarmLog
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -49,9 +51,24 @@ class ReminderReceiver : BroadcastReceiver() {
         if (intent.action != ReminderScheduler.ACTION_FIRE) return
         val kind = intent.getStringExtra(ReminderScheduler.EXTRA_KIND)
             ?.let { runCatching { ReminderKind.valueOf(it) }.getOrNull() } ?: return
+        val firedAt = clock.instant()
         val pending = goAsync()
         scope.launch {
             try {
+                // Gecikme günlüğü (#17); yazılamazsa hatırlatma yine işlenir.
+                val scheduledAt = intent.getLongExtra(ReminderScheduler.EXTRA_SCHEDULED_AT, -1L)
+                if (scheduledAt > 0) {
+                    runCatching {
+                        alarmLog.record(
+                            AlarmLogEntry(
+                                kind = kind,
+                                scheduledAt = Instant.ofEpochMilli(scheduledAt),
+                                firedAt = firedAt,
+                                exact = intent.getBooleanExtra(ReminderScheduler.EXTRA_EXACT, false),
+                            ),
+                        )
+                    }
+                }
                 when (kind) {
                     ReminderKind.DOSE -> handleDose(context, intent)
                     ReminderKind.DAILY_CHECK -> handleDailyCheck(context)

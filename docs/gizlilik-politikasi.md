@@ -56,6 +56,7 @@ Aşağıdaki kayıtların hepsi yalnızca bu cihazda tutulur ve sen silene ya da
 - **Neden:** hatırlatma göndermek, hap paketini takip etmek, stok azaldığında haber vermek ve uyumunu göstermek. Ayla doz hesaplamaz, ilaç önermez ve etkileşim uyarısı vermez; ilaç adlarını sen girersin.
 - **Nerede:** şifreli veritabanında. Hatırlatma alarmları Android'in alarm hizmetine yalnızca kayıt numarası, gün ve saatle kurulur; ilacın adı bu alarmlara yazılmaz.
 - **Nasıl silinir:** bir ilacı listeden kaldırdığında hatırlatmaları durur, ancak geçmiş doz kayıtları uyum geçmişin için saklanmaya devam eder. Bunları da silmek için Tüm verilerimi sil'i kullan.
+- **Hatırlatma günlüğü:** hatırlatmaların zamanında çalıp çalmadığını görebilmen için son 200 hatırlatmanın türü (doz, su, günlük kontrol, akşam rutini ya da haftalık özet), planlandığı ve gerçekten çaldığı an ve alarmın tam zamanlı olup olmadığı kaydedilir. İlacın adı ya da kayıt numarası yazılmaz. Günlük, 3.6. bölümdeki ayar dosyası gibi Ayla'nın uygulama alanında tutulur; Ben > Ayarlar > Bildirimler > Hatırlatma günlüğü > Temizle ile ya da Tüm verilerimi sil ile silinir.
 
 ### 3.4 Su
 
@@ -122,6 +123,7 @@ Ayla kişisel verilerini yurt içinde ya da yurt dışında hiçbir üçüncü k
 Verilerin yalnızca senin açıkça başlattığın şu işlemlerle cihazından çıkabilir:
 
 - **Doktor notu:** Ben ekranındaki doktor notu, son 28 güne ait döngü, ilaç ve semptom özetini düz metin olarak hazırlar ve Android'in paylaşım menüsünü açar. Metni hangi uygulamayla kime göndereceğini sen seçersin; Ayla metni kendisi hiçbir yere göndermez. Gönderdiğin uygulamanın koşulları geçerli olur.
+- **Hatırlatma günlüğü:** Ayarlar'daki hatırlatma günlüğünde Paylaş'a dokunursan günlük; telefonunun markası ve modeli, Android sürümü, tam zamanlı alarm izni ve pil ayarı durumuyla birlikte düz metin olarak hazırlanır ve paylaşım menüsü açılır. Kime göndereceğini sen seçersin; Ayla metni kendisi hiçbir yere göndermez.
 - **Dışa aktarma:** Ben > Ayarlar > Verilerin > Verilerimi dışa aktar, tüm kayıtlarını ve ayarlarını (rıza ve koruma ayarları hariç) bir JSON dosyasına yazar ve dosyayı senin seçtiğin yere kaydeder. Bu dosya şifrelenmez; içindeki sağlık verilerini dosyaya erişen herkes okuyabilir. Dosyayı güvendiğin bir yerde sakla; bir bulut hizmetine kaydedersen o hizmetin koşulları geçerli olur.
 - **Yedekten geri yükleme:** seçtiğin dosya yalnızca cihazında okunur; kayıtlarına eklenir ya da sen seçersen onların yerine yazılır.
 

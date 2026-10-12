@@ -12,6 +12,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -289,7 +291,11 @@ fun SuSatiri(cups: Int, goal: Int, onAdd: () -> Unit, modifier: Modifier = Modif
 
 enum class BantTuru { BILGI, DIKKAT, HATA }
 
-/** Uyarı bandı: ikon, başlık, gövde ve isteğe bağlı eylem. Korku dili yok; ne oldu, ne yapılabilir. */
+/**
+ * Uyarı bandı: ikon, başlık, gövde ve isteğe bağlı eylem. Korku dili yok; ne oldu, ne yapılabilir.
+ * Düğmeler büyük yazıda sığmazsa alt satıra geçer (ikinci düğme sıkışmaz).
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun UyariBandi(
     tur: BantTuru,
@@ -316,7 +322,7 @@ fun UyariBandi(
                 Spacer(Modifier.height(4.dp))
                 Text(text, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurface)
                 if ((actionLabel != null && onAction != null) || (dismissLabel != null && onDismiss != null)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         if (actionLabel != null && onAction != null) {
                             TextButton(onClick = onAction, contentPadding = ButtonDefaults.TextButtonContentPadding, modifier = Modifier.widthIn(min = 48.dp)) {
                                 Text(actionLabel, color = scheme.onSurface, fontWeight = FontWeight.Bold)

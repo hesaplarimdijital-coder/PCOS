@@ -52,4 +52,6 @@ data class UserPreferences(
     val lastLongCycleAlertKey: String = "",
     /** "Bildirimler kapalı" bandı kapatıldı; bildirimler yeniden açılınca sıfırlanır. */
     val notificationsBandDismissed: Boolean = false,
+    /** İlaçlar ekranındaki pil tasarrufu bandı kapatıldı; Ayarlar'daki satır her zaman görünür. */
+    val batteryBandDismissed: Boolean = false,
 )

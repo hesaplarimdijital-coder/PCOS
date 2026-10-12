@@ -3,6 +3,7 @@ package com.ayla.pcos.ui.meds
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayla.pcos.data.db.MedicationEntity
+import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.data.repo.Adherence
 import com.ayla.pcos.data.repo.DateTicker
 import com.ayla.pcos.data.repo.DoseItem
@@ -28,6 +29,7 @@ data class MedsUiState(
     val medications: List<MedicationEntity> = emptyList(),
     val todayDoses: List<DoseItem> = emptyList(),
     val weekAdherence: Adherence = Adherence(0, 0),
+    val batteryBandDismissed: Boolean = false,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -35,6 +37,7 @@ data class MedsUiState(
 class MedsViewModel @Inject constructor(
     private val repository: MedicationRepository,
     private val ticker: DateTicker,
+    private val prefs: UserPreferencesRepository,
 ) : ViewModel() {
 
     val uiState: StateFlow<MedsUiState> = ticker.today.flatMapLatest { today ->
@@ -43,14 +46,20 @@ class MedsViewModel @Inject constructor(
             repository.activeMedications,
             repository.observeDoses(today),
             repository.observeAdherence(weekStart, today),
-        ) { meds, doses, adherence ->
-            MedsUiState(loading = false, today = today, medications = meds, todayDoses = doses, weekAdherence = adherence)
+            prefs.preferences,
+        ) { meds, doses, adherence, p ->
+            MedsUiState(
+                loading = false, today = today, medications = meds, todayDoses = doses, weekAdherence = adherence,
+                batteryBandDismissed = p.batteryBandDismissed,
+            )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MedsUiState())
 
     fun markTaken(item: DoseItem) = viewModelScope.launch { repository.markTaken(item.medication.id, item.date, item.time) }
 
     fun undo(item: DoseItem) = viewModelScope.launch { repository.markPending(item.medication.id, item.date, item.time) }
+
+    fun dismissBatteryBand() = viewModelScope.launch { prefs.update { it.copy(batteryBandDismissed = true) } }
 
     /** Şablondan ekler; doğum kontrol hapında [packStart] paketin ilk hapının günüdür. */
     fun addTemplate(template: MedicationTemplates.Template, packStart: LocalDate?) = viewModelScope.launch {
