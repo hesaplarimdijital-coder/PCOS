@@ -13,3 +13,6 @@
 -keepclasseswithmembers class com.ayla.pcos.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
+
+# Navigation 3 geri yığını anahtarları süreç ölümünde yansımayla (Class.forName + serializer()) yazılır/okunur
+-keepnames class com.ayla.pcos.ui.navigation.** implements androidx.navigation3.runtime.NavKey

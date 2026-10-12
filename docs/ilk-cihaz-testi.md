@@ -65,6 +65,15 @@ ilk kez açan kişi içindir. Bulguları GitHub Issues'a (etiket `mvp-1` ya da `
 2. Dosya galeride ya da İndirilenler'de görünmez; uygulama kapatılıp açılınca önbellekteki eski raporlar silinir.
 3. Ekran görüntüsü engeli açıkken rapor ekranı ve paylaşım önizlemesi karartılır.
 
+## Gezinme (Navigation 3, #22)
+1. İlaçlar > İlaç ekle > "Listede yok" → form; geri tuşu formdan listeye, bir daha geri → İlaçlar, bir daha → Bugün,
+   bir daha → uygulama kapanır (öngörücü geri kaydırmasında itilen ekran yana kayarak çekilir).
+2. Takvim'de aşağı kaydır, Bugün'e geç, Takvim'e dön: kaydırma konumu korunur. Günlük kayıt açıkken uygulamayı
+   "Son uygulamalar"dan kapatmadan geliştirici seçeneklerinde "Etkinlikleri tutma" ile süreci öldür: aynı kayıt
+   ekranı geri gelir.
+3. Bildirime ve widget'a dokunmak ilgili sekmeyi (`EXTRA_OPEN`) açar; açık bir ayrıntı ekranı varsa kapanır.
+4. Ayarlar > Erişilebilirlik > Animasyonları kaldır açıkken ekran geçişleri anında olur.
+
 ## Bilinen eksikler
 Erişilebilirlik ve boş/hata durumlarının cihazda denetimi (#5) ile bildirim izni reddi akışının son hâli (#7)
 gerçek cihaz gerektirir. Widget'ın `exported="false"` sağlayıcıyla güncellendiği ve kilit ekranı dışı

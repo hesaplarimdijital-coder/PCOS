@@ -151,3 +151,50 @@ kadar bekler.
   https://github.com/androidx/androidx/tree/androidx-main/navigation3/navigation3-ui
 - Android 17 davranış değişiklikleri: https://developer.android.com/about/versions/17/behavior-changes-17
 - Ayrıntılı sürüm tablosu ve katalog önerileri: `docs/arastirma/mvp2-teknik-notlar.md`
+
+## Uygulama (Ekim 2026) — #22: Navigation 3'e geçildi
+
+- Tarih: 2026-10-12 · Durum: Uygulandı · Tetik: ölçüt 1 (MVP 3'ün cilt bakımı, LH/BBT ve doktor raporu
+  ekranlarıyla 12 hedef aşılacak) ve ölçüt 5 (MVP 3 planlaması). Geçiş, MVP 3 ekranlarından önce ayrı ve
+  işlev değiştirmeyen bir değişiklik olarak yapıldı.
+
+### Ne yapıldı
+- `navigation3-runtime` / `navigation3-ui` **1.2.0** (kararlı, 23 Eylül 2026). `lifecycle-viewmodel-navigation3`
+  katalogda hazır (`lifecycle` sürüm ref'i), henüz bağımlılık değil (aşağıya bakın).
+- `Screen` sealed arayüzü `NavKey` oldu; her alt tür `@Serializable` ve yalnızca ilkel değer taşıyor
+  (`LocalDate` → ISO metin serileştiricisi `data/IsoSerializers.kt`). `route`/`fromRoute` simetrisi kaldı
+  (sekme kaydı ve testler için).
+- Geri yığını `rememberNavBackStack(TabsRoot)`: kök giriş `TabsRoot` hiç çıkmaz, üstüne itilen `Screen`'ler
+  gelir. Beş sekme kök girişin **içinde** değişir (`SekmeKoku`: `AnimatedContent` + sekme başına
+  `SaveableStateProvider`); seçili sekme ayrı `rememberSaveable` ile tutulur. Böylece sekme ViewModel'leri
+  sıcak kalır, sekme değişimi geri yığınına girmez ve "sekme değişimi yığını boşaltır / geri önce yığın sonra
+  Bugün" davranışı birebir korunur. `AylaNavigator` bu kuralları `MutableList<NavKey>` üzerinde uygular ve
+  Compose'suz test edilir (`NavigatorTest`: geçişin kabul testleri, 7 test).
+- `NavDisplay(backStack, onBack, transitionSpec, popTransitionSpec, predictivePopTransitionSpec, entryProvider)`:
+  itme/çıkarma animasyonları eskisiyle aynı (`AylaMotion.enter()`, kayma + solma); **öngörücü geri** artık
+  NavDisplay'den gelir; "Animasyonları kaldır" açıkken geçişler anında biter. Yığın boşken Bugün dışındaki
+  sekmeden geri tuşu `BackHandler` ile Bugün'e döner (NavDisplay'in işleyicisi yalnızca önceki giriş varken
+  etkindir; ikisi çakışmaz). 720 dp ortalama `NavDisplay` çevresinde.
+- `rememberSaveableStateHolderNavEntryDecorator` (varsayılan) ile itilen ekranların `rememberSaveable` durumu
+  korunur; sekme içi durum da `SekmeKoku`'daki tutucu ile (ilk güncellemedeki hazırlık 1 böylece kapandı).
+- CI (`android.yml`, "Compose BOM uyumu"): `dependencyInsight` ile `androidx.compose.runtime:runtime`,
+  `ui:ui` ve `animation:animation`'ın BOM kısıtının üstüne çekilmediği doğrulanır (engelleyici koşul).
+- R8: NavKey sınıf adları korunur (`-keepnames`), çünkü `NavKeySerializer` `Class.forName` + `serializer()`
+  yansımasıyla yazar/okur; `serializer()` üyeleri zaten korunuyordu.
+
+### Bilinçli olarak yapılmayan
+- **Entry kapsamlı ViewModel yok** (`rememberViewModelStoreNavEntryDecorator` eklenmedi, #27). Entry kapsamı,
+  ekran yığından çıkar çıkmaz `viewModelScope`'u iptal eder; bugün birkaç yazma "ateşle ve unut" biçiminde
+  (`AddMedicationScreen` → `addTemplate()` + hemen `onDone()`, `SettingsViewModel.update/exportTo/…`). Önce
+  bu yazmalar uygulama kapsamına taşınır, sonra dekoratör eklenir. `DailyLogViewModel`/`EditMedicationViewModel`
+  `load(key)` kalıbı o zamana dek kalır.
+- Sekme başına korunan yığın yok (ürün davranışı "sekme değişimi yığını boşaltır").
+- Liste-ayrıntı (`SceneStrategy`) yok; ölçüt 2 gerçekleşince özel `Scene` ile denenir.
+- Derin bağlantı eşleyicileri kullanılmadı; `EXTRA_OPEN` hedefleri (bildirim, widget) `selectTab` ile sürüyor.
+
+### Sonuçlar
++ MVP 3 ekranları `entryProvider`'a birer `entry<K>` satırı olarak eklenir; 12 sınırı kalktı.
++ Öngörücü geri önizlemesi itilen ekranlarda hazır; süreç ölümünde yığın serileştirilerek döner.
+− Yeni geçişli bağımlılıklar: `navigationevent-compose`, `savedstate-compose` (ikisi de AndroidX; izin yok).
+− Ekran görüntüsü testleri kabuğu (`MainShell`) çizmez; gezinme davranışı yalnızca birim testleriyle ve
+  cihazda doğrulanır (`docs/ilk-cihaz-testi.md`).

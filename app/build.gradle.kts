@@ -130,6 +130,9 @@ dependencies {
     implementation(libs.androidx.health.connect)
     // Fotoğraf yön etiketi (ADR-0010): platform ExifInterface yerine önerilen AndroidX sürümü (Robolectric'te de çalışır).
     implementation(libs.androidx.exifinterface)
+    // Gezinme: Navigation 3 kararlı 1.2.0 (ADR-0003, #22). VM kapsamı dekoratörü sonraki adımda (#27).
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
 
     // Veri
     implementation(libs.androidx.room.runtime)

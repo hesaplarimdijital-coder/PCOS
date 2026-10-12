@@ -2,6 +2,10 @@ package com.ayla.pcos.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +37,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.scene.Scene
+import androidx.navigation3.ui.NavDisplay
 import com.ayla.pcos.R
 import com.ayla.pcos.ui.calendar.CalendarScreen
 import com.ayla.pcos.ui.components.AltGezinme
@@ -45,10 +54,12 @@ import com.ayla.pcos.ui.meds.EditMedicationScreen
 import com.ayla.pcos.ui.meds.MedsScreen
 import com.ayla.pcos.ui.navigation.AylaNavigator
 import com.ayla.pcos.ui.navigation.Screen
+import com.ayla.pcos.ui.navigation.TabsRoot
 import com.ayla.pcos.ui.navigation.rememberAylaNavigator
 import com.ayla.pcos.ui.onboarding.OnboardingScreen
 import com.ayla.pcos.ui.plan.PlanScreen
 import com.ayla.pcos.ui.theme.AylaMotion
+import com.ayla.pcos.ui.theme.LocalReducedMotion
 import com.ayla.pcos.ui.today.TodayScreen
 
 /**
@@ -129,6 +140,10 @@ fun AylaRoot(
  * [openTarget] dışarıdan (bildirim, başlatıcı) gelebilir; yalnızca sekme seçer. Yedek geri yükleme
  * ise yalnızca uygulama içinden ([restoreRequested]) açılır: başka bir uygulamanın gönderdiği bir intent
  * dosya seçiciyi açtıramaz.
+ *
+ * Gezinme Navigation 3 ile (ADR-0003): geri yığını [TabsRoot] + itilen ekranlardır; sekmeler kök girişin
+ * içinde değişir ve yığına girmez. İtilen ekranlar için öngörücü geri hareketi NavDisplay'dedir; yığın
+ * boşken Bugün dışındaki sekmeden geri, Bugün'e döner.
  */
 @Composable
 private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit, restoreRequested: Boolean, onRestoreOpened: () -> Unit) {
@@ -152,7 +167,24 @@ private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit, res
         if (openTarget != null) onOpenTargetConsumed()
     }
 
-    BackHandler(enabled = navigator.canGoBack) { navigator.pop() }
+    // Yığın varken geri tuşunu NavDisplay işler (öngörücü geri dâhil); yalnızca sekme kökündeyken burası.
+    BackHandler(enabled = navigator.showsBottomBar && navigator.tab != Screen.Today) { navigator.pop() }
+
+    val reducedMotion = LocalReducedMotion.current
+    val pushTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> ContentTransform = {
+        if (reducedMotion) {
+            EnterTransition.None togetherWith ExitTransition.None
+        } else {
+            slideInHorizontally(AylaMotion.enter()) { it / 6 } + fadeIn(tween(220)) togetherWith fadeOut(tween(160))
+        }
+    }
+    val popTransition: AnimatedContentTransitionScope<Scene<NavKey>>.() -> ContentTransform = {
+        if (reducedMotion) {
+            EnterTransition.None togetherWith ExitTransition.None
+        } else {
+            fadeIn(tween(220)) togetherWith slideOutHorizontally(tween(260)) { it / 6 } + fadeOut(tween(160))
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -161,61 +193,78 @@ private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit, res
             }
         },
     ) { padding ->
-        val current = navigator.current
-        AnimatedContent(
-            targetState = current,
-            modifier = Modifier.fillMaxSize().padding(padding),
-            transitionSpec = {
-                val pushing = targetState !is Screen.Tab && initialState is Screen.Tab
-                val popping = targetState is Screen.Tab && initialState !is Screen.Tab
-                when {
-                    pushing -> slideInHorizontally(AylaMotion.enter()) { it / 6 } + fadeIn(tween(220)) togetherWith
-                        fadeOut(tween(160))
-                    popping -> fadeIn(tween(220)) togetherWith
-                        slideOutHorizontally(tween(260)) { it / 6 } + fadeOut(tween(160))
-                    else -> fadeIn(tween(240)) togetherWith fadeOut(tween(160))
-                }
-            },
-            label = "screen",
-        ) { screen ->
-            // Android 17 büyük ekranlarda yönlendirme/boyut kısıtlarını yok sayar: içerik ortalanır,
-            // 720 dp'den geniş olmaz; telefonlarda etkisizdir.
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-                Box(modifier = Modifier.widthIn(max = 720.dp).fillMaxSize()) {
-                    ScreenHost(screen, navigator)
-                }
-            }
+        // Android 17 büyük ekranlarda yönlendirme/boyut kısıtlarını yok sayar: içerik ortalanır,
+        // 720 dp'den geniş olmaz; telefonlarda etkisizdir.
+        Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
+            NavDisplay(
+                backStack = navigator.backStack,
+                modifier = Modifier.widthIn(max = 720.dp).fillMaxSize(),
+                onBack = { navigator.pop() },
+                transitionSpec = pushTransition,
+                popTransitionSpec = popTransition,
+                predictivePopTransitionSpec = { _ -> popTransition() },
+                entryProvider = entryProvider<NavKey> {
+                    entry<TabsRoot> { SekmeKoku(navigator) }
+                    entry<Screen.DailyLog> { key -> DailyLogScreen(date = key.date, onClose = { navigator.pop() }) }
+                    entry<Screen.AddMedication> {
+                        AddMedicationScreen(
+                            onDone = { navigator.pop() },
+                            onCustom = { navigator.replaceTop(Screen.EditMedication(0)) },
+                        )
+                    }
+                    entry<Screen.EditMedication> { key -> EditMedicationScreen(id = key.id, onDone = { navigator.pop() }) }
+                    entry<Screen.Settings> {
+                        SettingsScreen(onBack = { navigator.pop() }, onOpenPrivacyPolicy = { navigator.push(Screen.PrivacyPolicy) })
+                    }
+                    entry<Screen.RestoreBackup> {
+                        SettingsScreen(
+                            onBack = { navigator.pop() },
+                            autoStartImport = true,
+                            onOpenPrivacyPolicy = { navigator.push(Screen.PrivacyPolicy) },
+                        )
+                    }
+                    entry<Screen.PrivacyPolicy> { GizlilikPolitikasiEkrani(onBack = { navigator.pop() }) }
+                },
+            )
         }
     }
 }
 
+/**
+ * Kök giriş: seçili sekmenin ekranı. Sekme ViewModel'leri Activity kapsamındadır (sekme değişiminde sıcak);
+ * ekran içi durum (kaydırma konumu vb.) sekme başına saklanır ki sekmeler arasında gidip gelince kaybolmasın.
+ */
 @Composable
-private fun ScreenHost(screen: Screen, navigator: AylaNavigator) {
-    when (screen) {
-        Screen.Today -> TodayScreen(
-            onOpenLog = { date -> navigator.push(Screen.DailyLog(date)) },
-            onOpenMeds = { navigator.selectTab(Screen.Meds) },
-            onOpenSettings = { navigator.push(Screen.Settings) },
-        )
-        Screen.Calendar -> CalendarScreen(onOpenLog = { date -> navigator.push(Screen.DailyLog(date)) })
-        Screen.Meds -> MedsScreen(
-            onAdd = { navigator.push(Screen.AddMedication) },
-            onEdit = { id -> navigator.push(Screen.EditMedication(id)) },
-        )
-        Screen.Plan -> PlanScreen()
-        Screen.Me -> MeScreen(onOpenSettings = { navigator.push(Screen.Settings) })
-        is Screen.DailyLog -> DailyLogScreen(date = screen.date, onClose = { navigator.pop() })
-        Screen.AddMedication -> AddMedicationScreen(
-            onDone = { navigator.pop() },
-            onCustom = { navigator.replaceTop(Screen.EditMedication(0)) },
-        )
-        is Screen.EditMedication -> EditMedicationScreen(id = screen.id, onDone = { navigator.pop() })
-        Screen.Settings -> SettingsScreen(onBack = { navigator.pop() }, onOpenPrivacyPolicy = { navigator.push(Screen.PrivacyPolicy) })
-        Screen.RestoreBackup -> SettingsScreen(
-            onBack = { navigator.pop() },
-            autoStartImport = true,
-            onOpenPrivacyPolicy = { navigator.push(Screen.PrivacyPolicy) },
-        )
-        Screen.PrivacyPolicy -> GizlilikPolitikasiEkrani(onBack = { navigator.pop() })
+private fun SekmeKoku(navigator: AylaNavigator) {
+    val stateHolder = rememberSaveableStateHolder()
+    val reducedMotion = LocalReducedMotion.current
+    AnimatedContent(
+        targetState = navigator.tab,
+        modifier = Modifier.fillMaxSize(),
+        transitionSpec = {
+            if (reducedMotion) {
+                EnterTransition.None togetherWith ExitTransition.None
+            } else {
+                fadeIn(tween(240)) togetherWith fadeOut(tween(160))
+            }
+        },
+        label = "tab",
+    ) { tab ->
+        stateHolder.SaveableStateProvider(tab.route) {
+            when (tab) {
+                Screen.Today -> TodayScreen(
+                    onOpenLog = { date -> navigator.push(Screen.DailyLog(date)) },
+                    onOpenMeds = { navigator.selectTab(Screen.Meds) },
+                    onOpenSettings = { navigator.push(Screen.Settings) },
+                )
+                Screen.Calendar -> CalendarScreen(onOpenLog = { date -> navigator.push(Screen.DailyLog(date)) })
+                Screen.Meds -> MedsScreen(
+                    onAdd = { navigator.push(Screen.AddMedication) },
+                    onEdit = { id -> navigator.push(Screen.EditMedication(id)) },
+                )
+                Screen.Plan -> PlanScreen()
+                Screen.Me -> MeScreen(onOpenSettings = { navigator.push(Screen.Settings) })
+            }
+        }
     }
 }

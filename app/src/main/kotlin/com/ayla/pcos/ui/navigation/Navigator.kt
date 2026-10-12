@@ -1,42 +1,64 @@
 package com.ayla.pcos.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
+import com.ayla.pcos.data.LocalDateIso
+import kotlinx.serialization.Serializable
 import java.time.LocalDate
 
 /**
- * Ekranlar. Beş sekme kök ekrandır; diğerleri sekmenin üstüne itilir.
- * Navigation 3'e geçiş planlanmıştır (bkz. docs/adr/0003-navigasyon.md); MVP 1'de derlemeyi
- * belirleyici tutmak için küçük bir yığın kullanılır.
+ * Ekranlar. Beş sekme kök ekrandır; diğerleri sekmenin üstüne itilir ve Navigation 3 geri yığınında
+ * ([NavKey]) taşınır; bu yüzden hepsi serileştirilebilir ve yalnızca ilkel değer taşır
+ * (bkz. docs/adr/0003-navigasyon.md). [route] metni yalnızca sekme kaydı ve testler içindir.
  */
-sealed interface Screen {
+sealed interface Screen : NavKey {
     val route: String
 
     sealed interface Tab : Screen
 
-    data object Today : Tab { override val route = "today" }
-    data object Calendar : Tab { override val route = "calendar" }
-    data object Meds : Tab { override val route = "meds" }
-    data object Plan : Tab { override val route = "plan" }
-    data object Me : Tab { override val route = "me" }
+    @Serializable
+    data object Today : Tab { override val route: String get() = "today" }
 
-    data class DailyLog(val date: LocalDate) : Screen { override val route = "log/$date" }
-    data object AddMedication : Screen { override val route = "meds/add" }
+    @Serializable
+    data object Calendar : Tab { override val route: String get() = "calendar" }
+
+    @Serializable
+    data object Meds : Tab { override val route: String get() = "meds" }
+
+    @Serializable
+    data object Plan : Tab { override val route: String get() = "plan" }
+
+    @Serializable
+    data object Me : Tab { override val route: String get() = "me" }
+
+    @Serializable
+    data class DailyLog(@Serializable(with = LocalDateIso::class) val date: LocalDate) : Screen {
+        override val route: String get() = "log/$date"
+    }
+
+    @Serializable
+    data object AddMedication : Screen { override val route: String get() = "meds/add" }
 
     /** [id] 0 ise yeni ilaç formu. */
-    data class EditMedication(val id: Long) : Screen { override val route = "meds/edit/$id" }
-    data object Settings : Screen { override val route = "settings" }
+    @Serializable
+    data class EditMedication(val id: Long) : Screen { override val route: String get() = "meds/edit/$id" }
+
+    @Serializable
+    data object Settings : Screen { override val route: String get() = "settings" }
 
     /** Ayarlar, yedek dosyası seçici açık başlar (anahtar kaybı diyaloğundan gelinir). */
-    data object RestoreBackup : Screen { override val route = "settings/restore" }
+    @Serializable
+    data object RestoreBackup : Screen { override val route: String get() = "settings/restore" }
 
     /** Gizlilik politikası ve KVKK aydınlatma metni. */
-    data object PrivacyPolicy : Screen { override val route = "privacy" }
+    @Serializable
+    data object PrivacyPolicy : Screen { override val route: String get() = "privacy" }
 
     companion object {
         val tabs: List<Tab> = listOf(Today, Calendar, Meds, Plan, Me)
@@ -58,41 +80,65 @@ sealed interface Screen {
     }
 }
 
-/** Sekme + üstüne itilen ekranlar. Geri: önce yığın, sonra Bugün sekmesi, sonra sistem. */
-class AylaNavigator(initialTab: Screen.Tab = Screen.Today, initialStack: List<Screen> = emptyList()) {
-    var tab: Screen.Tab by mutableStateOf(initialTab)
-        private set
+/**
+ * Geri yığınının kök girişi: beş sekme bu girişin içinde çizilir ve değişir; yığından hiç çıkmaz.
+ * Böylece sekme ViewModel'leri sekme değişiminde sıcak kalır ve sekme değişimi geri yığınına girmez.
+ */
+@Serializable
+data object TabsRoot : NavKey
 
-    val stack = mutableStateListOf<Screen>().apply { addAll(initialStack) }
+/**
+ * Sekme + üstüne itilen ekranlar, Navigation 3 geri yığını üzerinde. [backStack] her zaman [TabsRoot] ile
+ * başlar; sonrası itilen [Screen]'lerdir. Geri: önce yığın, sonra Bugün sekmesi, sonra sistem.
+ * Sekme değişimi yığını boşaltır; aynı ekran üst üste itilmez.
+ */
+class AylaNavigator(val backStack: MutableList<NavKey>, private val tabState: MutableState<Screen.Tab>) {
 
-    val current: Screen get() = stack.lastOrNull() ?: tab
+    init {
+        // Kök giriş eksikse (bozuk ya da eski kayıt) yığın sıfırlanır; NavDisplay boş yığın kabul etmez.
+        if (backStack.firstOrNull() != TabsRoot) {
+            backStack.clear()
+            backStack.add(TabsRoot)
+        }
+    }
 
-    val showsBottomBar: Boolean get() = stack.isEmpty()
+    var tab: Screen.Tab
+        get() = tabState.value
+        private set(value) {
+            tabState.value = value
+        }
 
-    val canGoBack: Boolean get() = stack.isNotEmpty() || tab != Screen.Today
+    /** İtilen ekranlar, alttan üste. */
+    val stack: List<Screen> get() = backStack.drop(1).filterIsInstance<Screen>()
+
+    val current: Screen get() = backStack.lastOrNull() as? Screen ?: tab
+
+    val showsBottomBar: Boolean get() = backStack.size <= 1
+
+    val canGoBack: Boolean get() = backStack.size > 1 || tab != Screen.Today
 
     fun selectTab(target: Screen.Tab) {
-        stack.clear()
+        clearStack()
         tab = target
     }
 
     fun push(screen: Screen) {
         if (screen is Screen.Tab) {
             selectTab(screen)
-        } else if (stack.lastOrNull() != screen) {
-            stack.add(screen)
+        } else if (backStack.lastOrNull() != screen) {
+            backStack.add(screen)
         }
     }
 
     /** Üstteki ekranı [screen] ile değiştirir (ör. "ilaç ekle" → "yeni ilaç formu"). */
     fun replaceTop(screen: Screen) {
-        if (stack.isNotEmpty()) stack.removeAt(stack.lastIndex)
+        if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
         push(screen)
     }
 
     fun pop(): Boolean = when {
-        stack.isNotEmpty() -> {
-            stack.removeAt(stack.lastIndex)
+        backStack.size > 1 -> {
+            backStack.removeAt(backStack.lastIndex)
             true
         }
         tab != Screen.Today -> {
@@ -102,17 +148,26 @@ class AylaNavigator(initialTab: Screen.Tab = Screen.Today, initialStack: List<Sc
         else -> false
     }
 
+    private fun clearStack() {
+        while (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
+    }
+
     companion object {
-        val Saver = listSaver<AylaNavigator, String>(
-            save = { nav -> listOf(nav.tab.route) + nav.stack.map { it.route } },
-            restore = { routes ->
-                val tab = routes.firstOrNull()?.let { Screen.fromRoute(it) } as? Screen.Tab ?: Screen.Today
-                val stack = routes.drop(1).mapNotNull { Screen.fromRoute(it) }
-                AylaNavigator(tab, stack)
-            },
+        /** Seçili sekme süreç ölümünden rota metniyle döner. */
+        val TabSaver: Saver<Screen.Tab, String> = Saver(
+            save = { it.route },
+            restore = { Screen.fromRoute(it) as? Screen.Tab },
         )
     }
 }
 
+/**
+ * Geri yığını `rememberNavBackStack` ile (Navigation 3; anahtarlar serileştirilerek süreç ölümüne dayanır),
+ * seçili sekme ayrı bir kayıtla tutulur.
+ */
 @Composable
-fun rememberAylaNavigator(): AylaNavigator = rememberSaveable(saver = AylaNavigator.Saver) { AylaNavigator() }
+fun rememberAylaNavigator(): AylaNavigator {
+    val backStack = rememberNavBackStack(TabsRoot)
+    val tab = rememberSaveable(stateSaver = AylaNavigator.TabSaver) { mutableStateOf<Screen.Tab>(Screen.Today) }
+    return remember(backStack, tab) { AylaNavigator(backStack, tab) }
+}

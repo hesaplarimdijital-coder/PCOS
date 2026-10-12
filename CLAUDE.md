@@ -20,8 +20,11 @@ Arayüz dili **Türkçe**; ürün tonu sıcak, yargılamayan, kanıta bağlı.
   (`security/DatabaseKeyProvider`). Tercihler Preferences DataStore. Bulut yok, hesap yok, analitik SDK yok.
 - Hatırlatma: `AlarmManager` tam alarm (izin varsa `setExactAndAllowWhileIdle`, yoksa 10 dk `setWindow`),
   doz anahtarı kayıt defteriyle iptal (`reminders/ReminderScheduler`). WorkManager kullanılmaz.
-- Gezinme: `ui/navigation/Navigator.kt` içindeki yerel gezgin (sekme + yığın). Navigation 3'e geçiş ADR-0003'te
-  ertelenmiştir; `androidx.navigation` eklenmez.
+- Gezinme: Navigation 3 (`navigation3-runtime/ui` 1.2.0, ADR-0003). `ui/navigation/Navigator.kt`: `Screen` =
+  `@Serializable NavKey`; kök giriş `TabsRoot` (sekmeler içinde değişir, yığına girmez) + itilen ekranlar;
+  `AylaNavigator` kuralları (sekme değişimi yığını boşaltır, aynı ekran üst üste itilmez) `NavigatorTest`'te.
+  Yeni ekran = `Screen` alt türü + `AylaRoot.kt` `entryProvider`'a `entry<K>`. ViewModel'ler Activity kapsamında
+  (entry kapsamı #27'ye bağlı); `androidx.navigation` (2.x) eklenmez.
 - Tema: `ui/theme` altındaki tokenlar Ayla Tasarım Sistemi'nden birebirdir. Material Expressive bileşenleri
   kullanılmaz; biçimler `Shape.kt` polar GenericShape'leridir; hareket `Motion.kt` yaylarıdır.
 
