@@ -23,6 +23,7 @@ import com.ayla.pcos.data.repo.FertilityRepository
 import com.ayla.pcos.data.repo.HydrationRepository
 import com.ayla.pcos.data.repo.SkinRepository
 import com.ayla.pcos.data.repo.SleepRepository
+import com.ayla.pcos.ui.components.toTurkishUpper
 import com.ayla.pcos.ui.log.symptomLabel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
@@ -105,7 +106,7 @@ class DoctorReportBuilder @Inject constructor(
         val today = ticker.now()
         val preferences = prefs.current()
         val sections = mutableListOf<ReportSection>()
-        if (options.includeCycle) sections += cycleSection(options, preferences.goals.contains(Goal.PILL))
+        if (options.includeCycle) sections += cycleSection(options, fertilityRepository.isOnPill())
         if (options.includeLog) sections += logSection(options, preferences.showBodyMeasurements)
         if (options.includeMeds) sections += medsSection(options, today)
         if (options.includeSleepWater) sleepWaterSection(options, preferences.cupMl, preferences.waterGoalCups)?.let { sections += it }
@@ -126,7 +127,7 @@ class DoctorReportBuilder @Inject constructor(
 
     // --- Bölümler ---
 
-    private suspend fun cycleSection(options: ReportOptions, pillGoal: Boolean): ReportSection {
+    private suspend fun cycleSection(options: ReportOptions, onPill: Boolean): ReportSection {
         val overview = cycleRepository.snapshot()
         val blocks = mutableListOf<ReportBlock>()
         val last = overview.lastPeriodStart
@@ -177,7 +178,6 @@ class DoctorReportBuilder @Inject constructor(
             if (records.isNotEmpty()) blocks += ReportBlock.Bullets(records)
         }
         val pill = medicationDao.getActive().firstOrNull { it.kind == MedicationKind.CONTRACEPTIVE }
-        val onPill = pill != null || pillGoal
         if (onPill) {
             val active = pill?.pillActiveDays
             blocks += ReportBlock.Note(
@@ -348,8 +348,8 @@ class DoctorReportBuilder @Inject constructor(
         return ReportSection(s(R.string.report_section_skin), listOf(ReportBlock.KeyValues(rows)))
     }
 
-    /** "Evet" ise kullanıcının doktoruna söylemek istediği bir işarettir; rapor bunu yorumlamaz. */
-    private fun flagged(value: Boolean): String = if (value) "${s(R.string.report_yes)} · ${s(R.string.report_skin_flag)}" else s(R.string.report_no)
+    /** Öz-beyan işareti; rapor bunu yorumlamaz, niyet de atfetmez (kullanıcının kendi değerlendirmesi). */
+    private fun flagged(value: Boolean): String = if (value) "${s(R.string.report_yes)} (${s(R.string.report_skin_flag)})" else s(R.string.report_no)
 
     private suspend fun questionsSection(): ReportSection? {
         val questions = questionRepository.getAll()
@@ -405,7 +405,7 @@ fun DoctorReport.toPlainText(): String = buildString {
     if (disclaimer.isNotBlank()) appendLine(disclaimer)
     sections.forEach { section ->
         appendLine()
-        appendLine(section.title.uppercase(Locale.forLanguageTag("tr")))
+        appendLine(section.title.toTurkishUpper())
         section.blocks.forEach { block ->
             when (block) {
                 is ReportBlock.Paragraph -> appendLine(block.text)

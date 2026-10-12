@@ -25,6 +25,9 @@ data class UserPreferences(
      * silinir. Rıza olmadan, Health Connect izni verilmiş olsa bile hiçbir şey okunmaz (#11).
      */
     val healthConnectConsentAt: Instant? = null,
+
+    /** Cilt/saç fotoğrafları için ayrı, geri alınabilir açık rıza (ADR-0010); geri alma = fotoğrafların silinmesi. */
+    val photoConsentAt: Instant? = null,
     /** Health Connect izin penceresinin art arda kapatılma sayısı; 2'de pencere bir daha açılmaz. */
     val healthConnectPermissionCancels: Int = 0,
     /**

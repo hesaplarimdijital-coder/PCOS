@@ -187,6 +187,11 @@ class PdfReportWriter @Inject constructor(
             }
     }
 
+    /** Tam silme: önbellekteki tüm rapor dosyaları gider ("Tüm verilerimi sil", ADR-0009). */
+    fun deleteAll() {
+        directory.deleteRecursively()
+    }
+
     companion object {
         const val DIRECTORY = "raporlar"
         const val KEEP_FILES = 3

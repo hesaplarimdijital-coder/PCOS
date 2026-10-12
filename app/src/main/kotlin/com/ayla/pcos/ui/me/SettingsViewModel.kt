@@ -18,6 +18,7 @@ import com.ayla.pcos.reminders.AlarmLog
 import com.ayla.pcos.reminders.AlarmLogEntry
 import com.ayla.pcos.reminders.ReminderNotifier
 import com.ayla.pcos.reminders.ReminderScheduler
+import com.ayla.pcos.report.PdfReportWriter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -55,6 +56,7 @@ class SettingsViewModel @Inject constructor(
     private val alarmLog: AlarmLog,
     private val healthConnect: HealthConnectRepository,
     private val photoStore: PhotoStore,
+    private val pdfReportWriter: PdfReportWriter,
 ) : ViewModel() {
 
     /** Doz hatırlatması olan biri için pil tasarrufu yönlendirmesi gösterilir (#17). */
@@ -134,6 +136,8 @@ class SettingsViewModel @Inject constructor(
         exporter.wipeAll()
         // Şifreli fotoğraflar ve anahtarları da gider (ADR-0010); anahtar açılamıyor olsa da çalışır.
         runCatching { photoStore.deleteAll() }
+        // Önbellekteki düz PDF raporları da gider (ADR-0009).
+        runCatching { pdfReportWriter.deleteAll() }
         alarmLog.clear()
         prefs.update { UserPreferences() }
         runCatching { scheduler.rescheduleAll() }

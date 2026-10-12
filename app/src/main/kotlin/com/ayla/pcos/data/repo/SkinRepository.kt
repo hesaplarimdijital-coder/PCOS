@@ -6,6 +6,7 @@ import com.ayla.pcos.data.db.SkinProfileEntity
 import com.ayla.pcos.data.db.SkinRoutineCheckDao
 import com.ayla.pcos.data.db.SkinRoutineCheckEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.time.Instant
@@ -35,13 +36,16 @@ class SkinRepository @Inject constructor(
 
     suspend fun clearProfile() = profileDao.deleteAll()
 
-    /** Günün sabah/akşam işaretleri (işaretsiz dilim listede yoktur). */
-    fun observeRoutine(date: LocalDate): Flow<List<SkinRoutineCheckEntity>> = routineDao.observe(date)
+    /** Günün sabah/akşam işaretleri (işaretsiz dilim listede yoktur); sıra sabah → akşam (enum sırası, metin sırası değil). */
+    fun observeRoutine(date: LocalDate): Flow<List<SkinRoutineCheckEntity>> = routineDao.observe(date).map { it.slotOrder() }
 
     fun observeRoutineRange(from: LocalDate, to: LocalDate): Flow<List<SkinRoutineCheckEntity>> =
-        routineDao.observeRange(from, to)
+        routineDao.observeRange(from, to).map { it.slotOrder() }
 
-    suspend fun routineRange(from: LocalDate, to: LocalDate): List<SkinRoutineCheckEntity> = routineDao.getRange(from, to)
+    suspend fun routineRange(from: LocalDate, to: LocalDate): List<SkinRoutineCheckEntity> = routineDao.getRange(from, to).slotOrder()
+
+    private fun List<SkinRoutineCheckEntity>.slotOrder(): List<SkinRoutineCheckEntity> =
+        sortedWith(compareBy<SkinRoutineCheckEntity> { it.date }.thenBy { it.slot.ordinal })
 
     suspend fun routine(date: LocalDate, slot: RoutineSlot): SkinRoutineCheckEntity? = routineDao.get(date, slot)
 

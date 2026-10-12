@@ -54,7 +54,8 @@ jobs:
           ./gradlew :app:testDebugUnitTest :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee build-app.log
 
       # ADR-0003 engelleyici koşulu: Navigation 3 (ya da başka bir bağımlılık) Compose'u BOM'un seçtiği sürümün
-      # üstüne çekerse geçiş BOM yükseltmesine kadar bekler. BOM kısıtının "->" ile ezildiği satır aranır.
+      # üstüne çekerse geçiş BOM yükseltmesine kadar bekler. dependencyInsight çıktısında BOM kısıtının kendi satırı
+      # (bir alt satırı "compose-bom" olan başlık) " -> " içeriyorsa kısıt ezilmiştir. Çıktı açıklama olarak yayımlanır.
       - name: Compose BOM uyumu (dependencyInsight)
         shell: bash
         run: |
@@ -62,17 +63,19 @@ jobs:
           fail=0
           for dep in androidx.compose.runtime:runtime androidx.compose.ui:ui androidx.compose.animation:animation; do
             out=$(./gradlew -q :app:dependencyInsight --configuration debugRuntimeClasspath --dependency "$dep" --no-daemon 2>&1)
-            sel=$(printf '%s\n' "$out" | grep -m1 -oE "^${dep}:[^ ]+" || true)
-            echo "::notice title=Compose::${sel:-$dep çözümlenemedi}"
-            if printf '%s\n' "$out" | grep -A4 -E "^${dep}:.* -> " | grep -q 'compose-bom'; then
-              echo "::error title=Compose BOM::${dep} BOM sürümünün üstüne çekiliyor (ADR-0003 engelleyici koşul)"
-              printf '%s\n' "$out" | head -40
-              fail=1
-            fi
+            sel=$(printf '%s\n' "$out" | grep -m1 -oE "^${dep}:[0-9][^ ]*" | sed "s#^${dep}:##")
+            bomline=$(printf '%s\n' "$out" | grep -B1 -E '^[\\+]--- androidx.compose:compose-bom' | grep -E "^${dep}:" | head -1)
+            echo "::notice title=Compose::${dep} seçilen=${sel:-?} · BOM satırı: ${bomline:-bulunamadı}"
+            case "$bomline" in
+              *" -> "*)
+                echo "::error title=Compose BOM::${dep} BOM sürümünün üstüne çekiliyor (ADR-0003 engelleyici koşul): ${bomline}"
+                echo "::notice title=dependencyInsight::$(printf '%s\n' "$out" | head -30 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')"
+                fail=1
+                ;;
+            esac
           done
           exit $fail
 
-      # Günlükler ajan oturumlarından indirilemiyor; derleme hataları ve test özeti
       # GitHub "annotation" olarak yayımlanır (gh run view / check-runs API ile okunur).
       - name: Derleme hatalarını açıklama olarak yayımla
         if: failure()

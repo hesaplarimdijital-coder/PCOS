@@ -60,13 +60,15 @@ class SkinRoutineRulesTest {
     }
 
     @Test
-    fun `lekede hassas olmayan cilt azelaik niasinamid ve AHA alir, gebelikte AHA kalir`() {
+    fun `lekede hassas olmayan cilt azelaik niasinamid ve AHA alir, gebelikte AHA ve salisilik cikar`() {
         val p = plan(skinType = SkinType.NORMAL, darkSpots = true)
         assertEquals(listOf(RoutineStep.CLEANSER, RoutineStep.AZELAIC, RoutineStep.NIACINAMIDE, RoutineStep.AHA, RoutineStep.MOISTURIZER), p.evening)
         assertTrue(RoutineStep.NIACINAMIDE in p.morning)
         val gebe = plan(skinType = SkinType.NORMAL, darkSpots = true, pregnancyPlan = true)
-        assertTrue(RoutineStep.AHA in gebe.evening, "glikolik asit gebelikte güvenli sayılıyor (MotherSafe)")
+        assertFalse(RoutineStep.AHA in gebe.evening, "sürülüp bırakılan asitler ihtiyaten çıkar (skin_avoid_kept ile tutarlı)")
         assertFalse(RoutineStep.SALICYLIC in gebe.evening)
+        assertTrue(RoutineStep.AZELAIC in gebe.evening && RoutineStep.NIACINAMIDE in gebe.evening)
+        assertTrue(RoutineNote.TTC_NIACINAMIDE in gebe.notes)
     }
 
     @Test

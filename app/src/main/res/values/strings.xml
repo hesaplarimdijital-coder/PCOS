@@ -134,7 +134,7 @@
     <string name="onboarding_consent_text">Sağlık verin KVKK&#8217;ya göre özel nitelikli kişisel veridir. Ayla&#8217;nın çalışması için kayıtların yalnızca bu cihazda ve şifreli olarak işlenir; hiçbir yere gönderilmez.</string>
     <string name="consent_personalization_title">Kişiselleştirme</string>
     <string name="consent_health_title">Açık rıza</string>
-    <string name="consent_health_text">Adet, günlük kayıt, ilaç, su ve uyku kayıtlarımın bu cihazda işlenmesine, aydınlatma metnini okuyarak açık rıza veriyorum.</string>
+    <string name="consent_health_text">Adet, günlük kayıt, ilaç, su, uyku, doğurganlık (bazal ısı, LH testi, mukus), cilt ve saç profili ile doktora sorularımın bu cihazda işlenmesine, aydınlatma metnini okuyarak açık rıza veriyorum. Cilt fotoğrafları için ayrıca sorulur.</string>
     <string name="consent_health_required">Başlamak için açık rızanı işaretlemelisin.</string>
     <string name="consent_dialog_title">Açık rızan gerekiyor</string>
     <string name="consent_dialog_text">Ayla kayıtlarını yalnızca bu cihazda ve şifreli işler. Devam etmek için sağlık verilerinin bu şekilde işlenmesine açık rıza vermen gerekiyor. Gizlilik politikasını ve aydınlatma metnini okuyabilirsin.</string>
@@ -382,7 +382,7 @@
     <string name="settings_export_text">JSON dosyası</string>
     <string name="settings_delete_all">Tüm verilerimi sil</string>
     <string name="settings_delete_confirm_title">Tüm veriler silinsin mi?</string>
-    <string name="settings_delete_confirm_text">Adet, kayıt, ilaç, su ve uyku verilerin, hatırlatma günlüğün ve ayarların kalıcı olarak silinir; rızaların sıfırlanır ve Health Connect bağlantısı kesilir. Health Connect&#8217;teki asıl kayıtlar değişmez. Bu işlem geri alınamaz.</string>
+    <string name="settings_delete_confirm_text">Adet, kayıt, ilaç, su, uyku, doğurganlık, cilt ve saç profili, rutin işaretleri, doktora sorular, şifreli fotoğraflar, hazırlanmış rapor dosyaları, hatırlatma günlüğün ve ayarların kalıcı olarak silinir; rızaların sıfırlanır ve Health Connect bağlantısı kesilir. Health Connect&#8217;teki asıl kayıtlar değişmez. Bu işlem geri alınamaz.</string>
     <string name="settings_water_goal">Günlük hedef</string>
     <string name="settings_cup_size">Bardak hacmi</string>
     <string name="settings_name">Adın</string>
@@ -647,7 +647,7 @@
     <string name="report_skin_pregnant">Gebe ya da emziriyor</string>
     <string name="report_skin_routine">Bakım rutini işaretlenen gün</string>
     <string name="report_skin_routine_value">sabah %1$d, akşam %2$d / %3$d gün</string>
-    <string name="report_skin_flag">kullanıcı doktoruyla paylaşmak istedi</string>
+    <string name="report_skin_flag">öz-beyan</string>
 
     <string name="report_section_questions">Doktora sorular</string>
     <string name="report_questions_asked">Daha önce sorulduğu işaretlenen soru sayısı: %1$d</string>

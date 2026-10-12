@@ -13,7 +13,7 @@
     <string name="fertility_not_diagnosis">Buradaki notlar tanı ya da tedavi değildir; gözlemlerini doktorunla paylaşmana yardım eder.</string>
     <string name="fertility_disabled_pill_title">Hap kullanırken kapalı</string>
     <string name="fertility_disabled_pill_text">Doğum kontrol hapı yumurtlamayı baskıladığı için bu bölümde hesap yapılmaz. Hap modunu kapatınca kayıtların yeniden görünür.</string>
-    <string name="fertility_disabled_pill_source" translatable="false">NHS, kontrasepsiyon bilgisi</string>
+    <string name="fertility_disabled_pill_source" translatable="false">NHS, Combined pill; ADR-0005 (hap modunda tahmin yapılmaz)</string>
     <string name="fertility_enable_hint">Bu bölüm “Hamile kalmayı planlıyorum” önceliği açıkken görünür; ayarlardan açabilirsin.</string>
     <string name="fertility_tell_doctor">Grafiği ve notları doktor raporuna ekleyebilirsin; yorumunu birlikte yaparsınız.</string>
 
@@ -59,14 +59,14 @@
     <string name="fertility_lh_how_title">Nasıl okunur?</string>
     <string name="fertility_lh_how_text">Test çizgisi kontrol çizgisi kadar ya da daha koyuysa pozitif, daha açıksa negatiftir; silik çizgi de negatif sayılır. Her gün aynı saatte test et, öncesinde çok sıvı içme.</string>
     <string name="fertility_lh_how_note">Kendi testinin talimatı önceliklidir; markalar arasında küçük farklar olabilir.</string>
-    <string name="fertility_lh_how_source" translatable="false">Clearblue Digital Ovulation Test kullanım talimatı</string>
+    <string name="fertility_lh_how_source" translatable="false">Ovülasyon testi üretici kullanım talimatı (çizgi tipi)</string>
     <string name="fertility_lh_invalid_help">Kontrol çizgisi çıkmadıysa test geçersizdir; yeni bir testle tekrarla.</string>
     <string name="fertility_lh_positive_meaning_title">Pozitif ne demek?</string>
     <string name="fertility_lh_positive_meaning_text">Pozitif LH, yumurtlamanın yaklaştığını düşündürür; çoğu zaman 1–2 gün içinde olur ama her LH yükselişi yumurtlamayla sonuçlanmaz. Kesin bilgi ısı yükselmesinden gelir.</string>
     <string name="fertility_lh_positive_meaning_source" translatable="false">Su ve ark. 2017, Bioeng Transl Med; Ecochard ve ark. 2001, BJOG; Hoff ve ark. 1983; Testart ve ark. 1981</string>
     <string name="fertility_lh_pcos_title">PCOS\'ta LH testi yanıltabilir</string>
     <string name="fertility_lh_pcos_text">PCOS\'ta LH döngü boyunca yüksek seyredebilir; test, yumurtlama olmadan da pozitif görünebilir. Üreticiler de bu uyarıyı yapar. Bu yüzden LH yalnızca kayıttır.</string>
-    <string name="fertility_lh_pcos_source" translatable="false">Clearblue kullanım talimatı; McGovern ve ark. 2004, Fertil Steril; Taylor ve ark. 1997, J Clin Endocrinol Metab</string>
+    <string name="fertility_lh_pcos_source" translatable="false">Ovülasyon testi üretici kullanım talimatı; McGovern ve ark. 2004, Fertil Steril; Taylor ve ark. 1997, J Clin Endocrinol Metab</string>
 
     <!-- Servikal mukus -->
     <string name="fertility_mucus_title">Servikal mukus</string>
@@ -103,13 +103,13 @@
     <string name="fertility_note_many_disturbed_text">Bu döngüde ölçümlerin önemli bir kısmı bozuk işaretli; grafik güvenilir okunmayabilir. Mümkünse ölçüm saatini ve koşullarını sabitlemeyi dene.</string>
     <string name="fertility_note_many_disturbed_source" translatable="false">Sensiplan bozucu etkenler</string>
     <string name="fertility_note_lh_without_rise_title">LH pozitif ama ısı yükselmedi</string>
-    <string name="fertility_note_lh_without_rise_text">Pozitif testten sonra beş ölçümde yükselme yok. PCOS\'ta LH testi yumurtlama olmadan da pozitif çıkabilir; yumurtlama olmamış ya da gecikmiş olabilir. Sık olursa doktoruna söyle.</string>
-    <string name="fertility_note_lh_without_rise_source" translatable="false">Clearblue kullanım talimatı; McGovern ve ark. 2004, Fertil Steril; Su ve ark. 2017, Bioeng Transl Med</string>
+    <string name="fertility_note_lh_without_rise_text">Pozitif testten sonra beş ölçümde yükselme yok. Bu döngüde ısıyla doğrulama yok. PCOS\'ta LH testi yumurtlama olmadan da pozitif çıkabilir. Sık olursa doktoruna söyle.</string>
+    <string name="fertility_note_lh_without_rise_source" translatable="false">Ovülasyon testi üretici kullanım talimatı; McGovern ve ark. 2004, Fertil Steril; Su ve ark. 2017, Bioeng Transl Med</string>
     <string name="fertility_note_rise_without_lh_title">Isı yükseldi, LH pozitif yakalanmadı</string>
     <string name="fertility_note_rise_without_lh_text">Yumurtlama ısıyla doğrulandı ama testlerin pozitif göstermedi. LH yükselişi kısa sürebilir; günde tek test onu kaçırabilir. Doğrulama geçerli.</string>
-    <string name="fertility_note_rise_without_lh_source" translatable="false">Direito ve ark. 2013, Fertil Steril; Clearblue kullanım talimatı</string>
+    <string name="fertility_note_rise_without_lh_source" translatable="false">Direito ve ark. 2013, Fertil Steril; Ovülasyon testi üretici kullanım talimatı</string>
     <string name="fertility_note_long_luteal_title">Yumurtlama sonrası 18 günü geçti</string>
-    <string name="fertility_note_long_luteal_text">Isın 18 günden uzun süredir yüksek ve adet gelmedi. Bu, gebelik olasılığının klasik işaretidir; bir gebelik testi yapabilirsin. Test negatifse ve adet gelmezse doktorunla konuş.</string>
+    <string name="fertility_note_long_luteal_text">Isın 18 günden uzun süredir yüksek ve adet gelmedi. Doğal aile planlaması kaynakları bu durumda gebelik testi önerir. Test negatifse ve adet gelmezse doktorunla konuş.</string>
     <string name="fertility_note_long_luteal_source" translatable="false">Lenton ve ark. 1984, Br J Obstet Gynaecol; Crawford ve ark. 2017, Fertil Steril; NHS, Doing a pregnancy test; Sensiplan</string>
 
     <!-- Düzensiz döngü, umut, ne zaman doktora -->

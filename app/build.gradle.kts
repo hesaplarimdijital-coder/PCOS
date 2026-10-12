@@ -61,11 +61,6 @@ android {
             isIncludeAndroidResources = true
         }
     }
-
-    // Room'un dışa aktardığı şema JSON'ları (app/schemas) geçiş testinde sınıf yolundan okunur
-    // (veri/GecisTesti: sürüm 1 şemasından gerçek geçişle açılış). Uygulama paketine girmez.
-    // Uygulama modülünde src/test/assets birleştirilmediği için assets yerine Java kaynakları kullanılır.
-    sourceSets.getByName("test").resources.srcDir("$projectDir/schemas")
 }
 
 // Ekran görüntüleri (com.ayla.pcos.ekran) yalnızca -Pekran ile çalışır ve app/build/ekran altına PNG yazar.

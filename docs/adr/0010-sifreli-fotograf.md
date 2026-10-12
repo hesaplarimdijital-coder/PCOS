@@ -74,8 +74,12 @@ Android Keystore yoktur, Android 17 Keystore anahtar sayısını sınırlar.
     Ben > Ayarlar > İzinlerin'den geri alınabilir; geri alma = `deleteAll()` + rıza sıfırlama. Yüz tanıma, analiz ya da
     otomatik değerlendirme yapılmadığı için biyometrik veri işlenmez; fotoğraflar bağlam gereği sağlık verisi olarak
     işlenir. Google Play Veri güvenliği formuna "Fotoğraflar: cihazda işlenir, paylaşılmaz, şifrelenir, kullanıcı
-    silebilir" satırı eklenir. Politikaya eklenecek taslak aşağıdadır (politika bu ADR ile değiştirilmedi; `res/raw`
-    kopyasıyla birlikte güncellenir).
+    silebilir" satırı eklenir. Politikaya eklenecek taslak aşağıdadır. **Güncelleme (12 Ekim 2026, uyum
+    incelemesi):** taslak, politika sürümü 1.1'e işlendi (§3.10 fotoğraflar, §3.11 düzeltilen "fotoğraf toplanmaz"
+    cümlesi, §4 ayrı onay, §5, §7 JPEG dışa aktarma, §9 izin notu; `res/raw` kopyası eş). Play Veri güvenliği satırı
+    `docs/play/health-connect-beyani.md` §4'te. `UserPreferences.photoConsentAt` tercihlerde tanımlı (varsayılan
+    null); onay diyaloğu, İzinlerin'den geri alma (= `deleteAll()` + alanın sıfırlanması) UI işiyle (#25) gelir;
+    bunlar olmadan fotoğraf özelliği açılmaz.
 12. **Test.** `PhotoKeyProvider` arayüzü sayesinde Robolectric testleri yazılımsal sabit anahtar kullanır
     (`veri/FotografTesti`, `@GraphicsMode(NATIVE)` ile gerçek JPEG kodlama). Keystore sarmalı ancak cihazda
     doğrulanır (`docs/ilk-cihaz-testi.md`'ye madde).

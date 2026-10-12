@@ -1,6 +1,7 @@
 # Play Console: Health Connect beyanı ve Veri güvenliği yanıtları
 
-- Tarih: 12 Ekim 2026 · İlgili iş: #11 (Health Connect'ten uyku içe aktarma)
+- Tarih: 12 Ekim 2026 · İlgili iş: #11 (Health Connect'ten uyku içe aktarma); MVP 3 eki (12 Ekim 2026, uyum
+  incelemesi): #24 doğurganlık kayıtları, #25 cilt/saç profili ve şifreli fotoğraf, #26 doktor raporu PDF.
 - Kapsam: "Health apps" beyan formu (Health Connect veri türleri dahil), Veri güvenliği (Data safety) formu,
   gizlilik politikası alanı, mağaza açıklaması denetimi.
 - Hukuki görüş değildir; uygulanabilir kontrol listesidir. Politika metinleri her gönderimden önce yeniden
@@ -12,9 +13,9 @@
 |---|---|
 | Health Connect izni | Yalnızca `android.permission.health.READ_SLEEP` (okuma). Yazma, geçmiş (30 günden eski) ve arka plan okuma izni yok; Ayla yalnızca son 7 günü okur. |
 | Onaylı kullanım durumu | "Fitness, wellness and coaching" altında uyku düzenini izleme ("analyzing sleep health and patterns"). |
-| Health apps formu, ekran 1 | Period tracking, Sleep management, Medication management, Diseases and conditions management (son ikisi aşağıda gerekçeli). Medical device apps **seçilmez**. |
-| Health apps formu, ekran 2 | Yalnızca Sleep management > Sleep, okuma; gerekçe metni §3.2'de (İngilizce, yapıştırmaya hazır). |
-| Veri güvenliği formu | "Kullanıcı verisi topluyor veya paylaşıyor mu?" → **Hayır**. Mağazada "veri toplanmıyor / paylaşılmıyor" görünür. |
+| Health apps formu, ekran 1 | Period tracking (MVP 3'te bazal ısı/LH/mukus kayıtları da bu başlığın "fertility awareness" kapsamındadır), Sleep management, Medication management, Diseases and conditions management (cilt/saç bakımı da burada; son ikisi aşağıda gerekçeli). Medical device apps **seçilmez**. MVP 3 özellikleri eklendiğinde form yeniden gözden geçirilir (§3.1). |
+| Health apps formu, ekran 2 | Yalnızca Sleep management > Sleep, okuma; gerekçe metni §3.2'de (İngilizce, yapıştırmaya hazır). MVP 3 kayıtları (bazal ısı, LH, mukus, cilt profili, fotoğraf) Health Connect'ten **okunmaz, oraya yazılmaz**; ekran 2 değişmez. |
+| Veri güvenliği formu | "Kullanıcı verisi topluyor veya paylaşıyor mu?" → **Hayır**. Mağazada "veri toplanmıyor / paylaşılmıyor" görünür. MVP 3'te de geçerli: fotoğraflar, doğurganlık ve cilt kayıtları cihazda işlenir; PDF rapor yalnızca kullanıcının başlattığı paylaşımla cihazdan çıkar (§4). |
 | Gizlilik politikası | `docs/gizlilik-politikasi.md`; herkese açık HTML sayfa olarak [POLİTİKA URL'Sİ]'nde, aynı metin uygulama içinde ve Health Connect gerekçe etkinliğinde. |
 | Gönderimden önce düzeltilecekler | §2'de açık kalanlar: politikadaki yer tutucular ve politikanın yayımlanması (rıza anahtarları, karşılamada açık rıza, gerekçe etkinliği Ekim 2026'da kapandı). |
 
@@ -82,6 +83,17 @@ Engelleyici (beyandan önce kapanmalı):
 - [x] **Politika ile uygulama aynı şeyi söylüyor:** Ayarlar > Health Connect bölümü ("Bağlantıyı kes",
       "Health Connect ayarlarını aç", "Health Connect'ten alınan geceleri sil") uygulandı; kaynak uygulama adı
       saklanmıyor ve politika da saklanmadığını söylüyor (Ekim 2026, #11).
+- [ ] **MVP 3 (politika 1.1) ile uygulama aynı şeyi söylüyor:** karşılamadaki açık rıza metni yeni kayıt türlerini
+      (doğurganlık, cilt/saç, doktora sorular) sayıyor; önceki sürümde rıza vermiş kullanıcıya bu bölümler ilk
+      açıldığında onay soruluyor; fotoğraf için ayrı onay (`photoConsentAt`) ve İzinlerin'den geri alma
+      (= tüm fotoğrafların silinmesi) var; "Tüm verilerimi sil" fotoğrafları, fotoğraf anahtarını ve önbellekteki
+      PDF raporları da siliyor; silme onay metni bunları sayıyor.
+- [ ] **Uzman onayı:** `strings_cilt.xml` ve `strings_dogurganlik.xml` içerikleri uzman onayından geçti ve
+      `skin_review_pending` bandı kaldırıldı. Onay alınmadan bu bölümler herkese açık sürüme girmez (Play Health
+      Content: yanıltıcı sağlık bilgisi; MDCG 2019-11 sınırı).
+- [ ] **Doğurganlık bölümünün wellness sınırı kararı:** "Hamile kalmayı planlıyorum" önceliğine bağlı yumurtlama
+      doğrulama ve "verimli günler" dili için mevzuat görüşü alındı ya da dil yalnızca kayıt/paylaşım olarak
+      daraltıldı (§6 ve uyum raporu); karar sahibinde.
 
 Gönderimle birlikte:
 
@@ -104,13 +116,13 @@ yalnızca istenen veri türleri için yazılır.
 
 | Özellik | Öneri | Gerekçe |
 |---|---|---|
-| Period tracking | Seç | Adet kaydı, aralıklı döngü tahmini, 60/90. gün uyarıları. |
+| Period tracking | Seç | Adet kaydı, aralıklı döngü tahmini, 60/90. gün uyarıları. MVP 3: bazal vücut ısısı, LH testi ve servikal mukus kayıtları ile ısı yükselmesiyle geriye dönük yumurtlama doğrulaması; Play yardım sayfası "fertility awareness"ı bu başlık altında sayar (12 Ekim 2026'da okundu). Doğum kontrolü için kullanılmaz; hap modunda hesap yok. |
 | Sleep management | Seç | Elle uyku kaydı ve Health Connect'ten uyku oturumu içe aktarma. |
 | Medication and treatment management (rehberde "Medication and pain management") | Seç | İlaç ve takviye hatırlatmaları, doğum kontrol hapı paket takibi, doz uyumu, stok uyarısı. Doz hesabı ya da ilaç önerisi yok. |
-| Diseases and conditions management | Seç (karar sahibinde) | Uygulama PCOS ile yaşayanlara yönelik öz-takip aracı olarak konumlanıyor; seçmemek beyanı eksik gösterebilir. Tanı ya da tedavi işlevi yok. |
-| Medical device apps | **Seçme** | TİTCK / MDCG 2019-11 wellness sınırı: tanı, tedavi önerisi, doz hesabı, etkileşim uyarısı yok. |
+| Diseases and conditions management | Seç (karar sahibinde) | Uygulama PCOS ile yaşayanlara yönelik öz-takip aracı olarak konumlanıyor; seçmemek beyanı eksik gösterebilir. MVP 3: cilt/saç profili öz-beyanları, kozmetik içerik maddesi düzeyinde bakım rutini, şifreli ilerleme fotoğrafı (Play yardım sayfası cilt bakımını bu başlıkta sayar), doktor raporu PDF. Tanı ya da tedavi işlevi yok; fotoğraf analizi yok. |
+| Medical device apps | **Seçme** | TİTCK / MDCG 2019-11 wellness sınırı: tanı, tedavi önerisi, doz hesabı, etkileşim uyarısı yok. Dikkat: MDR m. 2(1) ve Tıbbi Cihaz Yönetmeliği m. 3 "gebeliğin önlenmesi veya desteklenmesi"ni tıbbi amaç sayar; doğurganlık bölümünün amacı mağazada ve uygulamada "kayıt ve doktorla paylaşım" olarak kalır, "gebe kalmana yardım eder" denmez (§6, uyum raporu). |
 | Nutrition and weight management | Seçme | MVP 1'de beslenme yok; kilo/bel varsayılan gizli, hedef ve kalori yok. MVP 2 beslenme planıyla yeniden değerlendir. |
-| Reproductive and sexual health | Seçme | Doğurganlık tedavisi ya da cinsel sağlık işlevi yok; "Hamile kalmayı planlıyorum" yalnızca öncelik etiketi. LH/BBT (MVP 3) ile yeniden değerlendir. |
+| Reproductive and sexual health | Seçme (karar sahibinde) | Play yardım sayfası bu başlıkta "fertility treatments"ı sayar; Ayla doğurganlık tedavisi, cinsel sağlık ya da doğum kontrol işlevi sunmaz. BBT/LH/mukus kayıtları "Period tracking > fertility awareness" altında beyan edilir. İnceleme ekibi aksini isterse eklenir. |
 | Stress management, relaxation, mental acuity; Mental and behavioral health | Seçme | Akşam rutini yalnızca hatırlatma; ruh hâli yalnızca günlük kayıt alanı. |
 | Clinical decision support, research ve diğerleri | Seçme | Kapsam dışı. |
 
@@ -173,7 +185,7 @@ ve geçmiş veri izni istenmez.
 | `WRITE_SLEEP` | Ayla Health Connect'e veri yazmaz; elle girilen uyku yalnızca Ayla'da kalır. |
 | `READ_HEALTH_DATA_HISTORY` | Uyku kartı son 7 geceyi gösterir ve Ayla yalnızca son 7 günü okur; varsayılan 30 günlük pencere fazlasıyla yeterli. |
 | `READ_HEALTH_DATA_IN_BACKGROUND` | Okuma yalnızca ön planda (dokununca ve bağlıyken uygulama açılınca); Ayla arka planda okumaz. |
-| Adet, ovülasyon testi, bazal ısı, semptom vb. | MVP 1–2 kapsamı dışında; üreme sağlığı türleri yüksek hassasiyetli incelemeye tabi. |
+| Adet, ovülasyon testi, bazal ısı, servikal mukus, semptom vb. (`READ_MENSTRUATION`, `READ_OVULATION_TEST`, `READ_BASAL_BODY_TEMPERATURE`, `READ_CERVICAL_MUCUS`) | MVP 3'te bu kayıtlar yalnızca kullanıcının Ayla'ya elle girdiği verilerdir; Health Connect'ten okunmaz, oraya yazılmaz. Üreme sağlığı türleri yüksek hassasiyetli incelemeye tabi olduğu için bilinçli olarak istenmez; CI izin denetimi READ_SLEEP dışındaki her `android.permission.health.*` iznini kırmızıya çevirir. |
 
 ## 4. Veri güvenliği (Data safety) formu: önerilen yanıtlar
 
@@ -181,6 +193,9 @@ ve geçmiş veri izni istenmez.
 |---|---|---|
 | Does your app collect or share any of the required user data types? | **No** | "Collect" = verinin uygulamadan cihaz dışına iletilmesi. "User data accessed by your app that is only processed locally on the user's device and not sent off device does not need to be disclosed." Ayla'da internet izni, sunucu ve SDK yok; Health Connect verisi de cihazda kalır. |
 | Kullanıcının başlattığı dışa aktarma ve doktor notu paylaşımı | Beyan gerekmez | "Sharing" istisnası: "Transferring user data to a third party based on a specific user-initiated action, where the user reasonably expects the data to be shared". Dosyanın yerini ya da alıcıyı kullanıcı seçer; Ayla veriyi kendisi iletmez. |
+| MVP 3: Cilt/saç fotoğrafları ("Photos and videos" veri türü) | Toplama/paylaşma **yok**; beyan gerekmez | Fotoğraf yalnızca kullanıcı kamera (`ACTION_IMAGE_CAPTURE`, uygulamanın kendi `FileProvider`'ı) ya da sistem fotoğraf seçicisi (`PickVisualMedia`) ile tek fotoğraf seçtiğinde alınır; `CAMERA` ve `READ_MEDIA_IMAGES` izni yok (Play "Photo and Video Permissions" politikasıyla uyumlu). Cihazda yeniden kodlanır (EXIF/konum atılır), AES-GCM ile şifrelenir, galeriye/MediaStore'a yazılmaz, yedeğe girmez, hiçbir yere gönderilmez; yüz tanıma ya da analiz yok. Dışa aktarma yalnızca kullanıcının seçtiği SAF adresine, kullanıcı eylemiyle (sharing istisnası). Silme: tek tek, "Tüm verilerimi sil" ve fotoğraf onayını geri alma. |
+| MVP 3: Doğurganlık kayıtları (bazal ısı, LH testi, servikal mukus), cilt/saç profili öz-beyanları ve rutin işaretleri, doktora sorular ("Health info" veri türü) | Toplama/paylaşma **yok**; beyan gerekmez | Kullanıcı girer; şifreli SQLCipher veritabanında, cihazda. Health Connect ile alışverişi yok. Yalnızca kullanıcının başlattığı JSON dışa aktarma ve doktor raporuyla cihazdan çıkar (sharing istisnası). |
+| MVP 3: Doktor raporu PDF paylaşımı | Beyan gerekmez (sharing istisnası) | Rapor `cacheDir/raporlar/` altına şifrelenmeden yazılır, `FileProvider` + `ACTION_SEND` (`application/pdf`, yalnızca okuma izni) ile sistem paylaşım menüsüne verilir; alıcıyı kullanıcı seçer, Ayla iletmez. En fazla 3 dosya, 24 saat; açılışta ve her yeni raporda temizlenir. İçerik yalnızca kayıt özeti (tanı/tedavi/doz dili yok; fotoğraf yok; ad yok). |
 | Encrypted in transit / deletion request soruları | Gösterilmez | Yardım sayfasına göre bu sorular yalnızca "Yes" dalında sorulur. Konsol yine de silme sorusunu gösterirse: kullanıcı verisini uygulama içinden silebilir (Tüm verilerimi sil; adet ve uyku kayıtları tek tek de). |
 | Hesap oluşturma (gösterilirse) | Uygulama hesap oluşturmaya izin vermiyor | Hesap yok; hesap silme URL'si gerekmez. |
 | Bağımsız güvenlik incelemesi (isteğe bağlı rozet) | Boş bırak | Böyle bir doğrulama yapılmadı. |
@@ -188,7 +203,9 @@ ve geçmiş veri izni istenmez.
 
 Bu yanıtı **geçersiz kılan** değişiklikler (olursa form ve politika birlikte güncellenir): `INTERNET` izni
 getiren herhangi bir bağımlılık; çökme raporu, analitik, uzaktan yapılandırma ya da reklam SDK'sı; bulut
-yedekleme/eşitleme; sunucuya bağlanan forum (MVP 3); uygulama içi satın alma kayıtlarının sunucuda tutulması.
+yedekleme/eşitleme; sunucuya bağlanan forum (ADR-0008 ile sürüm 2'ye ertelendi); uygulama içi satın alma
+kayıtlarının sunucuda tutulması; fotoğrafların galeriye/MediaStore'a yazılması ya da cihaz dışında işlenmesi
+(ör. bulut görüntü analizi); raporun uygulama tarafından e-posta/mesajla doğrudan gönderilmesi.
 
 ## 5. Diğer App content öğeleri (kısa)
 
@@ -219,8 +236,13 @@ veriler cihazında kalır)."
 | "kanıt düzeyi: deneysel" (inositol) | doz önerisi, ilaç etkileşimi uyarısı, "ilacını değiştir" |
 | "verin cihazında şifreli kalır" | "%100 güvenli", "asla ele geçirilemez" gibi mutlak güvenlik iddiaları |
 | ritim, alışkanlık, düzen | kilo verme, kalori, "ideal kilo" gibi kilo odaklı dil |
+| MVP 3: "bazal ısı, LH testi ve mukus gözlemlerini kaydet, grafiğini doktoruna götür"; "yumurtlama ısı yükselmesiyle geriye dönük doğrulanır; doğum kontrolü için kullanılmaz" | "gebe kalmana yardım eder", "yumurtlama gününü söyler/öngörür", "verimli günlerini hesaplar", "doğurganlık takvimi", "gebelik testi gibi" |
+| MVP 3: "cilt ve saç bakım ritmi, içerik maddesi düzeyinde, kaynaklı"; "ilerlemeni fotoğrafla gör, şifreli ve yalnızca cihazında" | "akneyi tedavi eder/iyileştirir", "lekeleri yok eder", "dermatolog onaylı" (onay alınmadan), "cilt analizi", "yapay zekâ ile cilt değerlendirmesi", "kusursuz/pürüzsüz/lekesiz cilt" |
+| MVP 3: "doktoruna götürmek için kayıtlarının PDF özeti" | "doktor raporu oluşturur" (tıbbi rapor çağrışımı), "tıbbi rapor", "reçete", "tanı raporu" |
 
-Mağaza görselleri ve ekran görüntüleri de aynı sınıra uyar (ör. "PCOS'u yen" yazan görsel kullanılmaz).
+Mağaza görselleri ve ekran görüntüleri de aynı sınıra uyar (ör. "PCOS'u yen" yazan görsel kullanılmaz; fotoğraf
+karşılaştırma ekranında gerçek bir kullanıcı yüzü ya da "iyileşti" etiketi kullanılmaz). MVP 3 bölümleri uzman
+onayı alınmadan (`skin_review_pending` bandı dururken) mağaza metninde ve görsellerinde tanıtılmaz.
 
 ## 7. Ret risklerini azaltma
 
@@ -236,9 +258,12 @@ Mağaza görselleri ve ekran görüntüleri de aynı sınıra uyar (ör. "PCOS'u
 
 ## 8. Beyanı yeniden gönderme tetikleyicileri
 
-- Yeni Health Connect veri türü (ör. MVP 3: ovülasyon testi, bazal vücut ısısı, adet akışı → üreme sağlığı,
-  yüksek hassasiyetli inceleme), yazma izni, arka plan ya da geçmiş okuma: form yeniden doldurulur; mevcut
-  türler dahil edilir, kullanılmayanlar çıkarılır.
+- Yeni Health Connect veri türü (ör. ileride ovülasyon testi, bazal vücut ısısı ya da adet akışının Health
+  Connect'ten okunması → üreme sağlığı, yüksek hassasiyetli inceleme), yazma izni, arka plan ya da geçmiş okuma:
+  form yeniden doldurulur; mevcut türler dahil edilir, kullanılmayanlar çıkarılır. MVP 3 bu tetikleyiciyi
+  **çalıştırmaz**: BBT/LH/mukus kayıtları yalnızca elle girilir, Health Connect kapsamı uyku okumada kalır.
+- Uygulamanın sağlık özellikleri değiştiğinde (MVP 3: doğurganlık kayıtları, cilt/saç, doktor raporu) Health apps
+  formunun 1. ekranı yeniden gözden geçirilir (§3.1); Veri güvenliği yanıtı değişmez (§4).
 - `READ_SLEEP`'in kaldırılması: form, tür çıkarılarak yeniden gönderilir.
 - Ağ erişimi, SDK ya da yeni bir veri akışı: Veri güvenliği formu ve politika birlikte güncellenir.
 - Uygulamanın AB/AEA'da da yayımlanması: politika GDPR açısından ayrıca gözden geçirilir (bu metin KVKK'ya göre yazıldı).

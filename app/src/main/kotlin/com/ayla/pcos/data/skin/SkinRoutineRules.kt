@@ -150,7 +150,9 @@ object SkinRoutineRules {
                 if (actives.isNotEmpty()) notes += RoutineNote.PATCH_TEST_FIRST
             }
             if (pregnancy) {
+                // §3.5: sürülüp bırakılan asitler (salisilik, AHA) ihtiyaten rutinden çıkar; azelaik ve niasinamid kalır.
                 actives -= RoutineStep.SALICYLIC
+                actives -= RoutineStep.AHA
                 if (RoutineStep.NIACINAMIDE in actives) notes += RoutineNote.TTC_NIACINAMIDE
             }
             evening += actives

@@ -42,6 +42,7 @@ class UserPreferencesRepository @Inject constructor(
             trackingSince = this[Keys.TRACKING_SINCE]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
             healthDataConsentAt = this[Keys.HEALTH_DATA_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
             healthConnectConsentAt = this[Keys.HEALTH_CONNECT_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
+            photoConsentAt = this[Keys.PHOTO_CONSENT_AT]?.let { Instant.ofEpochMilli(it) },
             healthConnectPermissionCancels = this[Keys.HEALTH_CONNECT_PERMISSION_CANCELS] ?: defaults.healthConnectPermissionCancels,
             healthConnectHiddenIds = this[Keys.HEALTH_CONNECT_HIDDEN_IDS] ?: defaults.healthConnectHiddenIds,
             consentPersonalization = this[Keys.CONSENT_PERSONALIZATION] ?: defaults.consentPersonalization,
@@ -77,6 +78,7 @@ class UserPreferencesRepository @Inject constructor(
         p.trackingSince?.let { this[Keys.TRACKING_SINCE] = it.toString() } ?: remove(Keys.TRACKING_SINCE)
         p.healthDataConsentAt?.let { this[Keys.HEALTH_DATA_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.HEALTH_DATA_CONSENT_AT)
         p.healthConnectConsentAt?.let { this[Keys.HEALTH_CONNECT_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.HEALTH_CONNECT_CONSENT_AT)
+        p.photoConsentAt?.let { this[Keys.PHOTO_CONSENT_AT] = it.toEpochMilli() } ?: remove(Keys.PHOTO_CONSENT_AT)
         this[Keys.HEALTH_CONNECT_PERMISSION_CANCELS] = p.healthConnectPermissionCancels
         this[Keys.HEALTH_CONNECT_HIDDEN_IDS] = p.healthConnectHiddenIds
         this[Keys.CONSENT_PERSONALIZATION] = p.consentPersonalization
@@ -118,6 +120,7 @@ class UserPreferencesRepository @Inject constructor(
         val CONSENT_PERSONALIZATION = booleanPreferencesKey("consent_personalization")
         val HEALTH_DATA_CONSENT_AT = longPreferencesKey("health_data_consent_at")
         val HEALTH_CONNECT_CONSENT_AT = longPreferencesKey("health_connect_consent_at")
+        val PHOTO_CONSENT_AT = longPreferencesKey("photo_consent_at")
         val HEALTH_CONNECT_PERMISSION_CANCELS = intPreferencesKey("health_connect_permission_cancels")
         val HEALTH_CONNECT_HIDDEN_IDS = stringSetPreferencesKey("health_connect_hidden_ids")
         val LEGACY_CONSENT_ANALYTICS = booleanPreferencesKey("consent_analytics")

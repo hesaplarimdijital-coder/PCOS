@@ -101,7 +101,7 @@ class DoktorRaporuTesti : VeriTestOrtami() {
 
         val uyku = assertNotNull(section(report, R.string.report_section_sleep_water))
         val uykuSatirlari = uyku.blocks.filterIsInstance<ReportBlock.KeyValues>().single().rows
-        assertEquals(context.getString(R.string.report_sleep_value, 7, 30), uykuSatirlari.first { it.first.startsWith("Ortalama uyku") }.second)
+        assertEquals(context.getString(R.string.report_sleep_value, 7, 30), uykuSatirlari.first { it.first == context.getString(R.string.report_sleep_average, 1) }.second)
 
         val cilt = assertNotNull(section(report, R.string.report_section_skin))
         val ciltSatirlari = cilt.blocks.filterIsInstance<ReportBlock.KeyValues>().single().rows

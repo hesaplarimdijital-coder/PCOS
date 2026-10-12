@@ -169,8 +169,8 @@ niasinamid kartına `skin_ttc_niacinamide_note` eklenir).
 |---|---|---|---|
 | 1 | Herkes | Temizleyici; makyaj ve güneş koruyucu çıkarılır | `skin_step_cleanser` |
 | 2a | Akne hafif/orta ∧ gebelik planı kapalı | Salisilik asitli temizleyici (durulanan, en çok yüzde 2), haftada birkaç gece; ya da azelaik asit | `skin_step_salicylic`, `skin_step_azelaic` |
-| 2b | Akne hafif/orta ∧ gebelik planı açık | Azelaik asit; salisilik asit yalnızca durulanan düşük yüzdeli temizleyicide ve kısa süreli (kart notu); leave-on asit ürünleri yok | `skin_step_azelaic`, `skin_avoid_salicylic` |
-| 2c | Leke ∧ hassas değil | Azelaik asit ya da niasinamid; AHA haftada 1–2 gece (salisilik gecesiyle aynı gece değil) | `skin_step_azelaic`, `skin_step_niacinamide`, `skin_step_aha` |
+| 2b | Akne hafif/orta ∧ gebelik planı açık | Azelaik asit; salisilik asit rutinden çıkar (durulanan düşük yüzdenin sınırlı kullanılabilirliği `skin_avoid_salicylic` bandında anlatılır); sürülüp bırakılan asit ürünleri (AHA dâhil) yok | `skin_step_azelaic`, `skin_avoid_salicylic` |
+| 2c | Leke ∧ hassas değil | Azelaik asit ya da niasinamid; AHA haftada 1–2 gece (salisilik gecesiyle aynı gece değil; gebelik planında AHA çıkar, bkz. 3.5) | `skin_step_azelaic`, `skin_step_niacinamide`, `skin_step_aha` |
 | 2d | Leke ∧ hassas | Yalnızca niasinamid (yama testi sonrası); AHA ve salisilik yok | `skin_step_niacinamide` |
 | 2e | Akne yoğun | Aktif önerilmez; dermatolog kartı rutinin üstünde | `skin_doctor_acne_severe` |
 | 2f | Normal/kuru/hassas ∧ akne yok ∧ leke yok | Aktif yok | — |
@@ -211,8 +211,10 @@ Editör notları:
 - `skin_step_aha`: SCCNFP tüketici ürünlerinde glikolik asit en çok yüzde 4 (pH ≥ 3,8), laktik asit yüzde 2,5
   (pH ≥ 5) ve UV uyarısı önerir; bu sayılar kullanıcıya gösterilmez, yalnızca "güneşe duyarlılık" uyarısı
   metne girer.
-- Gebelik planında AHA rutinden **çıkarılmaz**: MotherSafe (2021) glikolik asidi gebelikte güvenli sayar. Hassas
-  ciltte zaten yok.
+- Gebelik planında AHA rutinden **çıkar** (uygulama kararı, 12 Ekim 2026 uyum incelemesi): MotherSafe (2021) glikolik asidi
+  gebelikte güvenli sayar, ancak `skin_avoid_kept` bandı "sürülüp bırakılan asitler çıkar" dediğinden gösterilen rutinle
+  güvenlik listesi çelişmesin diye ihtiyat ilkesi uygulanır; kod (`SkinRoutineRules`) ve bant metni buna göredir. Hassas
+  ciltte AHA zaten yoktur.
 
 ### 3.5 Gebelik planı açıkken kaçınılacaklar
 

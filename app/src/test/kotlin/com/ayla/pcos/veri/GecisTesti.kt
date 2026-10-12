@@ -127,6 +127,23 @@ class GecisTesti {
     }
 
     @Test
+    fun `gecis listesi veritabani surumune kadar ulasir`() {
+        // Sürüm artırılıp Migration unutulursa burada yakalanır; cihazda "Migration didn't properly handle" çökmesi olmaz.
+        val sonSurum = ALL_MIGRATIONS.maxOf { it.endVersion }
+        assertEquals(surumOku(), sonSurum, "AylaDatabase sürümü ile son geçiş hedefi aynı olmalı")
+        (1 until sonSurum).forEach { from ->
+            assertTrue(ALL_MIGRATIONS.any { it.startVersion == from && it.endVersion == from + 1 }, "$from → ${from + 1} geçişi eksik")
+        }
+    }
+
+    /** `@Database(version = N)` değeri: Room'un sıfırdan kurduğu bellek içi veritabanının user_version'ı. */
+    private fun surumOku(): Int {
+        val db = Room.inMemoryDatabaseBuilder(context, AylaDatabase::class.java).allowMainThreadQueries().build()
+        acikVeritabanlari += db
+        return db.openHelper.readableDatabase.version
+    }
+
+    @Test
     fun `gecis SQL cumleleri Room tarafindan uretilen sema ile sutun ve indeks duzeyinde birebirdir`() {
         surum1Kur()
         val gecisli = gecisleAc().openHelper.readableDatabase

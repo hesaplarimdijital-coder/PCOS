@@ -97,7 +97,7 @@
     <string name="skin_avoid_title">Gebelik planında çıkardıklarımız</string>
     <string name="skin_avoid_text">Hamile kalmayı planladığın için aşağıdaki içerikler rutinde yok. Çoğunda gebelikte risk biliniyor ya da güvenlik verisi yetersiz; kullanıyorsan doktoruna söyle.</string>
     <string name="skin_avoid_retinoids_title">Retinol ve retinoidler</string>
-    <string name="skin_avoid_retinoids_text">Retinol, retinal ve reçeteli retinoidler (tretinoin, adapalen, tazaroten, izotretinoin). Ağızdan izotretinoin bebeğe ciddi zarar verir; sürülenler de gebelikte bırakılır.</string>
+    <string name="skin_avoid_retinoids_text">Retinol, retinal ve reçeteli retinoidler (tretinoin, adapalen, tazaroten, izotretinoin). Ağızdan izotretinoin bebeğe ciddi zarar verir. Reçeteli bir retinoid kullanıyorsan bırakma ya da sürdürme kararını doktorunla ver; kendi başına değiştirme.</string>
     <string name="skin_avoid_retinoids_source" translatable="false">AAD, Is any acne treatment safe to use during pregnancy?; MotherSafe 2021</string>
     <string name="skin_avoid_hydroquinone_title">Hidrokinon</string>
     <string name="skin_avoid_hydroquinone_text">Leke açıcı bir ilaç etken maddesi; ciltten yüksek oranda emildiği için gebelikte kaçınılması öneriliyor. Kozmetikte bulunmaz; yalnızca hekim kontrolünde kullanılır.</string>
@@ -112,7 +112,7 @@
     <string name="skin_avoid_rx_text">Ağızdan antibiyotikler, hormon ilaçları ve antiandrojenler gebelikte özel değerlendirme gerektirir. Kullanıyorsan bırakmadan, düşünüyorsan başlamadan önce doktorunla konuş.</string>
     <string name="skin_avoid_rx_source" translatable="false">AAD, Is any acne treatment safe to use during pregnancy?; Türk Dermatoloji Derneği, hirsutizm broşürü</string>
     <string name="skin_avoid_kept_title">Gebelik planında kalanlar</string>
-    <string name="skin_avoid_kept_text">Nazik temizleyici, nemlendirici, güneş koruyucu ve azelaik asit rutinde kalır; gebelikte kullanılabildikleri düşünülüyor. Her yeni ürünü yine de doktoruna ya da ebene sorabilirsin.</string>
+    <string name="skin_avoid_kept_text">Nazik temizleyici, nemlendirici, güneş koruyucu ve azelaik asit rutinde kalır; gebelikte kullanılabildikleri düşünülüyor. Niasinamid için kaynaklarımızda uyarı yok, yine de doktoruna sor. Sürülüp bırakılan asitler (AHA dâhil) ihtiyaten rutinden çıkar. Her yeni ürünü doktoruna ya da ebene sorabilirsin.</string>
     <string name="skin_avoid_kept_source" translatable="false">AAD, Is any acne treatment safe to use during pregnancy?; MotherSafe 2021</string>
 
     <!-- Alerji ve hassasiyet -->

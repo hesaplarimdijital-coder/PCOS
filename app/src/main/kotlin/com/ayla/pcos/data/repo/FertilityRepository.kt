@@ -49,7 +49,7 @@ class FertilityRepository @Inject constructor(
         ticker.today,
     ) { entries, periods, pill, today ->
         FertilityEngine.analyze(entries.map { it.toEntry() }, periods.map { it.startDate }, today, pill)
-    }
+    }.distinctUntilChanged()
 
     fun observeOverview(): Flow<FertilityOverview> = overview
 
@@ -82,6 +82,9 @@ class FertilityRepository @Inject constructor(
             onPill = pill,
         )
     }
+
+    /** Hap modu tek tanım: tercihlerde PILL hedefi ya da aktif doğum kontrol hapı (ADR-0005; rapor da bunu kullanır). */
+    suspend fun isOnPill(): Boolean = isOnPill(prefs.current(), medicationDao.getActive())
 
     private fun isOnPill(p: UserPreferences, activeMedications: List<MedicationEntity>): Boolean =
         Goal.PILL in p.goals || activeMedications.any { it.kind == MedicationKind.CONTRACEPTIVE }
