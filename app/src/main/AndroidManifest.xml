@@ -102,5 +102,18 @@
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <!-- Cilt/saç fotoğrafları (#25, ADR-0010): kamera uygulamasının geçici düz dosyayı yazacağı tek adres
+             (cacheDir/camera). Dışa kapalı; yazma izni yalnızca ACTION_IMAGE_CAPTURE niyetiyle, tek dosya için,
+             sistem tarafından verilir. CAMERA ya da depolama izni istenmez; şifreli fotoğraflar buradan sunulmaz. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.photos"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/photo_paths" />
+        </provider>
     </application>
 </manifest>

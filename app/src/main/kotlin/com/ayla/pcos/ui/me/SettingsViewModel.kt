@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayla.pcos.data.health.HealthConnectRepository
+import com.ayla.pcos.data.photos.PhotoStore
 import com.ayla.pcos.data.prefs.UserPreferences
 import com.ayla.pcos.data.prefs.UserPreferencesRepository
 import com.ayla.pcos.data.repo.MedicationRepository
@@ -53,6 +54,7 @@ class SettingsViewModel @Inject constructor(
     medications: MedicationRepository,
     private val alarmLog: AlarmLog,
     private val healthConnect: HealthConnectRepository,
+    private val photoStore: PhotoStore,
 ) : ViewModel() {
 
     /** Doz hatırlatması olan biri için pil tasarrufu yönlendirmesi gösterilir (#17). */
@@ -130,6 +132,8 @@ class SettingsViewModel @Inject constructor(
         // Önce Health Connect bağlantısı kesilir (rıza silinir, izinler bırakılır); sonra kayıtlar.
         healthConnect.disconnect()
         exporter.wipeAll()
+        // Şifreli fotoğraflar ve anahtarları da gider (ADR-0010); anahtar açılamıyor olsa da çalışır.
+        runCatching { photoStore.deleteAll() }
         alarmLog.clear()
         prefs.update { UserPreferences() }
         runCatching { scheduler.rescheduleAll() }

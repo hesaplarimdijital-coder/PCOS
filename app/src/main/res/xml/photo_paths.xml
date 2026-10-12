@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kamera uygulamasının yazabileceği tek yer: cacheDir/camera (ADR-0010). Şifreli fotoğraflar (filesDir/photos)
+     bu sağlayıcıdan erişilemez; dışa aktarma kullanıcının seçtiği SAF adresine yapılır. -->
+<paths>
+    <cache-path name="camera" path="camera/" />
+</paths>
