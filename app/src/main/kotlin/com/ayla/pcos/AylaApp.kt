@@ -5,6 +5,7 @@ import com.ayla.pcos.data.photos.PhotoStore
 import com.ayla.pcos.di.ApplicationScope
 import com.ayla.pcos.reminders.NotificationChannels
 import com.ayla.pcos.reminders.ReminderScheduler
+import com.ayla.pcos.report.PdfReportWriter
 import com.ayla.pcos.widget.WidgetSync
 import com.ayla.pcos.widget.WidgetUpdater
 import dagger.hilt.android.HiltAndroidApp
@@ -25,6 +26,9 @@ class AylaApp : Application() {
     /** Kamera için açılmış geçici düz dosyalar (ADR-0010); anahtara dokunmadan temizlenir. */
     @Inject lateinit var photoStore: dagger.Lazy<PhotoStore>
 
+    /** Önbellekteki eski rapor PDF'leri (ADR-0009). */
+    @Inject lateinit var pdfReportWriter: dagger.Lazy<PdfReportWriter>
+
     override fun onCreate() {
         super.onCreate()
         NotificationChannels.create(this)
@@ -32,5 +36,6 @@ class AylaApp : Application() {
         appScope.launch { runCatching { scheduler.get().rescheduleAll() } }
         appScope.launch { if (WidgetUpdater.hasWidgets(this@AylaApp)) widgetSync.get().start(refreshNow = true) }
         appScope.launch { runCatching { photoStore.get().cleanupTemp() } }
+        appScope.launch { runCatching { pdfReportWriter.get().cleanup() } }
     }
 }

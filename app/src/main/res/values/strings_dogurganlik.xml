@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Taslak: docs/arastirma/dogurganlik-icerigi.md (klinik içerik ajanı, 12 Ekim 2026). Uzman onayı bekliyor.
+     FertilityNote enum değerleri: fertility_note_* anahtarları. Kesme işaretleri \' ile. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation" tools:locale="tr">
+
+    <!-- Doğurganlık: başlık ve sınır ibareleri -->
+    <string name="fertility_title">Doğurganlık</string>
+    <string name="fertility_intro_title">Yumurtlamayı birlikte okuyalım</string>
+    <string name="fertility_intro_text">LH testi, bazal vücut ısısı ve mukusunu kaydedebilirsin. PCOS (yeni adıyla PMOS) ile yumurtlama düzensiz olabildiği için Ayla onu yalnızca ısı yükselmesiyle doğrulanmış sayar.</string>
+    <string name="fertility_intro_source" translatable="false">Teede ve ark. 2023, Hum Reprod; Sensiplan (Frank-Herrmann ve ark. 2007)</string>
+    <string name="fertility_not_contraception">Bu bölüm doğum kontrolü için kullanılmaz. Doğal aile planlaması ancak eğitimli bir danışmanla öğrenilir; Ayla bunun yerini tutmaz.</string>
+    <string name="fertility_not_contraception_source" translatable="false">NHS, Natural family planning</string>
+    <string name="fertility_not_diagnosis">Buradaki notlar tanı ya da tedavi değildir; gözlemlerini doktorunla paylaşmana yardım eder.</string>
+    <string name="fertility_disabled_pill_title">Hap kullanırken kapalı</string>
+    <string name="fertility_disabled_pill_text">Doğum kontrol hapı yumurtlamayı baskıladığı için bu bölümde hesap yapılmaz. Hap modunu kapatınca kayıtların yeniden görünür.</string>
+    <string name="fertility_disabled_pill_source" translatable="false">NHS, kontrasepsiyon bilgisi</string>
+    <string name="fertility_enable_hint">Bu bölüm “Hamile kalmayı planlıyorum” önceliği açıkken görünür; ayarlardan açabilirsin.</string>
+    <string name="fertility_tell_doctor">Grafiği ve notları doktor raporuna ekleyebilirsin; yorumunu birlikte yaparsınız.</string>
+
+    <!-- Bazal vücut ısısı -->
+    <string name="fertility_bbt_title">Bazal vücut ısısı (BBT)</string>
+    <string name="fertility_bbt_value_label">Isı (°C)</string>
+    <string name="fertility_bbt_value_hint">36,55</string>
+    <string name="fertility_bbt_time_label">Ölçüm saati</string>
+    <string name="fertility_bbt_how_title">Nasıl ölçülür?</string>
+    <string name="fertility_bbt_step_1">Uyanır uyanmaz, yataktan kalkmadan ve bir şey yiyip içmeden ölç.</string>
+    <string name="fertility_bbt_step_2">Her gün yaklaşık aynı saatte, yeterli bir uykudan sonra ölç.</string>
+    <string name="fertility_bbt_step_3">Ağızdan ölçebilirsin; döngü boyunca aynı yeri, aynı termometreyi ve aynı süreyi kullan.</string>
+    <string name="fertility_bbt_step_4">İki ondalık gösteren (36,55 gibi) bir bazal termometre uygun; ölçüm bitene kadar bekle.</string>
+    <string name="fertility_bbt_step_5">Değeri hemen kaydet; ateş, alkol ya da kötü uyku gibi bir etken varsa “ölçüm bozuk olabilir” işaretini aç.</string>
+    <string name="fertility_bbt_how_source" translatable="false">DSÖ/JHU, Family Planning Handbook; Family Planning NSW 2013; Sensiplan (Frank-Herrmann ve ark. 2007)</string>
+    <string name="fertility_bbt_disturbed_label">Ölçüm bozuk olabilir</string>
+    <string name="fertility_bbt_disturbed_help">Bozuk işaretli ölçüm grafikte içi boş görünür ve yükselme hesabına girmez; kaydın silinmez.</string>
+    <string name="fertility_bbt_reasons_title">Ölçümü etkileyebilen etkenler</string>
+    <string name="fertility_bbt_reason_fever">Ateş ya da hastalık</string>
+    <string name="fertility_bbt_reason_alcohol">Önceki akşam alkol</string>
+    <string name="fertility_bbt_reason_sleep">Kısa, kesintili ya da alışılmıştan geç uyku</string>
+    <string name="fertility_bbt_reason_time">Alışılmış saatten çok farklı bir saatte ölçüm</string>
+    <string name="fertility_bbt_reason_travel">Yolculuk, saat farkı ya da vardiya</string>
+    <string name="fertility_bbt_reason_medication">Yeni başlanan ilaç</string>
+    <string name="fertility_bbt_reason_blanket">Elektrikli battaniye</string>
+    <string name="fertility_bbt_reasons_source" translatable="false">Family Planning NSW 2013; Smoley ve Robinson 2012, Am Fam Physician; Sensiplan</string>
+    <string name="fertility_bbt_out_of_range">35,0–38,5 °C dışındaki değerler hesaba girmez; yazım hatası olabilir, kontrol et.</string>
+    <string name="fertility_bbt_why_title">Isı neden yükselir?</string>
+    <string name="fertility_bbt_why_text">Yumurtlamadan sonra salınan progesteron vücut ısısını yaklaşık 0,2–0,5 °C yükseltir ve adete kadar yüksek tutar. Yükselme yumurtlamayı sonradan doğrular; önceden haber vermez.</string>
+    <string name="fertility_bbt_why_source" translatable="false">DSÖ/JHU, Family Planning Handbook; Family Planning NSW 2013; Ecochard ve ark. 2001, BJOG</string>
+    <string name="fertility_bbt_imprecise_title">Tahmini gün yaklaşıktır</string>
+    <string name="fertility_bbt_imprecise_text">Isı yükselmesi çoğu zaman yumurtlamadan birkaç gün sonra görünür; bu yüzden “tahmini yumurtlama günü” yaklaşık bir tarihtir, kesin değildir.</string>
+    <string name="fertility_bbt_imprecise_source" translatable="false">Ecochard ve ark. 2001, BJOG</string>
+    <string name="fertility_rule_title">Doğrulama kuralı</string>
+    <string name="fertility_rule_text">Önceki altı geçerli ölçümün en yükseğinin (örtü çizgisi) üstünde art arda üç ölçüm; üçüncüsü çizginin en az 0,2 °C üstünde. Kural sağlanmadan yumurtlama “doğrulandı” denmez.</string>
+    <string name="fertility_rule_source" translatable="false">Sensiplan (Frank-Herrmann ve ark. 2007, Hum Reprod); Family Planning NSW 2013; DSÖ/JHU, Family Planning Handbook</string>
+
+    <!-- LH testi -->
+    <string name="fertility_lh_title">LH (yumurtlama) testi</string>
+    <string name="fertility_lh_negative">Negatif</string>
+    <string name="fertility_lh_positive">Pozitif</string>
+    <string name="fertility_lh_invalid">Geçersiz</string>
+    <string name="fertility_lh_how_title">Nasıl okunur?</string>
+    <string name="fertility_lh_how_text">Test çizgisi kontrol çizgisi kadar ya da daha koyuysa pozitif, daha açıksa negatiftir; silik çizgi de negatif sayılır. Her gün aynı saatte test et, öncesinde çok sıvı içme.</string>
+    <string name="fertility_lh_how_note">Kendi testinin talimatı önceliklidir; markalar arasında küçük farklar olabilir.</string>
+    <string name="fertility_lh_how_source" translatable="false">Clearblue Digital Ovulation Test kullanım talimatı</string>
+    <string name="fertility_lh_invalid_help">Kontrol çizgisi çıkmadıysa test geçersizdir; yeni bir testle tekrarla.</string>
+    <string name="fertility_lh_positive_meaning_title">Pozitif ne demek?</string>
+    <string name="fertility_lh_positive_meaning_text">Pozitif LH, yumurtlamanın yaklaştığını düşündürür; çoğu zaman 1–2 gün içinde olur ama her LH yükselişi yumurtlamayla sonuçlanmaz. Kesin bilgi ısı yükselmesinden gelir.</string>
+    <string name="fertility_lh_positive_meaning_source" translatable="false">Su ve ark. 2017, Bioeng Transl Med; Ecochard ve ark. 2001, BJOG; Hoff ve ark. 1983; Testart ve ark. 1981</string>
+    <string name="fertility_lh_pcos_title">PCOS\'ta LH testi yanıltabilir</string>
+    <string name="fertility_lh_pcos_text">PCOS\'ta LH döngü boyunca yüksek seyredebilir; test, yumurtlama olmadan da pozitif görünebilir. Üreticiler de bu uyarıyı yapar. Bu yüzden LH yalnızca kayıttır.</string>
+    <string name="fertility_lh_pcos_source" translatable="false">Clearblue kullanım talimatı; McGovern ve ark. 2004, Fertil Steril; Taylor ve ark. 1997, J Clin Endocrinol Metab</string>
+
+    <!-- Servikal mukus -->
+    <string name="fertility_mucus_title">Servikal mukus</string>
+    <string name="fertility_mucus_dry">Kuru</string>
+    <string name="fertility_mucus_sticky">Yapışkan</string>
+    <string name="fertility_mucus_creamy">Kremsi</string>
+    <string name="fertility_mucus_watery">Sulu</string>
+    <string name="fertility_mucus_egg_white">Yumurta akı</string>
+    <string name="fertility_mucus_text">Yalnızca kayıt için; doğrulamaya girmez. Yumurta akı kıvamındaki şeffaf, uzayan mukus en verimli günlere denk gelir; düzenli gözlem gebelik şansının yükselmesiyle ilişkili bulundu.</string>
+    <string name="fertility_mucus_source" translatable="false">Evans-Hoeker ve ark. 2013, Fertil Steril; Bigelow ve ark. 2004, Hum Reprod</string>
+    <string name="fertility_mucus_pcos_note">PCOS\'ta yumurtlama gecikince verimli tip mukus günlerce sürebilir ya da yinelenebilir; mukus tek başına yumurtlama demek değildir.</string>
+
+    <!-- Grafik ve döngü özeti -->
+    <string name="fertility_chart_title">Isı grafiği</string>
+    <string name="fertility_chart_coverline">Örtü çizgisi</string>
+    <string name="fertility_chart_excluded">Hesaba girmedi</string>
+    <string name="fertility_chart_lh_marker">LH pozitif</string>
+    <string name="fertility_chart_empty">Isı ölçümlerini kaydettikçe grafik burada oluşur. İlk kural için dokuz ölçüm gerekir; birkaç gün kaçarsa sorun değil.</string>
+    <string name="fertility_chart_a11y">Bu döngünün ısı grafiği: %1$d ölçüm, %2$d tanesi hesaba girmedi. %3$s</string>
+    <string name="fertility_chart_coverline_a11y">Örtü çizgisi %1$s derece.</string>
+    <string name="fertility_ovulation_estimate">Tahmini yumurtlama: %1$s (yaklaşık)</string>
+    <string name="fertility_confirmed_on">%1$s tarihinde doğrulandı</string>
+    <string name="fertility_luteal_day">Yumurtlama sonrası %1$d. gün</string>
+    <string name="fertility_cycle_day">Döngünün %1$d. günü</string>
+
+    <!-- FertilityNote metinleri (motor sırası) -->
+    <string name="fertility_note_confirmed_title">Yumurtlama doğrulandı</string>
+    <string name="fertility_note_confirmed_text">Isın üç gün üst üste örtü çizgisinin üstünde kaldı; bu döngüde yumurtlama olmuş görünüyor. Tahmini gün yaklaşıktır, yükselme yumurtlamadan birkaç gün sonra görünebilir.</string>
+    <string name="fertility_note_confirmed_source" translatable="false">Sensiplan (Frank-Herrmann ve ark. 2007, Hum Reprod); Ecochard ve ark. 2001, BJOG</string>
+    <string name="fertility_note_too_few_title">Henüz yeterli ölçüm yok</string>
+    <string name="fertility_note_too_few_text">Kural için en az dokuz geçerli ölçüm gerekir: altı önceki, üç yüksek. Birkaç gün kaçarsa sorun değil; ölçmeye devam et.</string>
+    <string name="fertility_note_too_few_source" translatable="false">Sensiplan yöntem kuralı; Family Planning NSW 2013</string>
+    <string name="fertility_note_many_disturbed_title">Bozuk ölçüm fazla</string>
+    <string name="fertility_note_many_disturbed_text">Bu döngüde ölçümlerin önemli bir kısmı bozuk işaretli; grafik güvenilir okunmayabilir. Mümkünse ölçüm saatini ve koşullarını sabitlemeyi dene.</string>
+    <string name="fertility_note_many_disturbed_source" translatable="false">Sensiplan bozucu etkenler</string>
+    <string name="fertility_note_lh_without_rise_title">LH pozitif ama ısı yükselmedi</string>
+    <string name="fertility_note_lh_without_rise_text">Pozitif testten sonra beş ölçümde yükselme yok. PCOS\'ta LH testi yumurtlama olmadan da pozitif çıkabilir; yumurtlama olmamış ya da gecikmiş olabilir. Sık olursa doktoruna söyle.</string>
+    <string name="fertility_note_lh_without_rise_source" translatable="false">Clearblue kullanım talimatı; McGovern ve ark. 2004, Fertil Steril; Su ve ark. 2017, Bioeng Transl Med</string>
+    <string name="fertility_note_rise_without_lh_title">Isı yükseldi, LH pozitif yakalanmadı</string>
+    <string name="fertility_note_rise_without_lh_text">Yumurtlama ısıyla doğrulandı ama testlerin pozitif göstermedi. LH yükselişi kısa sürebilir; günde tek test onu kaçırabilir. Doğrulama geçerli.</string>
+    <string name="fertility_note_rise_without_lh_source" translatable="false">Direito ve ark. 2013, Fertil Steril; Clearblue kullanım talimatı</string>
+    <string name="fertility_note_long_luteal_title">Yumurtlama sonrası 18 günü geçti</string>
+    <string name="fertility_note_long_luteal_text">Isın 18 günden uzun süredir yüksek ve adet gelmedi. Bu, gebelik olasılığının klasik işaretidir; bir gebelik testi yapabilirsin. Test negatifse ve adet gelmezse doktorunla konuş.</string>
+    <string name="fertility_note_long_luteal_source" translatable="false">Lenton ve ark. 1984, Br J Obstet Gynaecol; Crawford ve ark. 2017, Fertil Steril; NHS, Doing a pregnancy test; Sensiplan</string>
+
+    <!-- Düzensiz döngü, umut, ne zaman doktora -->
+    <string name="fertility_irregular_title">Döngün düzensizse</string>
+    <string name="fertility_irregular_text">Döngüler 21 günden kısa, 35 günden uzun ya da yılda sekizden azsa yumurtlama düzensiz olabilir. Bu konuşulabilir bir durum; doktoruna götürecek bir not hazırlayabiliriz.</string>
+    <string name="fertility_irregular_source" translatable="false">Teede ve ark. 2023, Hum Reprod</string>
+    <string name="fertility_regular_anovulation_title">Düzenli döngüde de olabilir</string>
+    <string name="fertility_regular_anovulation_text">Düzenli döngüde de yumurtlama olmayabilir; grafikte yükselme görünmeyen döngüler bunun ipucu olabilir. Emin olmak için doktorun kan testi isteyebilir.</string>
+    <string name="fertility_regular_anovulation_source" translatable="false">Teede ve ark. 2023, Hum Reprod</string>
+    <string name="fertility_hope_title">Dürüst bir not</string>
+    <string name="fertility_hope_text">PCOS\'ta yumurtlama her ay olmayabilir; bu, gebeliğin olmayacağı anlamına gelmez. Yumurtlamayı destekleyen tedaviler var; bir yıl beklemeden doktora gidilebilir.</string>
+    <string name="fertility_hope_source" translatable="false">NHS, Polycystic ovary syndrome (PMOS); NICE CG156; Teede ve ark. 2023</string>
+    <string name="fertility_doctor_when_title">Ne zaman doktora?</string>
+    <string name="fertility_doctor_when_text">Bir yıl korunmasız ilişkiye rağmen gebelik olmadıysa değerlendirme önerilir; döngün düzensizse ya da 36 yaş ve üstüysen daha erken. PCOS bilinen bir nedendir; beklemen gerekmez.</string>
+    <string name="fertility_doctor_when_source" translatable="false">NICE CG156; NHS, Polycystic ovary syndrome (PMOS)</string>
+    <string name="fertility_pregnancy_test_title">Gebelik testi ne zaman?</string>
+    <string name="fertility_pregnancy_test_text">Adetin geciktiği ilk günden test yapabilirsin; döngün düzensizse son korunmasız ilişkiden en az 21 gün sonra. Pozitif sonuç neredeyse kesindir; negatifse birkaç gün sonra tekrarla.</string>
+    <string name="fertility_pregnancy_test_source" translatable="false">NHS, Doing a pregnancy test</string>
+</resources>

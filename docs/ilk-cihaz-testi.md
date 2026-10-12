@@ -59,6 +59,12 @@ ilk kez açan kişi içindir. Bulguları GitHub Issues'a (etiket `mvp-1` ya da `
 4. Günlükte Paylaş → metni cihaz testi issue'suna (#5, #7) yapıştır. Metin cihaz modelini, Android sürümünü,
    tam zamanlı alarm iznini ve pil durumunu kendisi ekler; ilaç adı içermez.
 
+## Doktor raporu PDF (#26)
+1. Ben > Doktor raporu > son 90 gün > PDF oluştur ve paylaş: paylaşım menüsü açılır; dosya bir PDF görüntüleyicide
+   Türkçe karakterlerle (ş, ğ, ı, İ) doğru görünür, sayfa altında "Sayfa n / N" vardır, BBT grafiği (varsa) çizilidir.
+2. Dosya galeride ya da İndirilenler'de görünmez; uygulama kapatılıp açılınca önbellekteki eski raporlar silinir.
+3. Ekran görüntüsü engeli açıkken rapor ekranı ve paylaşım önizlemesi karartılır.
+
 ## Bilinen eksikler
 Erişilebilirlik ve boş/hata durumlarının cihazda denetimi (#5) ile bildirim izni reddi akışının son hâli (#7)
 gerçek cihaz gerektirir. Widget'ın `exported="false"` sağlayıcıyla güncellendiği ve kilit ekranı dışı

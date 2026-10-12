@@ -561,6 +561,97 @@
     <string name="me_doctor_note">Doktor notu</string>
     <string name="me_doctor_note_text">Döngü, ilaç ve semptom özetini doktorunla paylaş</string>
 
+    <!-- Doktor raporu PDF (#26, ADR-0009). Rapor kayıt özetidir; yorum, tanı ya da öneri içermez. -->
+    <string name="report_title">Ayla · Doktor raporu</string>
+    <string name="report_subtitle">%1$s – %2$s arası kayıtlar · %3$s tarihinde hazırlandı</string>
+    <string name="report_disclaimer">Bu belge, kullanıcının Ayla uygulamasındaki kendi kayıtlarının özetidir; kullanıcı tarafından paylaşılmıştır. Tanı, tedavi ya da tıbbi tavsiye içermez.</string>
+    <string name="report_footer">Ayla ile hazırlandı · veriler yalnızca kullanıcının cihazında tutulur</string>
+    <string name="report_page_label">Sayfa %1$d / %2$d</string>
+    <string name="report_file_name">ayla-doktor-raporu-%1$s.pdf</string>
+    <string name="report_days_value">%1$d gün</string>
+    <string name="report_yes">Evet</string>
+    <string name="report_no">Hayır</string>
+    <string name="report_none">—</string>
+
+    <string name="report_section_cycle">Döngü</string>
+    <string name="report_cycle_last_period">Son adet başlangıcı</string>
+    <string name="report_cycle_day">Bugün döngünün %1$d. günü</string>
+    <string name="report_cycle_no_period">Henüz adet kaydı yok.</string>
+    <string name="report_cycle_periods_year">Son 12 ayda adet sayısı</string>
+    <string name="report_cycle_stats">Döngü uzunluğu (son 6 döngü)</string>
+    <string name="report_cycle_stats_value">ortalama %1$d gün · en kısa %2$d · en uzun %3$d</string>
+    <string name="report_cycle_col_start">Başlangıç</string>
+    <string name="report_cycle_col_length">Uzunluk</string>
+    <string name="report_cycle_col_note">Not</string>
+    <string name="report_cycle_ongoing">sürüyor (%1$d. gün)</string>
+    <string name="report_cycle_excluded">istatistik dışı bırakıldı</string>
+    <string name="report_cycle_short">14 günden kısa; hesaba katılmadı</string>
+    <string name="report_cycle_long_record">%1$d gündür adet görülmedi.</string>
+    <string name="report_cycle_few_periods">Son 12 ayda 4&#8217;ten az adet kaydı var.</string>
+    <string name="report_cycle_on_pill">Doğum kontrol hapı kullanılıyor (%1$d etken + %2$d plasebo); bu dönemde döngü tahmini yapılmaz.</string>
+    <string name="report_cycle_on_pill_plain">Doğum kontrol hapı kullanılıyor; bu dönemde döngü tahmini yapılmaz.</string>
+
+    <string name="report_section_log">Günlük kayıt ve semptomlar</string>
+    <string name="report_log_days">Kayıt tutulan gün</string>
+    <string name="report_log_days_value">%1$d / %2$d gün</string>
+    <string name="report_log_flow_days">Kanama işaretlenen gün</string>
+    <string name="report_log_mood">Ruh hâli (1–5) ortalaması</string>
+    <string name="report_log_energy">Enerji (1–3) ortalaması</string>
+    <string name="report_log_no_symptoms">Bu aralıkta semptom işaretlenmedi.</string>
+    <string name="report_log_col_symptom">Semptom</string>
+    <string name="report_log_col_days">Gün sayısı</string>
+    <string name="report_log_weight">Kilo (son kayıt)</string>
+    <string name="report_log_waist">Bel çevresi (son kayıt)</string>
+    <string name="report_log_weight_value">%1$s kg · %2$s</string>
+    <string name="report_log_waist_value">%1$s cm · %2$s</string>
+
+    <string name="report_section_meds">İlaç ve takviyeler</string>
+    <string name="report_meds_none">Kayıtlı ilaç ya da takviye yok.</string>
+    <string name="report_meds_col_name">Ad</string>
+    <string name="report_meds_col_dose">Doz</string>
+    <string name="report_meds_col_times">Saatler</string>
+    <string name="report_meds_col_adherence">Alınan / planlanan</string>
+    <string name="report_meds_adherence_value">%1$d / %2$d (%%%3$d)</string>
+    <string name="report_meds_no_times">hatırlatmasız</string>
+    <string name="report_meds_pill_regimen">%1$d etken + %2$d plasebo</string>
+    <string name="report_meds_note">Adlar ve dozlar kullanıcının girdiği gibidir; uygulama doz hesaplamaz.</string>
+
+    <string name="report_section_sleep_water">Uyku ve su</string>
+    <string name="report_sleep_average">Ortalama uyku (%1$d gece)</string>
+    <string name="report_sleep_value">%1$d sa %2$d dk</string>
+    <string name="report_water_average">Ortalama su (%1$d gün)</string>
+    <string name="report_water_value">%1$s bardak / gün (bardak %2$d ml, hedef %3$d)</string>
+
+    <string name="report_section_fertility">Doğurganlık: bazal ısı ve LH</string>
+    <string name="report_fertility_cycle">%1$s başlangıçlı döngü</string>
+    <string name="report_fertility_readings">Isı ölçümü</string>
+    <string name="report_fertility_readings_value">%1$d geçerli, %2$d bozuk/aralık dışı</string>
+    <string name="report_fertility_ovulation">Isı yükselmesiyle doğrulanan yumurtlama</string>
+    <string name="report_fertility_ovulation_value">tahmini %1$s (doğrulama %2$s, örtü çizgisi %3$s °C)</string>
+    <string name="report_fertility_ovulation_none">doğrulanmadı</string>
+    <string name="report_fertility_lh_positive">LH pozitif günler</string>
+    <string name="report_fertility_luteal">Yumurtlama sonrası gün (bugün)</string>
+    <string name="report_fertility_notes">Notlar</string>
+    <string name="report_fertility_chart_x">Döngü günü</string>
+    <string name="report_fertility_chart_y">°C</string>
+    <string name="report_fertility_chart_caption">Grafik: %1$s başlangıçlı döngü; içi boş noktalar hesaba girmeyen ölçümlerdir, kareler LH pozitif günler, kesikli çizgi örtü çizgisi.</string>
+    <string name="report_fertility_disclaimer">Yumurtlama yalnızca ısı yükselmesiyle (üç yüksek ölçüm kuralı) “doğrulanmış” sayılır; LH ve mukus kayıt amaçlıdır. Bu bölüm doğum kontrolü için kullanılmaz.</string>
+
+    <string name="report_section_skin">Cilt ve saç (öz-beyan)</string>
+    <string name="report_skin_type">Cilt tipi</string>
+    <string name="report_skin_acne">Akne (kullanıcının değerlendirmesi)</string>
+    <string name="report_skin_dark_spots">Leke ya da koyulaşma</string>
+    <string name="report_skin_acanthosis">Boyun/koltuk altı/kasıkta kadifemsi koyu alanlar</string>
+    <string name="report_skin_hair_growth">Rahatsız eden yüz/vücut tüylenmesi</string>
+    <string name="report_skin_hair_thinning">Saç dökülmesi ya da incelme</string>
+    <string name="report_skin_pregnant">Gebe ya da emziriyor</string>
+    <string name="report_skin_routine">Bakım rutini işaretlenen gün</string>
+    <string name="report_skin_routine_value">sabah %1$d, akşam %2$d / %3$d gün</string>
+    <string name="report_skin_flag">kullanıcı doktoruyla paylaşmak istedi</string>
+
+    <string name="report_section_questions">Doktora sorular</string>
+    <string name="report_questions_asked">Daha önce sorulduğu işaretlenen soru sayısı: %1$d</string>
+
     <!-- Veri sıfırlama bildirimi (Keystore anahtarı kaybı) -->
     <string name="data_reset_title">Önceki kayıtların açılamadı</string>
     <string name="data_reset_text">Telefonun güvenlik anahtarı değişmiş görünüyor (sistem güncellemesi ya da kilit sıfırlaması buna yol açabilir). Şifreli veriler bu anahtar olmadan okunamaz; Ayla temiz bir başlangıç yaptı. Dışa aktardığın bir yedeğin varsa şimdi geri yükleyebilirsin; ileride Ayarlar &gt; Verilerin bölümünden düzenli dışa aktarma yapmanı öneririz.</string>

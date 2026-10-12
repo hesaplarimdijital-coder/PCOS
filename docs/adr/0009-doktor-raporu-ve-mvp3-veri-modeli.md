@@ -37,8 +37,9 @@ sorular. Room şeması bugün sürüm 1. Fotoğraflar Room dışıdır (ADR-0010
    Kilo/bel yalnızca `showBodyMeasurements` açıkken. Fotoğraf hiç girmez. Cilt bölümü öz-beyanları ve
    "doktoruna söyle" işaretlerini listeler; ürün/ilaç önerisi yok. Doğurganlık bölümü hap modunda yoktur;
    "doğum kontrolü için kullanılmaz" ibaresi bölüm sonundadır.
-4. **Düz metin not kalır** (`DoctorNoteRepository`): hızlı paylaşım. İkisi de aynı `DoctorReportBuilder`
-   verisinden beslenir; metin sürümü `ReportModel`'den satırlara indirgenir (tek kaynak).
+4. **Düz metin not** (`DoctorNoteRepository`, 28 gün, kendi biçimi) şimdilik kalır; `DoctorReportBuilder.plainText()`
+   (`DoctorReport.toPlainText()`) aynı modelden metin üretir ve rapor ekranı geldiğinde hızlı paylaşım da ona
+   geçer (tek kaynak; `note_*` dizeleri o zaman kaldırılır).
 5. **Rapor ekranı** (`ui/report/ReportScreen.kt`, `Screen.DoctorReport` anahtarı): aralık (28/90/180 gün, özel),
    bölüm anahtarları, sayfa sayısı önizlemesi (yerleşim motoru ucuz), "PDF oluştur ve paylaş". `FLAG_SECURE`
    ayarına uyar.
@@ -70,5 +71,7 @@ işaretleri), `DoctorQuestionRepository`. `DataExporter`/`DataImporter`: `Export
 ### Sonuçlar
 + Tek migration, tek dışa aktarma sürüm artışı; üç özellik aynı veri katmanını paylaşır.
 + PDF sayfalama JVM'de test edilir; cihaz testi yalnızca font/çizim doğrulaması ister.
-− `PdfDocument` Robolectric'te doğrulanamazsa yazıcı testi cihaza kalır (yerleşim testleri yine çalışır).
+− `PdfDocument` Robolectric'te çalışmaz (doğrulandı, 12 Ekim 2026: yerel `nativeCreateDocument` yok, "document is
+  closed!"); `PdfReportWriterTest`'in üç PdfDocument testi `@Ignore`, yazıcı cihazda doğrulanır
+  (`docs/ilk-cihaz-testi.md`). Yerleşim (`ReportLayoutTest`) ve Canvas çizimi (`ReportCanvasTest`) CI'da çalışır.
 − Rapor dosyası önbellekte düzdür (PDF şifrelenmez); kısa ömürlü tutulur ve paylaşımdan sonra temizlenir.

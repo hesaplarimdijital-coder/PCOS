@@ -3,4 +3,6 @@
      bu sağlayıcıdan erişilemez; dışa aktarma kullanıcının seçtiği SAF adresine yapılır. -->
 <paths>
     <cache-path name="camera" path="camera/" />
+    <!-- Doktor raporu PDF'leri (ADR-0009): paylaşım menüsüne yalnızca bu klasör, okuma izniyle açılır. -->
+    <cache-path name="raporlar" path="raporlar/" />
 </paths>

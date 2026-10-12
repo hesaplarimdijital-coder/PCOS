@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Taslak: docs/arastirma/cilt-sac-icerigi.md (klinik içerik ajanı, 12 Ekim 2026). Uzman onayı bekliyor.
+     Birleştirmede strings_plan.xml ile aynı dosyaya ya da ayrı bir strings_skin dosyasına alınır; kesme işaretleri \' ile. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation" tools:locale="tr">
+
+    <!-- Cilt ve saç: başlık, sınır ibareleri -->
+    <string name="skin_title">Cilt ve saç</string>
+    <string name="skin_intro_title">Cildine nazik bir ritim</string>
+    <string name="skin_intro_text">PCOS (yeni adıyla PMOS) ciltte akne, koyulaşma ve tüylenmeyle kendini gösterebilir. Burada içerik maddesi düzeyinde, kanıtı belli bakım adımları var; tedavi değildir.</string>
+    <string name="skin_intro_source" translatable="false">NHS, Polycystic ovary syndrome (PMOS); Teede ve ark. 2023, Hum Reprod</string>
+    <string name="skin_not_treatment">Bu rutin bir tedavi değildir; reçeteli ürün ya da ilaç önermiyoruz. Cildin için bir tedavi düşünüyorsan dermatoloğuna danış.</string>
+    <string name="skin_not_diagnosis">Profil bilgileri senin gözlemindir; tanı yerine geçmez. Doktorunun değerlendirmesi farklı olabilir.</string>
+    <string name="skin_review_pending">Bu içerik uzman onayı bekliyor; kaynakları her kartta görebilirsin.</string>
+    <string name="skin_doctor_note_add">Doktor notuna ekle</string>
+
+    <!-- Profil -->
+    <string name="skin_profile_title">Cilt ve saç profilin</string>
+    <string name="skin_profile_text">Rutinini buna göre kuruyoruz. Hepsi isteğe bağlı; istediğin zaman değiştirebilirsin.</string>
+    <string name="skin_profile_skin_type">Cilt tipin</string>
+    <string name="skin_type_dry">Kuru</string>
+    <string name="skin_type_oily">Yağlı</string>
+    <string name="skin_type_combination">Karma</string>
+    <string name="skin_type_normal">Normal</string>
+    <string name="skin_type_sensitive">Hassas</string>
+    <string name="skin_type_help">Emin değilsen Normal seçebilirsin; dermatoloğun söylediği tipi yazman en doğrusu.</string>
+    <string name="skin_profile_acne">Akne</string>
+    <string name="skin_acne_none">Yok</string>
+    <string name="skin_acne_mild">Hafif</string>
+    <string name="skin_acne_moderate">Orta</string>
+    <string name="skin_acne_severe">Yoğun</string>
+    <string name="skin_acne_help">Bu senin gözlemin, tıbbi bir derecelendirme değil. Ağrılı, derin sivilceler ya da iz kalıyorsa dermatoloğa görünmek iyi olur.</string>
+    <string name="skin_profile_dark_spots">Leke ya da koyulaşma</string>
+    <string name="skin_profile_acanthosis">Boyun, koltuk altı ya da kasıkta kadifemsi koyu alanlar</string>
+    <string name="skin_acanthosis_help">Buna akantozis nigrikans denir; insülin direnciyle ilişkili olabilir. Tanı değildir; bir sonraki muayenede doktorunla paylaşmanı öneririz.</string>
+    <string name="skin_acanthosis_source" translatable="false">AAD, Acanthosis nigricans: Overview; NHS, Acanthosis nigricans</string>
+    <string name="skin_profile_hair_growth">Yüz ya da vücut tüylenmesi beni rahatsız ediyor</string>
+    <string name="skin_hair_growth_help">Puanlama yapmıyoruz; önemli olan senin nasıl hissettiğin. Tüylenme hızla arttıysa doktoruna söyle.</string>
+    <string name="skin_profile_hair_thinning">Saç dökülmesi ya da incelme</string>
+    <string name="skin_profile_pregnancy">Gebelik planı</string>
+    <string name="skin_pregnancy_from_goals">Önceliklerinden alındı: hamile kalmayı planlıyorsun. Rutinden gebelikte kaçınılan içerikler çıkarıldı.</string>
+    <string name="skin_profile_pregnant_now">Gebeyim ya da emziriyorum</string>
+    <string name="skin_pregnant_help">Bu seçenek açıkken rutin yalnızca gebelikte uygun sayılan içerikleri gösterir. Her ürünü yine de doktoruna ya da ebene sorabilirsin.</string>
+
+    <!-- Rutin: ortak -->
+    <string name="skin_routine_morning">Sabah rutini</string>
+    <string name="skin_routine_evening">Akşam rutini</string>
+    <string name="skin_routine_rules_title">Başlarken</string>
+    <string name="skin_routine_rule_one_product">Aynı anda tek yeni ürün başlat; cildinin nasıl karşıladığını birkaç hafta izle.</string>
+    <string name="skin_routine_rule_patch">Yeni ürünü önce kol içine madenî para büyüklüğünde sür; 7–10 gün boyunca günde iki kez tekrarla. Kızarıklık, kaşıntı ya da şişlik olursa kullanma.</string>
+    <string name="skin_routine_rule_patch_source" translatable="false">AAD, How to test skin care products before use</string>
+    <string name="skin_routine_rule_irritation">Yanma, soyulma ya da kızarıklık olursa aktif ürüne ara ver; yalnızca temizleyici, nemlendirici ve güneş koruyucuyla devam et.</string>
+    <string name="skin_routine_rule_one_active">Bir gecede tek aktif içerik yeter; asitleri üst üste kullanmak tahrişi artırabilir. Aktif geceleri dönüşümlü planla.</string>
+    <string name="skin_routine_rules_source" translatable="false">AAD, Acne: Tips for managing</string>
+    <string name="skin_step_done">Yapıldı</string>
+    <string name="skin_step_skip">Bugün geç</string>
+    <string name="skin_step_done_a11y">%1$s, yapıldı olarak işaretlendi</string>
+    <string name="skin_routine_week_count">Bu hafta %1$d sabah, %2$d akşam</string>
+    <string name="skin_routine_empty">Profilini doldurunca rutin buna göre şekillenir; şimdilik temel ritim: temizleyici, nemlendirici, güneş koruyucu.</string>
+
+    <!-- Rutin adımları -->
+    <string name="skin_step_cleanser_title">Nazik temizleyici</string>
+    <string name="skin_step_cleanser_text">Yüzünü günde en fazla iki kez ve terledikten sonra, parmak uçlarınla ve ovmadan yıka. Alkolsüz, kokusuz, aşındırmayan bir temizleyici yeter.</string>
+    <string name="skin_step_cleanser_source" translatable="false">AAD, Acne: Tips for managing; Türk Dermatoloji Derneği, akne broşürü</string>
+    <string name="skin_step_cleanser_dry_title">Kuru ve hassas ciltte temizlik</string>
+    <string name="skin_step_cleanser_dry_text">Sabah yalnızca su ya da köpürmeyen bir süt temizleyici yetebilir. Akşam makyajı ve güneş koruyucuyu mutlaka çıkar; ovmak ve lif kullanmak tahrişi artırır.</string>
+    <string name="skin_step_cleanser_dry_source" translatable="false">AAD, Acne: Tips for managing; Türk Dermatoloji Derneği, akne broşürü</string>
+    <string name="skin_step_moisturizer_title">Nemlendirici</string>
+    <string name="skin_step_moisturizer_text">Her cilt tipi nemlendiriciden yararlanır. Yağlı ciltte hafif, yağsız ve gözenek tıkamayan (non-komedojenik); kuru ciltte seramid ya da gliserinli yoğun bir ürün uygun olabilir.</string>
+    <string name="skin_step_moisturizer_source" translatable="false">Türk Dermatoloji Derneği, akne broşürü; AAD; Araviiskaia ve Dréno 2016, JEADV</string>
+    <string name="skin_step_sunscreen_title">Geniş spektrumlu güneş koruyucu</string>
+    <string name="skin_step_sunscreen_text">Sabahın son adımı: SPF 30 ve üzeri, geniş spektrumlu, akneli ciltte gözenek tıkamayan bir güneş koruyucu. Bulutlu günde de sürülür; dışarıdayken yaklaşık iki saatte bir yenilenir.</string>
+    <string name="skin_step_sunscreen_source" translatable="false">AAD, Sunscreen FAQs; Green ve ark. 2011, J Clin Oncol; Türk Dermatoloji Derneği, akne broşürü</string>
+    <string name="skin_step_sunscreen_sensitive_title">Hassas ciltte güneş koruyucu</string>
+    <string name="skin_step_sunscreen_sensitive_text">Çinko oksit ya da titanyum dioksit içeren (mineral) güneş koruyucular hassas ciltte daha az tahriş eder.</string>
+    <string name="skin_step_sunscreen_sensitive_source" translatable="false">AAD, Sunscreen FAQs</string>
+    <string name="skin_step_niacinamide_title">Niasinamid</string>
+    <string name="skin_step_niacinamide_text">B3 vitamininin bir biçimi. Küçük çalışmalarda aknede ve koyu lekelerde yardımcı oldu; kanıt sınırlı. Sabah ya da akşam, nemlendiriciden önce sürülebilir.</string>
+    <string name="skin_step_niacinamide_source" translatable="false">Liu ve ark. 2020, Cochrane; Hakozaki ve ark. 2002, Br J Dermatol; Navarrete-Solís ve ark. 2011, Dermatol Res Pract</string>
+    <string name="skin_ttc_niacinamide_note">Niasinamid için gebelikte bilinen bir uyarı kaynaklarımızda yok; yine de doktoruna sorabilirsin.</string>
+    <string name="skin_step_azelaic_title">Azelaik asit</string>
+    <string name="skin_step_azelaic_text">Aknede ve koyu lekelerde çalışılmış; kozmetik yüzdelerde kanıt sınırlı. Gebelik planında da kullanılabildiği düşünülen az sayıdaki aktiften biri. Akşam, haftada birkaç gece başla.</string>
+    <string name="skin_step_azelaic_source" translatable="false">Liu ve ark. 2020, Cochrane; AAD, Is any acne treatment safe to use during pregnancy?</string>
+    <string name="skin_step_salicylic_title">Salisilik asitli temizleyici</string>
+    <string name="skin_step_salicylic_text">Gözenekleri temizlemeye yardımcı olan, yağda çözünen bir asit; kozmetik ürünlerde en çok yüzde 2 bulunur. Durulanan temizleyici biçimi daha nazik; haftada birkaç kezle başla.</string>
+    <string name="skin_step_salicylic_source" translatable="false">Liu ve ark. 2020, Cochrane; SCCS 2023 ve AB Kozmetik Tüzüğü Ek III</string>
+    <string name="skin_step_aha_title">AHA (glikolik ya da laktik asit)</string>
+    <string name="skin_step_aha_text">Ölü deriyi nazikçe çözen asitler; koyu leke ya da pürüzlü görünen ciltte haftada 1–2 gece yeter. Güneşe duyarlılığı artırır, sabah güneş koruyucu şart. Hassas ciltte önerilmez.</string>
+    <string name="skin_step_aha_source" translatable="false">Liu ve ark. 2020, Cochrane; SCCNFP 2004, AHA görüşü</string>
+    <string name="skin_tip_hands_off_title">Ellerini yüzünden uzak tut</string>
+    <string name="skin_tip_hands_off_text">Sivilceleri sıkmak iyileşmeyi geciktirir, iz ve koyu leke riskini artırır. Gün içinde yüzüne dokunmak da alevlenmeyi tetikleyebilir.</string>
+    <string name="skin_tip_hands_off_source" translatable="false">AAD, Acne: Tips for managing; Türk Dermatoloji Derneği, akne broşürü</string>
+    <string name="skin_tip_hair_oily_title">Saç ve yüz</string>
+    <string name="skin_tip_hair_oily_text">Saçın yağlıysa daha sık yıkamak sorun değil; saçı ve saç ürünlerini yüzünden uzak tut, alın ve yanaklarda sivilceyi tetikleyebilir.</string>
+    <string name="skin_tip_hair_oily_source" translatable="false">AAD, Acne: Tips for managing; NHS, Acne</string>
+
+    <!-- Gebelik planında kaçınılacaklar (uyarı bandı; kanıt düzeyinden bağımsız görünür) -->
+    <string name="skin_avoid_title">Gebelik planında çıkardıklarımız</string>
+    <string name="skin_avoid_text">Hamile kalmayı planladığın için aşağıdaki içerikler rutinde yok. Çoğunda gebelikte risk biliniyor ya da güvenlik verisi yetersiz; kullanıyorsan doktoruna söyle.</string>
+    <string name="skin_avoid_retinoids_title">Retinol ve retinoidler</string>
+    <string name="skin_avoid_retinoids_text">Retinol, retinal ve reçeteli retinoidler (tretinoin, adapalen, tazaroten, izotretinoin). Ağızdan izotretinoin bebeğe ciddi zarar verir; sürülenler de gebelikte bırakılır.</string>
+    <string name="skin_avoid_retinoids_source" translatable="false">AAD, Is any acne treatment safe to use during pregnancy?; MotherSafe 2021</string>
+    <string name="skin_avoid_hydroquinone_title">Hidrokinon</string>
+    <string name="skin_avoid_hydroquinone_text">Leke açıcı bir ilaç etken maddesi; ciltten yüksek oranda emildiği için gebelikte kaçınılması öneriliyor. Kozmetikte bulunmaz; yalnızca hekim kontrolünde kullanılır.</string>
+    <string name="skin_avoid_hydroquinone_source" translatable="false">MotherSafe 2021; AB Kozmetik Tüzüğü Ek II</string>
+    <string name="skin_avoid_salicylic_title">Yüksek yüzdeli salisilik asit</string>
+    <string name="skin_avoid_salicylic_text">Durulanan düşük yüzdeli temizleyiciler sınırlı süre kullanılabilir sayılıyor. Yüksek yüzdeli ürünler, kimyasal peeling ve ağızdan alınan salisilatlar için doktoruna danış.</string>
+    <string name="skin_avoid_salicylic_source" translatable="false">AAD, Is any acne treatment safe to use during pregnancy?; MotherSafe 2021</string>
+    <string name="skin_avoid_essential_oils_title">Uçucu yağlar</string>
+    <string name="skin_avoid_essential_oils_text">Adaçayı (clary sage) gibi bazı uçucu yağlar rahmi uyarabilir; gebelikte güvenlikleri yeterince çalışılmamış. Seyreltilmeden sürülmez; kullanmadan önce ebene ya da doktoruna sor.</string>
+    <string name="skin_avoid_essential_oils_source" translatable="false">NHS Lanarkshire, Aromatherapy Guideline for Midwives 2022</string>
+    <string name="skin_avoid_rx_title">Reçeteli akne ve tüylenme ilaçları</string>
+    <string name="skin_avoid_rx_text">Ağızdan antibiyotikler, hormon ilaçları ve antiandrojenler gebelikte özel değerlendirme gerektirir. Kullanıyorsan bırakmadan, düşünüyorsan başlamadan önce doktorunla konuş.</string>
+    <string name="skin_avoid_rx_source" translatable="false">AAD, Is any acne treatment safe to use during pregnancy?; Türk Dermatoloji Derneği, hirsutizm broşürü</string>
+    <string name="skin_avoid_kept_title">Gebelik planında kalanlar</string>
+    <string name="skin_avoid_kept_text">Nazik temizleyici, nemlendirici, güneş koruyucu ve azelaik asit rutinde kalır; gebelikte kullanılabildikleri düşünülüyor. Her yeni ürünü yine de doktoruna ya da ebene sorabilirsin.</string>
+    <string name="skin_avoid_kept_source" translatable="false">AAD, Is any acne treatment safe to use during pregnancy?; MotherSafe 2021</string>
+
+    <!-- Alerji ve hassasiyet -->
+    <string name="skin_allergen_title">Alerji ve hassasiyet</string>
+    <string name="skin_allergen_text">Parfüm ve uçucu yağlar en sık alerjen gruplarından. Avrupa kurallarına göre belli kokulu maddeler etikette tek tek yazılır; kokusuz ürün seçmek hassas ciltte işi kolaylaştırır.</string>
+    <string name="skin_allergen_source" translatable="false">AB Tüzüğü 2023/1545; AAD, How to test skin care products before use</string>
+    <string name="skin_allergen_reaction_title">Tepki olursa</string>
+    <string name="skin_allergen_reaction_text">Yanma, kaşıntı, şişlik ya da döküntü olursa ürünü nazikçe yıka ve bir daha kullanma; soğuk kompres ya da vazelin rahatlatabilir. Geçmiyorsa dermatoloğa görün.</string>
+    <string name="skin_allergen_reaction_source" translatable="false">AAD, How to test skin care products before use</string>
+
+    <!-- Saç -->
+    <string name="skin_hair_title">Saç bakımı</string>
+    <string name="skin_hair_gentle_title">Saçına nazik</string>
+    <string name="skin_hair_gentle_text">Sıkı at kuyruğu, topuz ve örgü saçı kökünden çeker; sık yapılırsa kalıcı incelmeye yol açabilir. Saçı gevşek topla, modelleri değiştir, ısı ve kimyasal işlemi azalt.</string>
+    <string name="skin_hair_gentle_source" translatable="false">AAD, Hairstyles that pull can lead to hair loss</string>
+    <string name="skin_hair_wash_title">Yıkama</string>
+    <string name="skin_hair_wash_text">Saç derin yağlanıyorsa daha sık yıkamak sorun değil; saç ve kafa derisi ürünlerini yüzden uzak tut.</string>
+    <string name="skin_hair_wash_source" translatable="false">AAD, Acne: Tips for managing</string>
+    <string name="skin_hair_thinning_title">Saç incelmesi</string>
+    <string name="skin_hair_thinning_text">PCOS\'ta saç incelmesi görülebilir; reçeteli seçenekler var ama biz önermiyoruz. Dökülme seni endişelendiriyorsa doktoruna git; saç kliniğinden önce nedenini öğrenmek önemli.</string>
+    <string name="skin_hair_thinning_source" translatable="false">NHS, Hair loss; NHS, Polycystic ovary syndrome (PMOS)</string>
+
+    <!-- Tüy alma yöntemleri (bilgi) -->
+    <string name="skin_hair_removal_title">Tüy alma yöntemleri</string>
+    <string name="skin_hair_removal_text">Hangi yöntem sana uyar, sen seçersin. Burada tedavi değil bilgi var; her yöntemin cilde etkisi farklı. Tüylenmenin nedenini araştırmak doktorunun işi.</string>
+    <string name="skin_hair_removal_shave_title">Tıraş</string>
+    <string name="skin_hair_removal_shave_text">Hızlı ve ucuz. Tıraş tüyü kalınlaştırmaz, hızlandırmaz ya da büyüme süresini uzatmaz; bu yaygın bir yanılgı.</string>
+    <string name="skin_hair_removal_shave_source" translatable="false">Martin ve ark. 2018, J Clin Endocrinol Metab (Endocrine Society)</string>
+    <string name="skin_hair_removal_wax_title">Ağda, cımbız ve epilatör</string>
+    <string name="skin_hair_removal_wax_text">Tüyü kökünden alır. Kıl kökü iltihabı (folikülit) ve özellikle koyu tenlerde koyulaşma yapabilir; tahriş olan bölgede ara ver.</string>
+    <string name="skin_hair_removal_wax_source" translatable="false">Martin ve ark. 2018, J Clin Endocrinol Metab (Endocrine Society)</string>
+    <string name="skin_hair_removal_cream_title">Tüy dökücü krem ve ağartma</string>
+    <string name="skin_hair_removal_cream_text">Kremler tüyü yüzeyden çözer, tahriş yapabilir; önce küçük bir alanda dene. Ağartma tüyü almaz, görünürlüğünü azaltır.</string>
+    <string name="skin_hair_removal_cream_source" translatable="false">Martin ve ark. 2018 (Endocrine Society); Türk Dermatoloji Derneği, hirsutizm broşürü</string>
+    <string name="skin_hair_removal_laser_title">Lazer ve IPL</string>
+    <string name="skin_hair_removal_laser_text">2023 kılavuzu: tüylenmede lazer ve ışık tedavileri düşünülebilir, deneyimli uygulayıcıda. Tıbbi ya da kozmetik bir işlemdir; birden çok seans gerekir, sonuç kişiye göre değişir.</string>
+    <string name="skin_hair_removal_laser_source" translatable="false">Teede ve ark. 2023, Hum Reprod; Tan ve ark. 2024, JAMA Dermatol; NHS, Hirsutism</string>
+    <string name="skin_hair_removal_laser_skin_title">Ten ve tüy rengi</string>
+    <string name="skin_hair_removal_laser_skin_text">Koyu tüy ve açık tende en iyi yanıt alınır. Koyu tende uzun dalga boylu cihaz ve soğutma gerekir; beyaz ya da sarı tüyde ışık işe yaramaz, elektroliz düşünülür.</string>
+    <string name="skin_hair_removal_laser_skin_source" translatable="false">Martin ve ark. 2018, J Clin Endocrinol Metab (Endocrine Society)</string>
+    <string name="skin_hair_removal_paradox_title">Nadir bir etki</string>
+    <string name="skin_hair_removal_paradox_text">Yüzde lazer sonrası nadiren tüylenmenin artması (paradoksal hipertrikoz) görülebilir; Akdeniz ve Orta Doğu kökenli kadınlarda daha sık bildirilmiş. Uygulayıcınla konuş.</string>
+    <string name="skin_hair_removal_paradox_source" translatable="false">Martin ve ark. 2018, J Clin Endocrinol Metab (Endocrine Society)</string>
+    <string name="skin_hair_removal_pregnancy_title">Gebelikte</string>
+    <string name="skin_hair_removal_pregnancy_text">Tüy dökücü krem ve lazer epilasyonun bebeğe zarar vermediği düşünülüyor; yine de uygulayıcıya gebe olduğunu söyle.</string>
+    <string name="skin_hair_removal_pregnancy_source" translatable="false">MotherSafe 2021</string>
+
+    <!-- Ne zaman dermatoloğa ya da doktora? -->
+    <string name="skin_doctor_title">Ne zaman doktora?</string>
+    <string name="skin_doctor_text">Erken görünmek iz kalmasını ve geç kalmayı önler. Aşağıdakilerden biri varsa randevu almak iyi bir fikir; seçtiklerini doktor notuna ekleyebilirsin.</string>
+    <string name="skin_doctor_urgency_now">Gecikmeden</string>
+    <string name="skin_doctor_urgency_same_day">Aynı gün</string>
+    <string name="skin_doctor_urgency_soon">Yakın zamanda</string>
+    <string name="skin_doctor_virilization_title">Hızla artan tüylenme, kalınlaşan ses</string>
+    <string name="skin_doctor_virilization_text">Yüz ve vücutta birden çıkan kalın koyu tüyler, sesin kalınlaşması ya da kasların belirgin büyümesi hızlı bir hormon değişimine işaret edebilir; gecikmeden doktora başvur.</string>
+    <string name="skin_doctor_virilization_source" translatable="false">NHS, Hirsutism; Martin ve ark. 2018 (Endocrine Society); Türk Dermatoloji Derneği, hirsutizm broşürü</string>
+    <string name="skin_doctor_acne_severe_title">Derin, ağrılı sivilceler ya da iz</string>
+    <string name="skin_doctor_acne_severe_text">Deri altında ağrılı şişlikler, iz bırakan sivilceler ya da kendi bakımına rağmen düzelmeyen akne için dermatoloğa görün; erken tedavi izi önler.</string>
+    <string name="skin_doctor_acne_severe_source" translatable="false">NHS, Acne; Türk Dermatoloji Derneği, akne broşürü</string>
+    <string name="skin_doctor_acne_mood_title">Akne ruh hâlini etkiliyorsa</string>
+    <string name="skin_doctor_acne_mood_text">Akne kaygı, keyifsizlik ya da insanlardan uzaklaşmaya yol açıyorsa bu da doktora gitmek için yeterli bir neden.</string>
+    <string name="skin_doctor_acne_mood_source" translatable="false">NHS, Acne</string>
+    <string name="skin_doctor_infection_title">Sıcak, şiş, kızarık cilt</string>
+    <string name="skin_doctor_infection_text">Sivilce bölgesi sıcak, şiş ve yaygın kızarıksa enfeksiyon olabilir; aynı gün doktora ya da eczacıya danış.</string>
+    <string name="skin_doctor_infection_source" translatable="false">NHS, Acne</string>
+    <string name="skin_doctor_acanthosis_title">Boyun, koltuk altı, kasıkta koyu alanlar</string>
+    <string name="skin_doctor_acanthosis_text">Yeni çıkan ya da yayılan kadifemsi koyu, kalın alanlar insülin direnci ya da prediyabetin işareti olabilir; bazen başka nedenler de olur. Bir sonraki muayenede doktoruna göster.</string>
+    <string name="skin_doctor_acanthosis_source" translatable="false">AAD, Acanthosis nigricans: Overview; NHS, Acanthosis nigricans</string>
+    <string name="skin_doctor_hair_loss_title">Saç dökülmesi</string>
+    <string name="skin_doctor_hair_loss_text">Dökülme seni endişelendiriyorsa ya da yer yer açılmalar varsa doktoruna git; saç kliniğinden önce nedenini öğrenmek önemli. Bazı dökülmeler geç kalınırsa kalıcı olabilir.</string>
+    <string name="skin_doctor_hair_loss_source" translatable="false">NHS, Hair loss; AAD, Hairstyles that pull can lead to hair loss</string>
+    <string name="skin_doctor_mole_title">Değişen ben ya da leke</string>
+    <string name="skin_doctor_mole_text">Bir ben ya da leke boyut, biçim ya da renk değiştiriyor, kaşınıyor ya da kanıyorsa dermatoloğa görün. Asimetri, düzensiz kenar, birden çok renk ve 6 mm üstü boyut uyarıcıdır.</string>
+    <string name="skin_doctor_mole_source" translatable="false">AAD, What to look for: ABCDEs of melanoma</string>
+    <string name="skin_doctor_pregnancy_title">Gebeysen ya da planlıyorsan</string>
+    <string name="skin_doctor_pregnancy_text">Cilt için kullandığın her ürünü ve ilacı doktoruna ya da dermatoloğuna söyle; bazıları gebelikte uygun değil.</string>
+    <string name="skin_doctor_pregnancy_source" translatable="false">Türk Dermatoloji Derneği, akne broşürü; AAD, Is any acne treatment safe to use during pregnancy?</string>
+
+    <!-- Fotoğraf takibi -->
+    <string name="skin_photo_title">Fotoğrafla takip</string>
+    <string name="skin_photo_intro">Fotoğraflar yalnızca bu cihazda şifreli saklanır, galeriye düşmez. Tanı aracı değildir; değişimi görmene ve doktoruna göstermene yarar.</string>
+    <string name="skin_photo_tip_light">Aynı yerde, gün ışığında ya da aynı tavan lambasıyla çek; flaş ve tek yönlü lamba gölge yapar.</string>
+    <string name="skin_photo_tip_distance">Telefonu cilde paralel tut ve en az 30–40 cm uzaktan çek; yakın plan için bir de karış mesafeden.</string>
+    <string name="skin_photo_tip_consistency">Her seferinde aynı açı, aynı mesafe ve günün aynı saati; makyajsız ve ürün sürülmemiş ciltle. Filtre kullanma.</string>
+    <string name="skin_photo_tip_helper">Mümkünse fotoğrafı bir başkası çeksin; sırt, boyun ve saç derisi için bu çok kolaylaştırır.</string>
+    <string name="skin_photo_tips_source" translatable="false">St Vincent\'s Hospital Melbourne, Photographing dermatological conditions</string>
+    <string name="skin_photo_not_diagnosis">Fotoğraf tanı koymaz; bir değişiklik fark edersen doktoruna göster.</string>
+    <string name="skin_photo_add">Fotoğraf ekle</string>
+    <string name="skin_photo_compare">Karşılaştır</string>
+    <string name="skin_photo_delete">Fotoğrafı sil</string>
+    <string name="skin_photo_date_a11y">%1$s tarihli cilt fotoğrafı</string>
+    <string name="skin_photo_empty">İlk fotoğrafını ekleyince burada tarihle görünür; ikinciyle karşılaştırabilirsin.</string>
+
+    <!-- Hatırlatmalar -->
+    <string name="skin_notif_morning_title">Sabah rutini</string>
+    <string name="skin_notif_morning_text">Temizleyici, nemlendirici, güneş koruyucu. Bugün olmazsa sorun değil.</string>
+    <string name="skin_notif_evening_title">Akşam rutini</string>
+    <string name="skin_notif_evening_text">Makyajı temizle, nemlendir. Birkaç dakika yeter.</string>
+    <string name="skin_reminder_morning">Sabah hatırlatması</string>
+    <string name="skin_reminder_evening">Akşam hatırlatması</string>
+</resources>
