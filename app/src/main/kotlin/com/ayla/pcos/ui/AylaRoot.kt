@@ -81,11 +81,10 @@ fun AylaRoot(
         !state.onboardingDone -> OnboardingScreen()
         state.locked -> AppLockScreen(onUnlocked = viewModel::onUnlocked)
         else -> MainShell(
-            openTarget = openTarget ?: RESTORE_TARGET.takeIf { restoreRequested },
-            onOpenTargetConsumed = {
-                restoreRequested = false
-                onOpenTargetConsumed()
-            },
+            openTarget = openTarget,
+            onOpenTargetConsumed = onOpenTargetConsumed,
+            restoreRequested = restoreRequested,
+            onRestoreOpened = { restoreRequested = false },
         )
     }
 
@@ -107,9 +106,21 @@ fun AylaRoot(
     }
 }
 
+/**
+ * [openTarget] dışarıdan (bildirim, başlatıcı) gelebilir; yalnızca sekme seçer. Yedek geri yükleme
+ * ise yalnızca uygulama içinden ([restoreRequested]) açılır: başka bir uygulamanın gönderdiği bir intent
+ * dosya seçiciyi açtıramaz.
+ */
 @Composable
-private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit) {
+private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit, restoreRequested: Boolean, onRestoreOpened: () -> Unit) {
     val navigator = rememberAylaNavigator()
+
+    LaunchedEffect(restoreRequested) {
+        if (restoreRequested) {
+            navigator.push(Screen.RestoreBackup)
+            onRestoreOpened()
+        }
+    }
 
     LaunchedEffect(openTarget) {
         when (openTarget) {
@@ -118,7 +129,6 @@ private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit) {
             "plan" -> navigator.selectTab(Screen.Plan)
             "calendar" -> navigator.selectTab(Screen.Calendar)
             "me" -> navigator.selectTab(Screen.Me)
-            RESTORE_TARGET -> navigator.push(Screen.RestoreBackup)
         }
         if (openTarget != null) onOpenTargetConsumed()
     }
@@ -185,6 +195,3 @@ private fun ScreenHost(screen: Screen, navigator: AylaNavigator) {
         Screen.RestoreBackup -> SettingsScreen(onBack = { navigator.pop() }, autoStartImport = true)
     }
 }
-
-/** Ana kabuğa "yedek geri yükleme ekranını aç" isteği (bildirim hedefleriyle aynı kanal). */
-private const val RESTORE_TARGET = "restore"

@@ -273,7 +273,7 @@ class DataImporter @Inject constructor(
         val known = medDao.getAll().toMutableList()
         val idMap = mutableMapOf<Long, Long>()
         d.medications.forEach { (oldId, med) ->
-            val match = known.firstOrNull { it.kind == med.kind && it.name.normalized() == med.name.normalized() }
+            val match = known.firstOrNull { it.kind == med.kind && it.name.normalizedName() == med.name.normalizedName() }
             if (match != null) {
                 idMap[oldId] = match.id
                 skipped++
@@ -370,9 +370,13 @@ internal fun UserPreferences.withRestored(p: ExportPreferences): UserPreferences
     )
 }
 
-private val trLocale: Locale = Locale.forLanguageTag("tr")
-
-private fun String.normalized(): String = trim().lowercase(trLocale)
+/**
+ * Ad karşılaştırması için sadeleştirme: büyük/küçük harf, fazla boşluk ve Türkçe I/İ farkı yok sayılır.
+ * Türkçe yerelle küçültmek "Inofolic" → "ınofolic" yapar ve "inofolic" ile eşleşmez; bu yüzden kök yerel
+ * kullanılır, noktasız ı ve birleşik nokta (İ → i̇) tek bir i'ye indirilir.
+ */
+internal fun String.normalizedName(): String =
+    trim().lowercase(Locale.ROOT).replace("\u0307", "").replace('ı', 'i').replace(Regex("\\s+"), " ")
 
 private inline fun <reified E : Enum<E>> enumOr(name: String, fallback: E): E =
     enumValues<E>().firstOrNull { it.name == name } ?: fallback

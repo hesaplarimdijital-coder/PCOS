@@ -10,6 +10,7 @@ import com.ayla.pcos.export.DataExporter
 import com.ayla.pcos.export.DataImporter
 import com.ayla.pcos.export.ImportMode
 import com.ayla.pcos.export.InvalidBackupException
+import com.ayla.pcos.export.normalizedName
 import kotlinx.serialization.encodeToString
 import org.junit.Test
 import java.time.LocalTime
@@ -165,5 +166,14 @@ class YedekTesti : VeriTestOrtami() {
         )
         calistir { assertTrue(db.periodDao().getAll().isEmpty()) }
         assertNull(calistir { prefs.current().trackingSince })
+    }
+
+    @Test
+    fun `ilac adi eslesmesi buyuk kucuk harf, bosluk ve Turkce I farkini yok sayar`() {
+        val ad = "Inofolic Combi".normalizedName()
+        listOf(" inofolic  combi ", "INOFOLIC COMBI", "İNOFOLİC COMBİ", "ınofolıc combı").forEach { yazim ->
+            assertEquals(ad, yazim.normalizedName(), yazim)
+        }
+        assertTrue("Inofolic Plus".normalizedName() != ad)
     }
 }

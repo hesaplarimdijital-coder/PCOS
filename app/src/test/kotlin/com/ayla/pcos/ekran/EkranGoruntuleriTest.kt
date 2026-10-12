@@ -35,6 +35,7 @@ import com.ayla.pcos.ui.plan.PlanContent
 import com.ayla.pcos.ui.theme.AylaTheme
 import com.ayla.pcos.ui.today.TodayContent
 import com.ayla.pcos.ui.today.TodayUiState
+import com.github.takahirom.roborazzi.ExperimentalRoborazziApi
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.github.takahirom.roborazzi.captureScreenRoboImage
 import org.junit.Before
@@ -68,6 +69,7 @@ class EkranGoruntuleriTest {
         TimeZone.setDefault(TimeZone.getTimeZone(Ornek.zone))
     }
 
+    @OptIn(ExperimentalRoborazziApi::class)
     private fun ekran(
         ad: String,
         sekme: Screen.Tab? = null,
