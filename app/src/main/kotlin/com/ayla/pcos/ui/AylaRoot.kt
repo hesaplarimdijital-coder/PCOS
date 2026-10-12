@@ -59,6 +59,8 @@ import com.ayla.pcos.ui.navigation.TabsRoot
 import com.ayla.pcos.ui.navigation.rememberAylaNavigator
 import com.ayla.pcos.ui.onboarding.OnboardingScreen
 import com.ayla.pcos.ui.plan.PlanScreen
+import com.ayla.pcos.ui.report.QuestionsScreen
+import com.ayla.pcos.ui.report.ReportScreen
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalReducedMotion
 import com.ayla.pcos.ui.today.TodayScreen
@@ -225,6 +227,10 @@ private fun MainShell(openTarget: String?, onOpenTargetConsumed: () -> Unit, res
                         )
                     }
                     entry<Screen.PrivacyPolicy> { GizlilikPolitikasiEkrani(onBack = { navigator.pop() }) }
+                    entry<Screen.Report> {
+                        ReportScreen(onBack = { navigator.pop() }, onOpenQuestions = { navigator.push(Screen.Questions) })
+                    }
+                    entry<Screen.Questions> { QuestionsScreen(onBack = { navigator.pop() }) }
                     entry<Screen.Fertility> {
                         FertilityScreen(onBack = { navigator.pop() }, onOpenLog = { date -> navigator.push(Screen.DailyLog(date)) })
                     }
@@ -270,6 +276,7 @@ private fun SekmeKoku(navigator: AylaNavigator) {
                 Screen.Me -> MeScreen(
                     onOpenSettings = { navigator.push(Screen.Settings) },
                     onOpenFertility = { navigator.push(Screen.Fertility) },
+                    onOpenReport = { navigator.push(Screen.Report) },
                 )
             }
         }

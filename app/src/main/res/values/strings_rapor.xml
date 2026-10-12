@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Doktor raporu ekranı ve doktora sorular (#26). Rapor içeriğinin kendisi strings.xml report_* dizelerindedir. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation" tools:locale="tr">
+    <string name="report_ui_title">Doktor raporu</string>
+    <string name="report_ui_entry_text">Seçtiğin aralığın kayıtları PDF ya da metin olarak; doktora soracakların da içinde</string>
+    <string name="report_ui_intro">Rapor kayıtlarının özetidir; yorum, tanı ya da tavsiye içermez. Yalnızca sen paylaşınca cihazından çıkar.</string>
+    <string name="report_ui_range">Aralık</string>
+    <string name="report_ui_range_28">28 gün</string>
+    <string name="report_ui_range_90">90 gün</string>
+    <string name="report_ui_range_180">180 gün</string>
+    <string name="report_ui_range_custom">Özel</string>
+    <string name="report_ui_from">Başlangıç</string>
+    <string name="report_ui_to">Bitiş</string>
+    <string name="report_ui_range_text">%1$s – %2$s</string>
+    <string name="report_ui_sections">Raporda neler olsun?</string>
+    <string name="report_ui_fertility_off">Hap modunda bu bölüm yazılmaz.</string>
+    <string name="report_ui_pages">Yaklaşık %1$d sayfa</string>
+    <string name="report_ui_pages_wait">Sayfa sayısı hesaplanıyor…</string>
+    <string name="report_ui_share_pdf">PDF oluştur ve paylaş</string>
+    <string name="report_ui_share_text">Metin olarak paylaş</string>
+    <string name="report_ui_busy">Rapor hazırlanıyor…</string>
+    <string name="report_ui_error_title">Rapor hazırlanamadı</string>
+    <string name="report_ui_error_text">Dosya yazılırken bir sorun oldu. Telefonda yer olduğundan emin olup yeniden dene; metin olarak da paylaşabilirsin.</string>
+    <string name="report_ui_retry">Yeniden dene</string>
+    <string name="report_ui_share_chooser">Raporu paylaş</string>
+    <string name="report_ui_questions">Doktora soracaklarım</string>
+    <string name="report_ui_questions_count">%1$d açık soru raporda yer alır</string>
+    <string name="report_ui_questions_none">Henüz soru yok; eklediklerin raporda yer alır.</string>
+    <string name="report_ui_section_on">%1$s, raporda</string>
+    <string name="report_ui_section_off">%1$s, raporda değil</string>
+
+    <string name="questions_title">Doktora soracaklarım</string>
+    <string name="questions_intro">Randevuda unutmamak için sorularını burada biriktir. Açık sorular doktor raporunda yer alır.</string>
+    <string name="questions_add_label">Yeni soru</string>
+    <string name="questions_add">Ekle</string>
+    <string name="questions_counter">%1$d / %2$d</string>
+    <string name="questions_suggestions">Fikir lazımsa</string>
+    <string name="questions_open">Açık sorular</string>
+    <string name="questions_asked">Sorduklarım</string>
+    <string name="questions_empty">Henüz soru yok. Aklına geldikçe ekleyebilirsin.</string>
+    <string name="questions_mark_asked">Sordum</string>
+    <string name="questions_mark_open">Henüz sormadım</string>
+    <string name="questions_delete">Soruyu sil</string>
+    <string name="questions_delete_confirm_title">Soru silinsin mi?</string>
+    <string name="questions_delete_confirm_text">Bu soru listeden ve sonraki raporlardan kalkar.</string>
+    <string name="questions_show_asked">Sorduklarımı göster (%1$d)</string>
+    <string name="questions_hide_asked">Sorduklarımı gizle</string>
+    <string name="questions_suggestion_1">Tahlillerimi hangi sıklıkla tekrarlamalıyım?</string>
+    <string name="questions_suggestion_2">Döngüm düzensiz kalırsa ne zaman yeniden görüşmeliyiz?</string>
+    <string name="questions_suggestion_3">Kullandığım takviyeleri sürdürmeli miyim?</string>
+    <string name="questions_suggestion_4">Belirtilerimden hangilerini izlemem yararlı olur?</string>
+    <string name="questions_suggestion_5">Hamilelik planladığımda neleri konuşmamız gerekir?</string>
+    <string name="questions_suggestion_6">Cildim ve saçımla ilgili değişiklikleri kime danışmalıyım?</string>
+    <string name="questions_suggestion_7">Bu kayıtlarda dikkatinizi çeken bir şey var mı?</string>
+</resources>

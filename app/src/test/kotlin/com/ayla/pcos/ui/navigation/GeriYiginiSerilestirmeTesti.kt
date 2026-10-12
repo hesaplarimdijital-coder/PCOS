@@ -25,7 +25,7 @@ class GeriYiginiSerilestirmeTesti {
         TabsRoot,
         Screen.Today, Screen.Calendar, Screen.Meds, Screen.Plan, Screen.Me,
         Screen.DailyLog(LocalDate.of(2026, 10, 12)), Screen.AddMedication, Screen.EditMedication(42), Screen.EditMedication(0),
-        Screen.Settings, Screen.RestoreBackup, Screen.PrivacyPolicy, Screen.Fertility,
+        Screen.Settings, Screen.RestoreBackup, Screen.PrivacyPolicy, Screen.Fertility, Screen.Report, Screen.Questions,
     )
 
     private val serializer = NavBackStackSerializer(NavKeySerializer<NavKey>())

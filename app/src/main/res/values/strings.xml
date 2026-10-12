@@ -558,8 +558,6 @@
     <string name="note_log_days">Günlük kayıt tutulan gün: %1$d</string>
     <string name="note_disclaimer">Bu özet Ayla uygulamasından kullanıcı tarafından paylaşılmıştır; tanı ya da tıbbi tavsiye içermez.</string>
     <string name="note_share">Doktor notunu paylaş</string>
-    <string name="me_doctor_note">Doktor notu</string>
-    <string name="me_doctor_note_text">Döngü, ilaç ve semptom özetini doktorunla paylaş</string>
 
     <!-- Doktor raporu PDF (#26, ADR-0009). Rapor kayıt özetidir; yorum, tanı ya da öneri içermez. -->
     <string name="report_title">Ayla · Doktor raporu</string>

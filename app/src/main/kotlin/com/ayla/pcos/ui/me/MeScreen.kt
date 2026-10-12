@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.EditNote
-import androidx.compose.material.icons.rounded.IosShare
 import androidx.compose.material.icons.rounded.Medication
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Thermostat
@@ -43,7 +42,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -59,7 +57,6 @@ import com.ayla.pcos.ui.components.AylaCard
 import com.ayla.pcos.ui.components.Overline
 import com.ayla.pcos.ui.components.SatirZemini
 import com.ayla.pcos.ui.components.SimgeZemini
-import com.ayla.pcos.ui.components.shareText
 import com.ayla.pcos.ui.theme.AylaMotion
 import com.ayla.pcos.ui.theme.LocalAylaColors
 import com.ayla.pcos.ui.theme.hareket
@@ -73,6 +70,7 @@ import java.time.format.TextStyle
 fun MeScreen(
     onOpenSettings: () -> Unit,
     onOpenFertility: () -> Unit = {},
+    onOpenReport: () -> Unit = {},
     viewModel: MeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -80,12 +78,10 @@ fun MeScreen(
         Box(Modifier.fillMaxSize())
         return
     }
-    val context = LocalContext.current
-    val shareTitle = stringResource(R.string.note_share)
     MeContent(
         state = state,
         onOpenSettings = onOpenSettings,
-        onShareDoctorNote = { viewModel.prepareDoctorNote { title, text -> shareText(context, title, text, shareTitle) } },
+        onOpenReport = onOpenReport,
         onOpenFertility = onOpenFertility,
     )
 }
@@ -95,7 +91,7 @@ fun MeScreen(
 internal fun MeContent(
     state: MeUiState,
     onOpenSettings: () -> Unit,
-    onShareDoctorNote: () -> Unit = {},
+    onOpenReport: () -> Unit = {},
     onOpenFertility: () -> Unit = {},
 ) {
     val scheme = MaterialTheme.colorScheme
@@ -192,13 +188,13 @@ internal fun MeContent(
             }
         }
 
-        SatirZemini(onClick = onShareDoctorNote) {
+        SatirZemini(onClick = onOpenReport) {
             SimgeZemini(icon = Icons.Rounded.Description, background = scheme.primaryContainer, tint = scheme.primary)
             Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(R.string.me_doctor_note), style = MaterialTheme.typography.titleMedium)
-                Text(stringResource(R.string.me_doctor_note_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+                Text(stringResource(R.string.report_ui_title), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.report_ui_entry_text), style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
             }
-            Icon(Icons.Rounded.IosShare, contentDescription = null, tint = scheme.onSurfaceVariant)
+            Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = scheme.onSurfaceVariant)
         }
 
         SatirZemini(onClick = onOpenSettings) {
