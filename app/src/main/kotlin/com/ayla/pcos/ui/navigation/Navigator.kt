@@ -100,6 +100,14 @@ class AylaNavigator(val backStack: MutableList<NavKey>, private val tabState: Mu
             backStack.clear()
             backStack.add(TabsRoot)
         }
+        // Kökten sonra yalnızca itilebilen ekranlar kalır: sekme ya da ikinci bir kök entryProvider'da karşılıksızdır.
+        // Ardışık kopyalar da temizlenir (push bunu zaten engeller; eski kayıtlara karşı).
+        val pushed = backStack.drop(1).filter { it is Screen && it !is Screen.Tab }
+        val cleaned = pushed.filterIndexed { index, key -> index == 0 || pushed[index - 1] != key }
+        if (cleaned.size != backStack.size - 1) {
+            while (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
+            backStack.addAll(cleaned)
+        }
     }
 
     var tab: Screen.Tab
