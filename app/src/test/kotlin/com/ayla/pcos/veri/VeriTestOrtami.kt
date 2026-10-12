@@ -3,6 +3,7 @@ package com.ayla.pcos.veri
 import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
+import androidx.core.content.FileProvider
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStore
@@ -120,6 +121,12 @@ abstract class VeriTestOrtami {
         TimeZone.setDefault(TimeZone.getTimeZone(zone))
         Dispatchers.setMain(Dispatchers.Default)
         context = RuntimeEnvironment.getApplication()
+        // FileProvider kökleri yetki adına göre süreç boyunca önbelleğe alınır; Robolectric her testte yeni veri
+        // dizini verir, eski kök kalırsa "Failed to find configured root" düşer.
+        runCatching {
+            val alan = FileProvider::class.java.getDeclaredField("sCache").apply { isAccessible = true }
+            (alan.get(null) as? MutableMap<*, *>)?.clear()
+        }
         db = Room.inMemoryDatabaseBuilder(context, AylaDatabase::class.java).allowMainThreadQueries().build()
         prefs = UserPreferencesRepository(
             PreferenceDataStoreFactory.create(scope = dataStoreScope) { File(tmp.root, "ayla.preferences_pb") },

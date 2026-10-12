@@ -102,7 +102,7 @@ class CiltEkraniTesti : VeriTestOrtami() {
         bekle(vm.state) { it.loaded }
         vm.updateProfile { it.copy(skinType = SkinType.OILY) }
         vm.updateProfile { it.copy(acne = AcneSelfReport.MILD) }
-        val son = bekle(vm.state) { it.profile?.acne == AcneSelfReport.MILD && it.profile?.skinType == SkinType.OILY }
+        val son = bekle(vm.state) { it.profile?.acne == AcneSelfReport.MILD && it.profile.skinType == SkinType.OILY }
         assertEquals(SkinType.OILY, calistir { skin.profile() }?.skinType)
         assertEquals(AcneSelfReport.MILD, son.profile?.acne)
     }
